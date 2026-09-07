@@ -1,0 +1,78 @@
+site_name: Sales Demos Documentation
+site_description: Demo documentation, talk tracks, and architecture guides
+site_url: https://ericcames.github.io/sales.demos-docs
+repo_url: https://github.com/ericcames/sales.demos-docs
+repo_name: ericcames/sales.demos-docs
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: red
+      accent: red
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: red
+      accent: red
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.tabs.link
+
+plugins:
+  - search
+
+markdown_extensions:
+  - tables
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - attr_list
+  - md_in_html
+
+nav:
+  - Home: index.md
+  - Demos:
+      - Overview: demos/README.md
+      - OpenShift Virtualization:
+          - Overview: demos/openshift-virtualization/README.md
+          - Run Sheet: demos/openshift-virtualization/run-sheet.md
+          - Talk Track: demos/openshift-virtualization/talk-track.md
+          - Architecture: demos/openshift-virtualization/architecture.md
+          - Objections: demos/openshift-virtualization/objections.md
+      - Private Automation Hub:
+          - Overview: demos/private-automation-hub/README.md
+          - Run Sheet: demos/private-automation-hub/run-sheet.md
+          - Talk Track: demos/private-automation-hub/talk-track.md
+          - Architecture: demos/private-automation-hub/architecture.md
+          - Objections: demos/private-automation-hub/objections.md
+          - ClickOps Walkthrough: demos/private-automation-hub/clickops.md
+      - MCP Servers:
+          - Overview: demos/mcp-servers/README.md
+          - Run Sheet: demos/mcp-servers/run-sheet.md
+          - Talk Track: demos/mcp-servers/talk-track.md
+          - Architecture: demos/mcp-servers/architecture.md
+          - Objections: demos/mcp-servers/objections.md
+          - Building a Server: demos/mcp-servers/building-a-server.md
+          - Server Inventory: demos/mcp-servers/server-inventory.md
+          - ServiceNow: demos/mcp-servers/servicenow.md
+  - Design Plans:
+      - OpenShift Virtualization: plan/ocpvirt-demo-plan.md
+      - Private Automation Hub: plan/pah-plan.md
+      - Grafana Cloud: plan/grafana-plan.md
+      - Network MCP: plan/network-mcp-plan.md
+      - Platform Add-ons: plan/platform-addons-plan.md
