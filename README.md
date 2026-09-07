@@ -19,7 +19,7 @@ Published as a GitHub Pages site at
 | Resource | Home |
 |---|---|
 | Playbooks, inventory, skills | [sales.demos](https://github.com/ericcames/sales.demos) |
-| Marketing content, key messages, Gemini prompts | Google Drive (shared folder) |
+| Marketing content, key messages, Gemini prompts | [Sales Demos (Google Drive)](https://drive.google.com/drive/folders/1Me_blEFV-xHUyZeL48F0GjCyWl3_KSxG) |
 
 ## This repo is public
 

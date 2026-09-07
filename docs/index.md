@@ -24,3 +24,4 @@ research, the decisions, and the phase plan.
 |---|---|
 | [sales.demos](https://github.com/ericcames/sales.demos) | The automation code — playbooks, inventory, skills |
 | [sales.demos-docs](https://github.com/ericcames/sales.demos-docs) | This repo — the markdown source for this site |
+| [Sales Demos (Google Drive)](https://drive.google.com/drive/folders/1Me_blEFV-xHUyZeL48F0GjCyWl3_KSxG) | Marketing content — key messages, Gemini prompts, Red Hat product links |
