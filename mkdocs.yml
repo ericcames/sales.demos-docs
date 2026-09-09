@@ -54,6 +54,7 @@ nav:
           - Talk Track: demos/openshift-virtualization/talk-track.md
           - Architecture: demos/openshift-virtualization/architecture.md
           - Objections: demos/openshift-virtualization/objections.md
+          - Timings: demos/openshift-virtualization/timings.md
       - Private Automation Hub:
           - Overview: demos/private-automation-hub/README.md
           - Run Sheet: demos/private-automation-hub/run-sheet.md
