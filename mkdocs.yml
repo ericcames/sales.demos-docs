@@ -71,6 +71,12 @@ nav:
           - Building a Server: demos/mcp-servers/building-a-server.md
           - Server Inventory: demos/mcp-servers/server-inventory.md
           - ServiceNow: demos/mcp-servers/servicenow.md
+      - Edge / Single Node OpenShift:
+          - Overview: demos/edge-sno/README.md
+          - Run Sheet: demos/edge-sno/run-sheet.md
+          - Talk Track: demos/edge-sno/talk-track.md
+          - Architecture: demos/edge-sno/architecture.md
+          - Objections: demos/edge-sno/objections.md
   - Design Plans:
       - OpenShift Virtualization: plan/ocpvirt-demo-plan.md
       - Private Automation Hub: plan/pah-plan.md
