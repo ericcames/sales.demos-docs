@@ -74,10 +74,15 @@ it. What changed lives in `git log` and the closed issue; the accumulated histor
 is archived at [`docs/reference/history/`](docs/reference/history/README.md).
 
 **`main` is protected**, and it applies to admins. A pull request is always
-required, with **0 required approvals** — zero is deliberate, not laziness:
-there is one collaborator and GitHub does not let you approve your own PR, so
-requiring one would deadlock every PR. Zero still forces the branch-and-PR flow,
-which is the part that matters. Both CI checks below must pass, and PR
+required, with **0 required approvals** — zero is deliberate, not laziness: a PR
+should not block on a second person being around. Zero still forces the
+branch-and-PR flow, which is the part that matters.
+
+This used to be justified by "there is one collaborator", and that stopped being
+true (#20). @mlowcher61 co-owns every path in `.github/CODEOWNERS`, so an
+approval requirement is now possible where it once would have deadlocked — it is
+still not wanted, for the reason above. CODEOWNERS **requests** review here and
+does not gate: `require_code_owner_reviews` is `false`. Both CI checks below must pass, and PR
 conversations must be resolved.
 
 ## CI checks
