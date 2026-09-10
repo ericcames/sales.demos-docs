@@ -84,6 +84,11 @@ nav:
       - Running from AAP: reference/running-from-aap.md
       - Execution Environment: reference/execution-environment.md
       - Reusing This Repo: reference/reusing-this-repo.md
+      - Project History:
+          - Overview: reference/history/README.md
+          - sales.demos: reference/history/sales-demos.md
+          - image.builder.pipeline: reference/history/image-builder-pipeline.md
+          - sales.demos-docs: reference/history/sales-demos-docs.md
   - Design Plans:
       - OpenShift Virtualization: plan/ocpvirt-demo-plan.md
       - Private Automation Hub: plan/pah-plan.md

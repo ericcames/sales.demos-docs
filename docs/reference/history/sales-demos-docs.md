@@ -1,14 +1,19 @@
-# Changelog
+# sales.demos-docs — project history
 
-All notable changes to this project are documented here.
+!!! note "Frozen archive — retired 2026-09-10"
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+    This is this repo's own `CHANGELOG.md` as it stood when the per-PR changelog
+    obligation was retired
+    ([sales.demos-docs#18](https://github.com/ericcames/sales.demos-docs/issues/18)).
+    Nothing is appended to it again.
 
-This repo publishes a site rather than a release artifact, so there are no
-version tags — the deployed site always reflects `main`. Entries record what
-changed and why, in the order it merged.
+    **Bare issue numbers refer to `ericcames/sales.demos-docs`.** They do not
+    autolink on this site — read `(#14)` as
+    `https://github.com/ericcames/sales.demos-docs/issues/14`. References to
+    `sales.demos` are written out in full.
 
-## [Unreleased]
+    Entries are verbatim and newest first. For anything after 2026-09-10, see
+    [where things live now](README.md).
 
 ### Fixed -- Phase 3 of the edge run sheet was not runnable (sales.demos#424)
 

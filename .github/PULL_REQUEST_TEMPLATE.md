@@ -14,7 +14,6 @@
 - [ ] RHDP `*.dyn.redhatworkshops.io` URLs left as they are — committed on purpose, not placeholders to restore
 - [ ] Every link added was checked by hand — relative paths resolve, external URLs return 200 (CI does not check this)
 - [ ] Claims in a talk track are sourced in its "Where the words come from" table
-- [ ] `CHANGELOG.md` updated under `[Unreleased]`
 
 ## Related issues
 
