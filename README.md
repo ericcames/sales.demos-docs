@@ -37,6 +37,14 @@ mkdocs serve
 That serves at **<http://127.0.0.1:8000/sales.demos-docs/>** and reloads on
 save. `mkdocs build` is what CI runs, and it must be clean before a PR merges.
 
+**Changing the automation and the words together?** Every claim in a talk track
+is sourced back to a file in
+[sales.demos](https://github.com/ericcames/sales.demos), so the two often move
+in one sitting. Start the agent session over there — its `.mcp.json` is
+project-scoped, so the cluster servers load only in a session started in that
+directory, and this repo has none. Then keep `mkdocs serve` running here
+alongside it; nothing in this repo needs an agent.
+
 ### Adding a demo
 
 ```bash

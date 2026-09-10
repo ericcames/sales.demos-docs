@@ -10,6 +10,23 @@ changed and why, in the order it merged.
 
 ## [Unreleased]
 
+### Changed -- README omitted the cross-repo working shape (#10)
+
+- **This repo's `## Getting started` is the model the other two just copied**,
+  and was the only one of the three left without the cross-repo pointer. It
+  already segments by audience -- *"Presenting a demo? You do not need this
+  repo"* / *"Editing the docs?"* -- which is the shape applied in sales.demos#418
+  and image.builder.pipeline#114. Added a third case: changing the automation
+  and the words in one sitting, which is normal here, since every claim in a
+  talk track is sourced back to a file in `sales.demos`.
+- **It points the agent session at `sales.demos`, not here.** That repo's
+  `.mcp.json` is project-scoped, so its cluster servers load only in a session
+  started in that directory; this repo has no `.mcp.json` at all and needs none.
+  Working here is `mkdocs serve` alongside it.
+- Kept to one paragraph that links out rather than duplicating either repo's
+  instructions -- the value of this section is that it is short and tells most
+  readers they can leave.
+
 ### Added -- Community Standards: the repo had a README and a LICENSE and nothing else (#7)
 
 - **This repo scored 42% on GitHub's Community Standards.** The community
