@@ -21,10 +21,16 @@ is a state of the config, not a connection target — git already models that wi
 
 ## Telling them apart at the sign-in page
 
-Both RHDP environments look identical at the AAP login page, and the moment you
-are most likely to act on the wrong one is the moment before you have touched
-anything. Each gets a badged sign-in logo — green for the environment you break,
-red for the one you show customers, the same severity convention as `aap_config`.
+Environments look identical at the AAP login page, and the moment you are most
+likely to act on the wrong one is the moment before you have touched anything.
+Each gets a badged sign-in logo, following the same severity convention as
+`aap_config`:
+
+| Environment | Colour | |
+|---|---|---|
+| `sandbox` | green | the one you break |
+| `demo` | red | the one customers watch |
+| `edge` | purple `#6753AC` | the one you own |
 
 ```bash
 python3 utilities/make-env-logo.py --env sandbox
@@ -35,9 +41,18 @@ The post-login masthead is a bundled UI asset, not a setting — re-measured in
 [#54](https://github.com/ericcames/sales.demos/issues/54) with `custom_logo`
 applied, and none of the 44 gateway settings marks the environment after login.
 
-!!! note "`edge` has no badged logo"
-    `inventory/group_vars/edge/` has only `connection.yml` — no
-    `gateway_settings.yml` — so nothing sets `custom_logo` there.
+The colours come from `utilities/env_colors.py`, which the browser extension's
+`colors.json` is generated from — so the sign-in page and the post-login pill
+cannot disagree about what an environment is.
+
+!!! note "This page said `edge` had no logo until 2026-09-10"
+    True when written, and false four commits later:
+    [#426](https://github.com/ericcames/sales.demos/issues/426) added the purple
+    one along with `inventory/group_vars/edge/gateway_settings.yml`. Adding a
+    fourth environment means moving three things together — a colour in
+    `env_colors.py`, a generated pair in `assets/aap-branding/`, and a
+    `gateway_settings.yml`. `check-env-logos.py` catches the last two; nothing
+    catches a missing colour.
 
 The generated files live in
 [`assets/aap-branding/`](https://github.com/ericcames/sales.demos/tree/main/assets/aap-branding),

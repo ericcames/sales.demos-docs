@@ -229,7 +229,7 @@ Launch **Sales Demos - Build Demo VM** from AAP, or:
 ansible-playbook playbooks/provision_vm.yml \
   -i inventory --limit edge \
   -e target_env=edge \
-  -e os_type=linux -e vm_size_tier=large-2cpu-6gb \
+  -e os_type=linux -e vm_size_tier=large \
   --vault-id sales.demos@~/secrets/.vault_pass_sales_demos
 ```
 

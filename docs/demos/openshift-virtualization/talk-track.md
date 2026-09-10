@@ -253,8 +253,11 @@ enough times to find the sharp edges.
 
 ![The demo namespace after the run — one VM, Running](../../images/ocp-vms-after.png)
 
-> *A `large-2cpu-6gb` run, so the name and the 6 GiB differ from the survey shot
-> above — they are two different launches, not one continuous sequence.*
+> *A `large` run, captured when that tier was still spelled `large-2cpu-6gb` on
+> screen, so the name differs from the survey shot above — they are two different
+> launches, not one continuous sequence. That spelling is now a retained alias
+> and no longer describes the shape: `large` is 4 vCPU and 16 GiB
+> ([#348](https://github.com/ericcames/sales.demos/issues/348)).*
 
 > **"Same view, one VM, running. Requested 2 CPU, using 6 gigs — which is
 > exactly the tier that was asked for. Nobody touched the console to make that
