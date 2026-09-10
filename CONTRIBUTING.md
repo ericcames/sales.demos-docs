@@ -63,11 +63,15 @@ earned it so far.
    links the branch back to the decision without anyone reading `git log`.
 3. **One concern per PR.** Group by shared root cause, not item count. The test:
    would you revert these together? Then ship them together.
-4. Update [`CHANGELOG.md`](CHANGELOG.md) under `[Unreleased]`.
-5. Run `mkdocs build` — it must be clean.
-6. **Check every link you added.** CI does not. Relative paths must resolve in
+4. Run `mkdocs build` — it must be clean.
+5. **Check every link you added.** CI does not. Relative paths must resolve in
    the tree; external URLs must return 200. This has bitten before.
-7. Open a PR with `Closes #N` in the body, so the issue closes on merge.
+6. Open a PR with `Closes #N` in the body, so the issue closes on merge.
+
+**There is no changelog to update.** The per-PR obligation was retired on
+2026-09-10 (#18) — it had never had a release to anchor it, and every PR touched
+it. What changed lives in `git log` and the closed issue; the accumulated history
+is archived at [`docs/reference/history/`](docs/reference/history/README.md).
 
 **`main` is protected**, and it applies to admins. A pull request is always
 required, with **0 required approvals** — zero is deliberate, not laziness:
