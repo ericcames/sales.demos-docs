@@ -10,6 +10,42 @@ changed and why, in the order it merged.
 
 ## [Unreleased]
 
+### Fixed -- Phase 3 of the edge run sheet was not runnable (sales.demos#424)
+
+- **`playbooks/setup_edge.yml` does not exist**, and the run sheet gave it as the
+  first command of Phase 3. A presenter following the page on the NUC got "the
+  playbook could not be found" before doing anything. It is
+  [sales.demos#406](https://github.com/ericcames/sales.demos/issues/406), blocked
+  on [#395](https://github.com/ericcames/sales.demos/issues/395)
+  (`install_aap.yml`), so it is not imminent.
+- **Replaced with the four playbooks that do exist**, in order, which is what the
+  page's own stage table already listed: `install_lvms.yml`, then AAP by hand,
+  then `install_cnv.yml`, `install_compliance.yml`, `prepare_env.yml`. Nothing
+  invented -- these are the same playbooks #406 will chain. A note says the
+  wrapper is coming and links both issues.
+- **The manual AAP step could not have worked as written either.** Step 2 said
+  *"`install_aap.yml` prints the operator-generated admin password"* -- a
+  playbook that does not exist cannot print anything, and the CR path produces no
+  such output. The password is in a secret; the command is now given, with the
+  name and key **read off the live edge cluster** rather than assumed:
+
+    ```bash
+    oc get secret aap-admin-password -n aap -o jsonpath='{.data.password}' | base64 -d
+    ```
+
+- **Both `ansible-playbook ... | tee` pipelines are gone**, replaced with
+  `ANSIBLE_LOG_PATH` under `~/ansible-logs/`. `sales.demos`' README has said why
+  since Phase 0: in a pipeline the exit status comes from `tee`, so a failed run
+  reports success -- and it caused a real misread. The run sheet was teaching the
+  opposite. The two `sudo tee` uses for writing dnsmasq config are untouched;
+  they are not pipelines.
+- `edge-sno/README.md` and `architecture.md` also described `setup_edge.yml` as
+  a thing you run. Both now describe it as proposed, pointing at #406.
+
+**Not drift.** These were wrong identically in both copies of the docs before the
+repo split, which is why they survived the #12 reconciliation -- that pass
+compared the two copies against each other, and agreeing copies look correct.
+
 ### Fixed -- the edge run sheet launched a job template the automation deletes (#1)
 
 - **`edge-sno/run-sheet.md` told a presenter to launch `Sales Demos - Build Demo

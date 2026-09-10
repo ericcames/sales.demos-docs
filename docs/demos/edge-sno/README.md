@@ -39,9 +39,11 @@ Two repos. Three phases. One command per phase.
    AAP 2.7, OpenShift Virtualization, LVMS, and the Compliance Operator.
 2. **Boot the hardware** — write the ISO to USB, boot from it, wait ~45 minutes.
    The cluster installs itself, fully unattended.
-3. **Configure the platform** (`sales.demos`) — `setup_edge.yml` installs LVMS
-   storage, deploys AAP from its operator, installs CNV, runs a compliance scan,
-   and proves the environment by building and timing a real VM.
+3. **Configure the platform** (`sales.demos`) — install LVMS storage, deploy AAP
+   from its operator, install CNV, run a compliance scan, and prove the
+   environment by building and timing a real VM. Five playbooks today; a single
+   `setup_edge.yml` that chains them is
+   [sales.demos#406](https://github.com/ericcames/sales.demos/issues/406).
 
 After phase 3, the environment is identical to an RHDP sandbox — same playbooks,
 same job templates, same demo. The difference is you own it.

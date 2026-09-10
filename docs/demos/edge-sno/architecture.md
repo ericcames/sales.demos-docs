@@ -25,9 +25,11 @@ flowchart TD
 
 LVMS must come before AAP because the AAP operator needs PVCs for its database
 and Hub file storage. AAP must come before CNV because `config.yml` configures
-both, and it needs the AAP gateway to be reachable. `config.yml` is not in
-`setup_edge.yml` because it needs the admin password, which only exists after
-AAP deploys and the user updates the vault.
+both, and it needs the AAP gateway to be reachable. **`config.yml` is a separate
+step, not part of the install sequence** — it needs the admin password, which
+only exists after AAP deploys and the user updates the vault. That ordering
+constraint is why [sales.demos#406](https://github.com/ericcames/sales.demos/issues/406)
+proposes `setup_edge.yml` as the first five stages only.
 
 ---
 

@@ -157,37 +157,69 @@ This creates `.kube/edge.kubeconfig` from the cluster's connection details.
 
 **Repo: `sales.demos`**
 
-### Step 1 — Run `setup_edge.yml`
+### Step 1 — Run the install playbooks, in order
 
-!!! note
-    `install_aap.yml` is tracked in
-    [sales.demos#395](https://github.com/ericcames/sales.demos/issues/395).
-    Until it ships, deploy AAP manually by creating the
-    `AnsibleAutomationPlatform` CR. See the
-    [architecture doc](architecture.md#manual-aap-deployment) for the CR spec.
+!!! note "There is no `setup_edge.yml` yet"
+    A single orchestrator that chains these is
+    [sales.demos#406](https://github.com/ericcames/sales.demos/issues/406),
+    blocked on [#395](https://github.com/ericcames/sales.demos/issues/395)
+    (`install_aap.yml`). Until both land, run the stages yourself — they are the
+    same playbooks the wrapper will call, in the same order.
+
+Set a log path first. **Do not pipe through `tee`**: in a pipeline the exit
+status comes from `tee`, not from `ansible-playbook`, so a failed run reports
+success.
 
 ```bash
-ansible-playbook playbooks/setup_edge.yml \
-  -i inventory --limit edge \
-  -e target_env=edge \
-  --vault-id sales.demos@~/secrets/.vault_pass_sales_demos \
-  2>&1 | tee /tmp/setup-edge-$(date +%Y%m%d-%H%M).log
+mkdir -p ~/ansible-logs
+export ANSIBLE_LOG_PATH=~/ansible-logs/edge-$(date +%F).log
+export VAULT="--vault-id sales.demos@~/secrets/.vault_pass_sales_demos"
 ```
-
-This runs five stages:
 
 | Stage | Playbook | Time |
 |---|---|---|
 | 1 | `install_lvms.yml` — LVMS operator + LVMCluster CR | ~2 min |
-| 2 | `install_aap.yml` — deploy AAP from operator | ~20 min |
+| 2 | **AAP — by hand for now**, see below | ~20 min |
 | 3 | `install_cnv.yml` — OpenShift Virtualization | ~4 min |
 | 4 | `install_compliance.yml` — Compliance Operator | ~2 min |
 | 5 | `prepare_env.yml` — prove it by building a real VM | ~1 min |
 
+**Stage 1 — LVMS.** It comes first because the AAP operator needs PVCs for its
+database and Hub file storage.
+
+```bash
+ansible-playbook playbooks/install_lvms.yml -i inventory --limit edge \
+  -e target_env=edge $VAULT
+```
+
+**Stage 2 — AAP.** `install_aap.yml` does not exist yet (#395), so create the
+`AnsibleAutomationPlatform` CR by hand — the spec is in the
+[architecture doc](architecture.md#manual-aap-deployment). Wait for the gateway
+to answer before continuing; `config.yml` in Step 3 needs it reachable.
+
+**Stages 3–5.** CNV, the Compliance Operator, then the proof:
+
+```bash
+ansible-playbook playbooks/install_cnv.yml -i inventory --limit edge \
+  -e target_env=edge $VAULT
+
+ansible-playbook playbooks/install_compliance.yml -i inventory --limit edge \
+  -e target_env=edge $VAULT
+
+ansible-playbook playbooks/prepare_env.yml -i inventory --limit edge \
+  -e target_env=edge $VAULT
+```
+
 ### Step 2 — Update the vault with the AAP admin password
 
-`install_aap.yml` prints the operator-generated admin password. Add it to
-the vault:
+The AAP operator generates the admin password into a secret. Read it — the key
+is `password`, and the secret is named after the `AnsibleAutomationPlatform` CR:
+
+```bash
+oc get secret aap-admin-password -n aap -o jsonpath='{.data.password}' | base64 -d; echo
+```
+
+Then add it to the vault:
 
 ```bash
 ansible-vault edit playbooks/group_vars/all/secrets.yml \
@@ -202,8 +234,7 @@ Set `env_secrets.edge.aap_password` to the printed value.
 ansible-playbook playbooks/config.yml \
   -i inventory --limit edge \
   -e target_env=edge \
-  --vault-id sales.demos@~/secrets/.vault_pass_sales_demos \
-  2>&1 | tee /tmp/config-edge-$(date +%Y%m%d-%H%M).log
+  --vault-id sales.demos@~/secrets/.vault_pass_sales_demos
 ```
 
 This creates the organizations, credentials, projects, job templates,
