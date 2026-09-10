@@ -64,7 +64,7 @@ first; it changes three beats and nothing else.
 Point at three things and nothing else:
 
 - the hostname and the green dot — *"that's a RHEL 9 guest"*
-- **Size tier** `large-2cpu-6gb → sd1.large` — *"somebody asked for 'large'"*
+- **Size tier** `large → sd1.large` — *"somebody asked for 'large'"*
 - the amber notice — *"and it deletes itself at 6 PM"*
 
 > **"This machine did not exist nine minutes before that screenshot was taken.
@@ -271,7 +271,7 @@ Back to `demo-page-live.png`. Now walk the facts table and make the point that
 **every value on that page came from the machine itself**:
 
 - OS, kernel, vCPU/memory — gathered facts
-- `small-1cpu-2gb → sd1.small` — the tier they asked for, resolved to the
+- `small → sd1.small` — the tier they asked for, resolved to the
   cluster instance type that served it
 - **In-cluster address** — *"that's how AAP reached it. Plain ssh on 22, no
   bastion, no jump host, no agent."*

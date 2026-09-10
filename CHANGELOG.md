@@ -10,6 +10,45 @@ changed and why, in the order it merged.
 
 ## [Unreleased]
 
+### Fixed -- sizing tables described tiers as they were before they were resized (#14)
+
+- **`large` was documented as 2 vCPU / 6 GiB. It is 4 / 16.** `small` is 2 / 4
+  and `medium` is 2 / 8, per `terraform/ocpvirt/tiers.yaml`, since
+  ericcames/sales.demos#348. A presenter reading the old tables told a customer
+  the VM was under a third of its real size.
+- **The old names survive as aliases, which is what made it read plausibly.**
+  `tiers.yaml` still maps `large-2cpu-6gb` -> `large`, so nothing errored and
+  nothing failed -- the label is a legacy key, and the docs read it as a
+  description. Said explicitly now, in the architecture page and the plan, so
+  the old numbers do not get "helpfully" restored.
+- **The AAP surveys had already moved on**, offering plain `small` / `medium` /
+  `large`, so the docs were also showing an interface the audience would not see.
+  Presenter-facing pages now use the plain names, including the runnable
+  `vm_size_tier=` in the edge run sheet.
+- **`available_memory_gb` was given as 67. It is 63** -- it went to 67 in #118
+  and back when Automation Orchestrator started drawing on the same budget
+  (#141).
+- **The plan is annotated, not rewritten.** `ocpvirt-demo-plan.md` records *why*
+  the tiers are repo-owned and why `u1.large` did not fit a 14 GiB cluster; that
+  reasoning still holds and is worth keeping. A superseded note above the table
+  carries the current figures instead.
+- **One occurrence deliberately left alone.** The `vm_size_tier` in
+  `talk-track.md`'s `facts.json` sits inside a `<!-- rendered: facts.json -->`
+  block that CI verifies against `render-demo-assets.py`. It is an explicitly
+  representative fixture, not a claim about tier sizes, and changing it means a
+  paired PR in `sales.demos` -- real cross-repo cost for a sample value.
+
+### Fixed -- this page said `edge` had no badged logo (#14)
+
+- True when `docs/reference/environments.md` was written, and false four commits
+  later: ericcames/sales.demos#426 added the purple one along with
+  `inventory/group_vars/edge/gateway_settings.yml`.
+- Replaced with a three-row colour table -- green `sandbox`, red `demo`, purple
+  `edge` -- and a note on what must move together when a fourth environment
+  appears: a colour in `env_colors.py`, a generated pair in
+  `assets/aap-branding/`, and a `gateway_settings.yml`. `check-env-logos.py`
+  catches the last two; nothing catches a missing colour.
+
 ### Changed -- this repo is now the canonical home for the docs (#12)
 
 - **`docs/plan/` and `docs/demos/` existed in both repos with nothing keeping

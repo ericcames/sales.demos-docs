@@ -90,20 +90,37 @@ Mapped to **repo-owned** `sd1.*` cluster instance types, not Red Hat's shipped
 
 | Tier | Instance type | vCPU / RAM | Linux disk |
 |---|---|---|---|
-| `small-1cpu-2gb` | `sd1.small` | 1 / 2 GiB | 30 GiB |
-| `medium-1cpu-4gb` | `sd1.medium` | 1 / 4 GiB | 30 GiB |
-| `large-2cpu-6gb` | `sd1.large` | 2 / 6 GiB | 50 GiB |
+| `small` | `sd1.small` | 2 / 4 GiB | 30 GiB |
+| `medium` | `sd1.medium` | 2 / 8 GiB | 30 GiB |
+| `large` | `sd1.large` | 4 / 16 GiB | 50 GiB |
 
-**Why not `u1.*`:** that series has no 6 GiB size — it goes 2 / 4 / 8 / 16. At
-`u1.large`'s 8 GiB, `os_type=both` needs about 16.6 GiB, which did not fit the
-~14 GiB free on the smaller cluster these tiers were designed against.
+Windows is floored at 60 GiB whatever the tier. The catalog is
+`terraform/ocpvirt/tiers.yaml` — one file read by both Terraform and the Ansible
+task that creates the `sd1.*` objects, so neither owns a copy.
 
-**That constraint no longer binds, and the tiers were left alone anyway.**
-`sales-demos-probe-env` measured 75.63 GiB free on sandbox (2026-09-03) and
-`available_memory_gb` is now 67 (#118). `u1.large` would fit comfortably. The
-tiers stay at 6 GiB because resizing them is a separate decision with its own
-blast radius — the lesson of #100 is that a number moves when something is
-measured, not merely when it becomes possible.
+!!! warning "`small-1cpu-2gb` and friends are retained aliases, not descriptions"
+    `tiers.yaml` still maps `small-1cpu-2gb` → `small`, `medium-1cpu-4gb` →
+    `medium` and `large-2cpu-6gb` → `large`, so older invocations keep working.
+    **The names no longer describe the shape** — `large-2cpu-6gb` provisions
+    4 vCPU and 16 GiB. This page quoted the names as if they were specs until
+    2026-09-10; the sizes changed in
+    [#348](https://github.com/ericcames/sales.demos/issues/348). The AAP surveys
+    offer the plain names, which is what the audience sees.
+
+**Why not `u1.*`:** Red Hat's series did not carry the shape these tiers needed
+when they were designed — it goes 2 / 4 / 8 / 16 GiB, and the original `large`
+was 6 GiB to fit a cluster with roughly 14 GiB free. That constraint is gone
+(`sales-demos-probe-env` measured 63 GiB of budget), but the repo-owned types
+stayed, so a tier can be resized without waiting on the shipped catalog.
+
+**That constraint no longer binds, and the tiers were resized once it was
+measured rather than merely possible.** `sales-demos-probe-env` measured
+75.63 GiB free on sandbox (2026-09-03), and `available_memory_gb` is **63** —
+it went to 67 in [#118](https://github.com/ericcames/sales.demos/issues/118) and
+back to 63 when Automation Orchestrator started drawing on the same budget
+([#141](https://github.com/ericcames/sales.demos/issues/141)). The tiers moved
+in [#348](https://github.com/ericcames/sales.demos/issues/348). Re-run
+`sales-demos-probe-env` rather than hand-adjusting the figure.
 
 **The ceiling is enforced in code.** `terraform/ocpvirt/locals.tf` carries a
 `terraform_data.memory_budget` precondition:
@@ -277,7 +294,7 @@ from a private registry and takes the placeholder over.
 
 ### What was measured
 
-Provisioning `os_type=windows` at `large-2cpu-6gb`:
+Provisioning `os_type=windows` at `large`:
 
 | Observation | Value |
 |---|---|

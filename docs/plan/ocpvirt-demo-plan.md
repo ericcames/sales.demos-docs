@@ -211,6 +211,15 @@ This is native OpenShift Virt functionality and demos better than hand-rolled sp
 > that OS's teardown. Sizes live in `terraform/ocpvirt/tiers.yaml`, read by both
 > Terraform and Ansible, so changing a tier is a one-line edit there.
 
+!!! warning "Superseded — these are the tiers as originally designed"
+    The sizes below were chosen against a cluster with ~14 GiB free and were
+    resized in [#348](https://github.com/ericcames/sales.demos/issues/348).
+    **Current values are `small` 2 / 4 GiB, `medium` 2 / 8 GiB, `large`
+    4 / 16 GiB**, in `terraform/ocpvirt/tiers.yaml`. The `-1cpu-2gb` names
+    survive as aliases so older invocations keep working, but they no longer
+    describe the shape. The reasoning below is kept because it records *why*
+    the tiers are repo-owned, which has not changed.
+
 | Tier | Instance type | vCPU / RAM | Root disk |
 |---|---|---|---|
 | `small-1cpu-2gb` | `sd1.small` | 1 / 2 GiB | 30 Gi |
@@ -230,7 +239,8 @@ contract shared with the AAP survey and the skill, so they must not promise memo
 does not give.
 
 A `terraform plan` precondition enforces the budget against `available_memory_gb` (default
-67, measured by the probe — #118), so an over-budget request fails in the plan instead of
+**63** as of #141 — it was 67 when this was written, and Automation Orchestrator now draws on
+the same budget), so an over-budget request fails in the plan instead of
 leaving a VM `Pending` with an `Insufficient memory` event while Terraform reports success.
 
 Windows uses the same tiers with `preference: windows.2k22` and a 60 Gi disk minimum.
@@ -630,7 +640,7 @@ one `dc1.azure` already produces.
 1. **CNV health** — `oc get hyperconverged -n openshift-cnv` Available; `oc get pods -n openshift-cnv`
    all Running; `oc get datasource -n openshift-virtualization-os-images` shows rhel9 ready.
 2. **Terraform** — `terraform init && terraform plan` clean, then apply each tier:
-   `-var os_type=linux -var vm_size_tier=small-1cpu-2gb`, then `medium`, then `large`.
+   `-var os_type=linux -var vm_size_tier=small`, then `medium`, then `large`.
    Confirm `oc get vm,vmi -n <ns>` shows Running and the instance type matches the tier.
 3. **Windows** — link the golden image, then apply `-var os_type=windows -var
    vm_size_tier=large`; confirm the Windows VMI reaches Running and WinRM
