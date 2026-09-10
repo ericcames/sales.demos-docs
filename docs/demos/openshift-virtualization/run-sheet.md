@@ -93,16 +93,67 @@ Reflect it back, then:
 
 ---
 
-## 6–8 · The entire interface is two questions
+## 6–8 · The entire interface is four questions
 
 **Show `aap-survey.png`.** This is the whole thing a requester sees:
 
 | Question | Variable | Choices | Default |
 |---|---|---|---|
-| Operating system | `os_type` | `linux` · `windows` · `both` | `linux` |
-| VM size tier | `vm_size_tier` | `small-1cpu-2gb` · `medium-1cpu-4gb` · `large-2cpu-6gb` | `small-1cpu-2gb` |
+| Hypervisor | `hypervisor` | `ocpvirt` | `ocpvirt` |
+| VM size tier | `vm_size_tier` | `small` · `medium` · `large` | `large` |
+| Workload role | `vm_role` | `web` · `db` · `app` | `web` |
+| How many VMs | `vm_count` | `1` · `2` | `1` |
 
-Source: `inventory/group_vars/aap/controller_workflows.yml:36-64`.
+Source: the `Linux Day 1 - 0 Workflow` survey in
+`inventory/group_vars/aap/controller_workflows.yml`.
+
+**This table has been wrong three times, and each correction is worth a
+sentence of the talk track.** It said one question and a `small` default; the
+default became `large` in 2026-09-08 (the demo is about speed, so it should not
+open on the tier that makes every step slower), `vm_role` and `vm_count` arrived
+with farms in #389, and `hypervisor` in #242. Re-check it against the file before
+you present — a survey screenshot ages faster than anything else in this
+run-sheet.
+
+**`Hypervisor` has exactly one choice, and say so rather than skipping it.**
+It is there because a *trigger* cannot pass a variable the survey does not ask
+for — the portal launcher, and later ServiceNow, hand `extra_vars` to the
+workflow, and a survey-enabled workflow rejects anything that is not one of its
+own questions. The dropdown with one entry is the seam the other providers land
+in, and it is honest about where the platform is today.
+
+**`How many VMs` stops at 2, and that number is not arbitrary.** It was 10 until
+#397. A `large` guest is 16 GiB against a 63 GiB budget, so three already
+exceed it — eight of the ten values on offer had no outcome but being refused.
+If someone asks whether they could have twenty, the answer is that the ceiling is
+set where the hardware is, in six places that move together.
+
+**This said "two questions" and showed an `os_type` dropdown until #300/#301.**
+If your screenshot still has it, retake it. Removing it was not simplification
+for its own sake: with one Terraform state per environment, choosing `windows`
+in that dropdown set `create_linux=false` and planned the *running* Linux VM for
+destruction. The operating system is now chosen by *which workflow you launch* —
+`Linux Day 1 - 0 Workflow` or `Windows Day 1 - 0 Workflow` — and each owns its
+own state, so neither can touch the other's VM.
+
+**That is a better answer to give than the old one anyway**, because someone
+always asks how you stop a self-service portal from letting a requester break
+production. Here the answer is structural rather than procedural.
+
+**And the portal is not hypothetical — show it if you have time (#242).** The
+same workflow has a second entry point: `Self-Service - Request Linux Server`
+in the self-service portal, which asks these four questions and fires *this*
+workflow. Not a copy of it, not a portal-flavoured variant — the same object
+you just launched from the Templates page.
+
+> **"There is one implementation and two front doors. The engineer gets a
+> Templates page; the requester gets a form. Neither is a re-creation of the
+> other, so a fix to the chain reaches both on the same day."**
+
+The wrapper exists for a dull reason worth naming if asked: the portal's catalog
+syncs job templates and not workflows, so the entry point has to *be* a job
+template. `playbooks/launch_workflow.yml` is that job template's whole
+implementation — it validates the inputs and fires the workflow.
 
 **Land the question that is deliberately missing.** There is no dropdown for
 *which environment* — that is set per-controller from `connection.yml`:
@@ -123,11 +174,16 @@ than the rest of the demo combined.
 
 > **"That's where the VM lands. Nothing in it. Watch."**
 
-**Then `aap-workflow-running.png`.** Four nodes, chained on success:
+**Then `aap-workflow-running.png`.** Five nodes, chained on success:
 
 ```
-Provision VM  →  Register VMs  →  Configure VMs  →  Check VMs
+1 Provision → 2 Register → 3 Configure → 4 Compliance Scan → 5 Check
 ```
+
+> **Screenshot is stale** — it was captured before the compliance node (#202)
+> and before the #300 rename, so it shows four nodes under the old
+> `Sales Demos - Build Demo VM` title. Retake it from a real run of
+> `Linux Day 1 - 0 Workflow`. The chain above is what the workflow actually does.
 
 Walk them in order. **Three beats matter here; everything else is detail.**
 
@@ -144,7 +200,7 @@ Walk them in order. **Three beats matter here; everything else is detail.**
 tier that was requested, `-web` is the Service, then the namespace.
 
 ```
-curl -sI $(terraform output -raw web_url) | head -1
+for u in $(terraform output -json web_urls | jq -r '.[]'); do curl -sI "$u" | head -1; done
 HTTP/1.1 503 Service Unavailable     # after provision
 HTTP/1.1 200 OK                      # after configure
 ```
@@ -196,9 +252,9 @@ pinning it to a host. It has nowhere to go on a single node. Full wording in
 | Node | Duration |
 |---|---|
 | Provision VM | 36 s |
-| Register VMs | 4 m 25 s |
-| Configure VMs | 3 m 49 s |
-| Check VMs | 5 s |
+| Register Linux VMs | 4 m 25 s |
+| Configure Linux VMs | 3 m 49 s |
+| Check Linux VMs | 5 s |
 | **Whole workflow** | **9 m 9 s** |
 
 > **"Nine minutes nine. Building the machine is thirty-six seconds of it —
@@ -270,20 +326,91 @@ than answering well.
 - **No live migration in this demo.** The lab cluster is a single node. CNV does
   live migration; this environment cannot show it. *"I'd rather tell you that
   than show you a slide about it."*
-- **Windows boots, and cannot be logged into yet.** The golden image is built,
-  published and linked, and a Windows VM provisions like any other — the 60 GiB
-  disk clones in **under a minute** and the VM is `Running` about 40 seconds
-  later. What it will not do is finish setup: the image is generalized, and it
-  ignores the answer file we hand it because the build left its own cached at a
-  higher-precedence location, so the guest stops at the Windows OOBE screen. The
-  fix is a one-line change in the image build plus a rebuild. Tracked in public
-  as #3 and #201 here (both done) and
-  ericcames/image.builder.pipeline#59 (the blocker).
+- **No live migration in this demo** (see above) is the only capability gap
+  left in this list. **Windows used to be the second one and is not any more** —
+  see the section below.
 
-  **If you are asked to show Windows, show the provisioning, not the guest.** The
-  sub-minute clone of a 60 GiB Windows disk is a genuinely good number and it is
-  a CSI snapshot rather than a copy — that is the interesting part. Do not open
-  the console.
+### Windows, if you are asked
+
+**You can show it now, and this run sheet told you not to until #340.** The old
+advice was "show the provisioning, not the guest, and do not open the console",
+because a generalized image ignored the answer file we handed it and stopped at
+the Windows OOBE screen. Three stacked bugs, all fixed and verified.
+
+There is a **second, complete chain**, same shape as the Linux one:
+
+```
+1 Provision → 2 Patch → 3 Configure → 4 Compliance Scan → 5 Check
+```
+
+#### It takes about 15 minutes, and you must launch it before you start talking
+
+**Windows is not Linux's 9 minutes and never will be.** Measured on sandbox:
+roughly **15–16 minutes** for a cold build. About **6 minutes 30 seconds of that
+is Windows first-boot after sysprep**, before Ansible can reach the guest at all
+— specialize, oobeSystem, and standing up the WinRM listener. No amount of
+automation shortens it. The full budget is in
+[`docs/plan/ocpvirt-demo-plan.md`](../../plan/ocpvirt-demo-plan.md) →
+*Windows demo performance budget*.
+
+**So treat it exactly like the Linux workflow, only more so: launch it first,
+then do the cold open while it runs.** Fifteen minutes of talking is a lot, so
+plan for it rather than discovering it live:
+
+- The sysprep wait is **good material, not dead air**. It is the one moment where
+  "this is a real Windows Server doing a real first boot from a generalized
+  image" is visible, and it is worth saying so instead of apologising for it.
+- If you only have ten minutes, **run against a guest that already exists** and
+  launch `Windows Day 1 - Repair` instead — same steps, no sysprep, about
+  **7 minutes**. You lose only the provisioning beat.
+- If you want the provisioning beat *and* the short demo, do both: show a clone
+  starting (about **36 seconds** to `Running`) as its own moment, and run Repair
+  against the guest you built earlier.
+
+**The one difference is worth calling out rather than glossing**, because a
+Windows admin in the room will notice it:
+
+> **"On Linux, step 2 registers the guest to the Red Hat CDN — that image ships
+> with no repositories at all, so nothing installs until it does. Windows has
+> nothing to register; the golden image is complete. So step 2 is patching
+> instead. Same slot, same job: get the machine entitled to content before you
+> ask it to do anything."**
+
+**The payoff is identical** — a Route that returns 503 until IIS serves, then
+200. `web_url` resolves per-OS, so it is the same one command either way.
+
+
+> ### The Windows compliance report is now safe to show
+>
+> Measured 2026-09-08: a clone of
+> `win2k22-cis-l1-golden:20260908-1853` scores **26 of 27 controls compliant
+> (96%)** — 0 non-compliant, 1 not configured. The hardening is real, it
+> survives `sysprep /generalize`, and the guest carries it.
+>
+> Getting here took fixing three defects of one shape — a status trusted instead
+> of the artifact measured (#364, image.builder.pipeline#92, #377). **The node
+> that surfaced all of it is this one**, which is worth saying out loud if
+> anyone asks why the number moved.
+
+**The compliance node is where the Windows story gets better than the Linux
+one.** There is no OpenSCAP for Windows, so it does not pretend to scan: it
+reads controls back off the running guest and reports what the image
+deliberately *does not* apply as documented exceptions, each with the file and
+the decision behind it.
+
+> **"Sixteen exceptions, and every one has a name against it. Fifteen are the
+> image factory's — controls that would sever the very connection doing the
+> hardening. The sixteenth is ours: we put a UAC setting back so automation can
+> log in at all. That's on the report, in front of you, rather than in
+> somebody's head."**
+
+That usually lands better than a green tick, because it is the conversation a
+security team actually wants to have.
+
+**Do not claim the percentage is an audit.** It is over the controls the report
+checks, and the report says so in words next to the number. If someone presses,
+that honesty is the point — hand them `summary.json`.
+
 - **`config.yml` always reports `changed`.** AAP returns one setting as
   `$encrypted$` on every read, so Ansible can never see it as converged. Known,
   cosmetic, documented.
@@ -313,7 +440,7 @@ If you have a warm environment, three beats change:
 
 | Beat | Live version |
 |---|---|
-| 0–3 cold open | Launch **`Sales Demos - Build Demo VM`** *first*, then do the cold open on the screenshot while it runs. It needs ~9 minutes and you are about to spend 13 talking |
+| 0–3 cold open | Launch **`Linux Day 1 - 0 Workflow`** *first*, then do the cold open on the screenshot while it runs. It needs ~9 minutes and you are about to spend 13 talking |
 | 8–16 | Cut to the running job's output instead of the graph. Narrate the node that is actually executing |
 | 16–22 | `curl -sI` the real URL, then open it. The 503 → 200 transition live is worth more than any slide |
 

@@ -69,7 +69,8 @@ follow and why there are two layers rather than one. Read it before writing.
 |---|---|
 | `docs/demos/` | Talk tracks, run sheets, architecture, objections — one folder per demo |
 | `docs/plan/` | Design plans for each use case — the research and the decisions |
-| `docs/images/` | Screenshots and logos |
+| `docs/reference/` | Operator reference for the automation — environments, running playbooks, AAP, the EE, reusing the repo |
+| `docs/images/` | Screenshots and diagrams |
 
 ## What's elsewhere
 
@@ -80,6 +81,19 @@ follow and why there are two layers rather than one. Read it before writing.
 | Marketing content, key messages, Gemini prompts | [Sales Demos (Google Drive)](https://drive.google.com/drive/folders/1Me_blEFV-xHUyZeL48F0GjCyWl3_KSxG) |
 
 New documentation goes here or to Google Drive, not to `sales.demos`.
+
+**This repo is the canonical copy.** `docs/plan/` and `docs/demos/` used to exist
+in both repos with nothing keeping them in step, and 20 of the 35 shared files
+had drifted apart — including a run sheet still telling presenters that Windows
+"cannot be logged into yet", days after that was proven working end to end.
+`sales.demos` now links here rather than carrying its own copy.
+
+A few documents stay with the code deliberately, because moving them would break
+something rather than tidy it: `CONTRIBUTING.md` (GitHub surfaces it during PR
+creation), `terraform/ocpvirt/README.md` (module docs belong with the module),
+`utilities/aap-env-badge/README.md`, and `assets/aap-branding/README.md` — those
+files are AAP *configuration inputs* read at playbook run time, not
+documentation, however much they look like screenshots.
 
 ## This repo is public
 

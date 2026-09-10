@@ -70,14 +70,15 @@ Override with `--ocp-version` only when pinning to a specific z-stream matters.
 | LVMS operator Subscription | `stable-4.22` channel |
 | Compliance Operator Subscription | `stable` channel |
 
-### Day 1 — applied by `setup_edge.yml`
+### Day 1 — applied by the install playbooks
 
-| Resource | Purpose |
-|---|---|
-| `LVMCluster` CR | Thin-provisioned VolumeGroup from partition 5, StorageClass `lvms-vg1` |
-| `AnsibleAutomationPlatform` CR | Gateway, Controller, Hub, EDA, PostgreSQL |
-| `HyperConverged` CR | CNV with `lvms-vg1` scratch space |
-| `ScanSettingBinding` | CIS L1 compliance scan |
+| Resource | Playbook | Purpose |
+|---|---|---|
+| `LVMCluster` CR | `install_lvms.yml` | Thin-provisioned VolumeGroup from partition 5, StorageClass `lvms-vg1` |
+| `AnsibleAutomationPlatform` CR | `install_aap.yml` | Gateway, Controller, Hub, EDA, PostgreSQL |
+| `HyperConverged` CR | `install_cnv.yml` | CNV with `lvms-vg1` scratch space |
+| `ScanSettingBinding` | `install_compliance.yml` | CIS L1 compliance scan |
+| AAP objects | `config.yml` | Orgs, credentials, projects, job templates, inventories, schedules |
 
 ---
 

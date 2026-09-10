@@ -81,7 +81,7 @@ ansible-playbook playbooks/sync_hub.yml -i inventory --limit sandbox \
   --vault-id sales.demos@~/secrets/.vault_pass_sales_demos
 ```
 
-Or use the [`pah-sync`](../../../.claude/skills/pah-sync/SKILL.md) skill, which
+Or use the [`pah-sync`](https://github.com/ericcames/sales.demos/blob/main/.claude/skills/pah-sync/SKILL.md) skill, which
 runs the preflight checks first and then verifies against the hub.
 
 **Sync the day before.** The demo shows a populated hub and a re-run; nobody

@@ -77,6 +77,13 @@ nav:
           - Talk Track: demos/edge-sno/talk-track.md
           - Architecture: demos/edge-sno/architecture.md
           - Objections: demos/edge-sno/objections.md
+  - Reference:
+      - Overview: reference/README.md
+      - Environments: reference/environments.md
+      - Running Playbooks: reference/running-playbooks.md
+      - Running from AAP: reference/running-from-aap.md
+      - Execution Environment: reference/execution-environment.md
+      - Reusing This Repo: reference/reusing-this-repo.md
   - Design Plans:
       - OpenShift Virtualization: plan/ocpvirt-demo-plan.md
       - Private Automation Hub: plan/pah-plan.md
