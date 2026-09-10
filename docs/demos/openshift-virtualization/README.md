@@ -120,9 +120,10 @@ authenticate to the guest:
                        ||----w |
                        ||     ||
 
-   Demo page:  https://sd-lnx-small-1cpu-2gb-web-sales-demos-demo.apps.cluster-abcde.dyn.redhatworkshops.io
-   Console:    https://sd-lnx-small-1cpu-2gb-cockpit-sales-demos-demo.apps.cluster-abcde.dyn.redhatworkshops.io
-   Compliance: https://sd-lnx-small-1cpu-2gb-web-sales-demos-demo.apps.cluster-abcde.dyn.redhatworkshops.io/compliance/report.html
+   Demo page:  https://web-lnx-1-web-sales-demos-demo.apps.cluster-abcde.dyn.redhatworkshops.io
+   Console:    https://web-lnx-1-cockpit-sales-demos-demo.apps.cluster-abcde.dyn.redhatworkshops.io
+   Compliance: https://web-lnx-1-web-sales-demos-demo.apps.cluster-abcde.dyn.redhatworkshops.io/compliance/report.html
+
 ```
 
 Let the cow get its laugh, then land the line under it: *"This host is managed
@@ -166,7 +167,7 @@ Two things, in order:
 
 ```bash
 /ocpvirt-new-env      # proves the environment is warm — builds and times a real VM
-/ocpvirt-provision    # or launch "Sales Demos - Build Demo VM" in AAP
+/ocpvirt-provision    # or launch "Linux Day 1 - 0 Workflow" in AAP
 ```
 
 Then read [Running it live](run-sheet.md#running-it-live) in the run sheet — it
@@ -181,5 +182,5 @@ New to this repo? Run `/sales-demos-first-time` first.
 
 - [`../../plan/ocpvirt-demo-plan.md`](../../plan/ocpvirt-demo-plan.md) — why the
   automation is built this way: the research, the decisions, the reversals
-- [`../../../ROADMAP.md`](../../../ROADMAP.md) — what is done and what is not
-- [`../../../README.md`](../../../README.md) — the repo itself
+- [`ROADMAP.md`](https://github.com/ericcames/sales.demos/blob/main/ROADMAP.md) — what is done and what is not
+- [`sales.demos`](https://github.com/ericcames/sales.demos) — the automation itself

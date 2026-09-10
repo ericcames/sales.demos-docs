@@ -10,6 +10,67 @@ changed and why, in the order it merged.
 
 ## [Unreleased]
 
+### Changed -- this repo is now the canonical home for the docs (#12)
+
+- **`docs/plan/` and `docs/demos/` existed in both repos with nothing keeping
+  them in step, and 20 of the 35 shared files had drifted apart.** Two copies
+  and no mechanism is the same failure class as #85 and #87: a reader cannot
+  tell which is current, and neither can CI. `sales.demos` now links here
+  (ericcames/sales.demos#422).
+- **The drift was not cosmetic, and it was not one-directional.** Resolved file
+  by file rather than by picking a winner wholesale, because neither copy was
+  uniformly newer:
+    - **Taken from `sales.demos`** -- `openshift-virtualization/` and
+      `mcp-servers/`, plus `plan/ocpvirt-demo-plan.md`. The copies here named
+      job templates the automation now *deletes* (`Sales Demos - Build Demo VM`
+      and `Sales Demos - Provision VM` both carry `state: absent`), playbooks
+      that were renamed (`register_vm.yml` -> `register_linux_vm.yml`), and a
+      `Sales Demos - Vault` credential superseded in #129.
+    - **Kept from here** -- all of `edge-sno/`, which was authored here and is
+      two to three times longer than the pointer stubs `sales.demos` carries,
+      and `demos/README.md`, whose framing is correct for a docs site.
+- **The worst of it was a run sheet telling presenters Windows "cannot be
+  logged into yet"** and citing image.builder.pipeline#59 as the blocker. That
+  was proven working end to end on 2026-09-06 -- clone reaches the desktop,
+  `win_ping` succeeds from AAP (sales.demos#257). A presenter reading this page
+  would have talked a customer out of a feature that works.
+- **`server-inventory.md` was the pre-#414 version, missing `openshift-edge`
+  entirely** and counting "five servers" in eight places. The fix landed in
+  `sales.demos` and never crossed. Stale enumerations are the recurring bug
+  class here.
+- **`demo-page.png` here was the 2026-09-06 original**; `sales.demos` had
+  regenerated it in #389. Refreshed.
+
+### Added -- `docs/reference/`, the operator material evicted from the sales.demos README (#12)
+
+- Five pages: `environments.md`, `running-playbooks.md`, `running-from-aap.md`,
+  `execution-environment.md`, `reusing-this-repo.md`, plus an index.
+- **`running-from-aap.md` is the one that did not exist in any form.** The
+  `sales.demos` README documented 2 Linux job templates; the automation defines
+  **32 live templates and 4 live workflows**, of which 13 Windows templates and
+  the entire `Windows Day 1` / `Windows Day 2` stories were undocumented. Counts
+  taken from `controller_templates.yml` and `controller_workflows.yml`, ignoring
+  `state: absent` tombstones.
+
+### Fixed -- links that pointed at the wrong repo, or at nothing (#12)
+
+- Six relative links reached for `../../../` -- `ROADMAP.md`, `.mcp.json`,
+  `.claude/skills/pah-sync/SKILL.md` -- which resolves outside this repo. Now
+  absolute URLs into `sales.demos`. Three were pre-existing here, three arrived
+  with the copied files.
+- **Two links resolved and were still wrong.** `../../../README.md` labelled
+  "the repo itself" lands on *this* repo's README from `docs/demos/<x>/`, not on
+  `sales.demos`. An existence check passes; the reader still goes to the wrong
+  page.
+- Four anchors into `server-inventory.md` were dead (`#aap--bearer-token` for
+  `#aap-bearer-token`, and three more). `mkdocs build` reports these at INFO and
+  exits 0, so nothing was failing.
+- **The Day 1 table in `edge-sno/architecture.md` was headed "applied by
+  `setup_edge.yml`", and that playbook does not exist.** Replaced with the real
+  per-playbook table. The rest of that page's `setup_edge.yml` references, and
+  the run sheet's `tee` pipelines, are sales.demos#424 -- wrong in both copies
+  identically, so not drift.
+
 ### Changed -- README omitted the cross-repo working shape (#10)
 
 - **This repo's `## Getting started` is the model the other two just copied**,

@@ -64,4 +64,4 @@ can make].
 ## Related
 
 - [`../../plan/`](../../plan/) — why the automation is built this way
-- [`../../../ROADMAP.md`](../../../ROADMAP.md) — what is done and what is not
+- [`ROADMAP.md`](https://github.com/ericcames/sales.demos/blob/main/ROADMAP.md) — what is done and what is not

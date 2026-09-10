@@ -188,7 +188,7 @@ your other demos.
 | `ocpvirt-setup` | `playbooks/setup.yml` | Phase 0 — bootstrap AAP *and* install CNV, self-contained |
 | `ocpvirt-provision` | `playbooks/provision_vm.yml` | Phase 1/3 — run Terraform, register hosts in AAP |
 | `ocpvirt-windows-image` | `playbooks/link_windows_image.yml` | Phase 2 — point CNV at the published golden image |
-| `ocpvirt-demo` | `playbooks/run_demo.yml` | Phase 4 — launch the layered daily demo |
+| `ocpvirt-demo` | `playbooks/repair_linux_vm.yml` | Phase 4 — re-run the daily demo content on existing VMs |
 | `ocpvirt-teardown` | `playbooks/teardown.yml` | `terraform destroy`, leave CNV and golden image intact |
 
 Follow the existing `aap-skills` SKILL.md shape: frontmatter `name` + `description` with
@@ -203,9 +203,13 @@ Map t-shirt tiers to **cluster instance types + preferences**, not raw CPU/memor
 This is native OpenShift Virt functionality and demos better than hand-rolled specs.
 
 > **Revised in #2 after measuring the cluster.** The tiers are now repo-owned `sd1.*`
-> instance types created by `terraform/ocpvirt/instancetypes.tf`, not Red Hat's shipped
-> `u1.*`, and `large` is 6 GiB rather than 8. Red Hat's `u1.*` remain on the cluster
-> untouched; reverting a tier to them is a one-line change in `locals.tf`.
+> instance types, not Red Hat's shipped `u1.*`, and `large` is 6 GiB rather than 8.
+> Red Hat's `u1.*` remain on the cluster untouched.
+>
+> **Since #348 they are created by `playbooks/tasks/ensure_shared_objects.yml`,
+> not Terraform** — a shared catalog owned by one OS's state was destroyed by
+> that OS's teardown. Sizes live in `terraform/ocpvirt/tiers.yaml`, read by both
+> Terraform and Ansible, so changing a tier is a one-line edit there.
 
 | Tier | Instance type | vCPU / RAM | Root disk |
 |---|---|---|---|
@@ -376,7 +380,7 @@ multi-OS pattern:
 - `providers.tf` — replace `azurerm` with `hashicorp/kubernetes` (~> 2.30) + `random`. Use the
   **official `kubernetes` provider with `kubernetes_manifest`**, not a community KubeVirt
   provider — no third-party dependency, and the CRDs exist after Phase 0.
-- `variables.tf` — port `vm_size_tier` and `os_type` (`windows` | `linux` | `both`) with their
+- `variables.tf` — port `vm_size_tier` and `os_type` (`windows` | `linux`; `both` was removed in #301) with their
   `validation` blocks verbatim from `dc1.azure/terraform/variables.tf:24-48`; swap the tier
   strings for the table above. Add `namespace`, `kubeconfig_path`.
 - `locals.tf` — port the `vm_size_map` → `instancetype` mapping, `random_string.suffix`,
@@ -503,7 +507,7 @@ all found by executing the playbook and none by lint:
 
 | Observation | Value |
 |---|---|
-| Image | `quay.io/zigfreed/win2k22-golden:20260905-1826` (private, 8.65 GiB) |
+| Image | `quay.io/zigfreed/win2k22-cis-l1-golden:20260907-0516` (private, 8.67 GiB). **The `CIS L1 hardened` this row used to claim was false** — that tag measures 0 of 10 and is superseded by `20260908-1853`. **The tag was deleted from Quay on 2026-09-08**; see the #358 section below |
 | Import time | ~5 min (much faster than the estimated 80 min) |
 | DataSource | `win2k22` — `Ready=True`, `spec.source.pvc.name: win2k22-initial-import` |
 | Backing PVC | `win2k22-initial-import` — `Bound`, 60Gi |
@@ -516,10 +520,9 @@ all found by executing the playbook and none by lint:
 repository went public before the secret mattered, so the pull secret was dropped
 in a later change. The fix in #222 corrected both playbooks.
 
-#### Phase 3 Windows: measured — the clone is fast, the login is blocked
+#### Phase 3 Windows: measured — clone, sysprep, and WinRM all working
 
-Executed against sandbox on 2026-09-05, the first time `os_type=windows` had ever
-been applied. Two separate results, and they point in opposite directions.
+Executed against sandbox, verified end-to-end on 2026-09-06 (#234, #255, #257).
 
 **The clone path works, and it is the number worth quoting.**
 
@@ -529,62 +532,36 @@ been applied. Two separate results, and they point in opposite directions.
 | VMI `Running`, `Ready=True` | ~40 s later |
 | Guest agent | connected, reporting Windows Server 2022 Standard Evaluation |
 | AAP registration | into `windemo`, `ansible_user: demoadmin` |
+| `win_ping` from AAP | **Success** — WinRM over NTLM verified (#257) |
 
 Sub-minute for 60 GiB is the Ceph RBD CSI smart-clone path — a snapshot, not a
 copy — so a Windows disk costs roughly what a 30 GiB Linux one does. This is
 worth saying out loud to a customer; it is the part of Windows-on-CNV that
 usually surprises people.
 
-**The guest cannot be logged into, and #201 did not fix it.**
+**Three stacked bugs blocked the login until 2026-09-06:**
 
-The published image is generalized, so a clone runs the OOBE specialize pass with
-an Administrator password the build generated and threw away. #201 answered that
-the way this plan always said it would — *"cloud-init for Linux, sysprep/unattend
-for Windows"* — with a Secret holding an `autounattend.xml`, attached as a
-read-only CD-ROM.
+1. **Cached answer file** — the producer left a build-time answer file in
+   `%WINDIR%\Panther`, which Windows found before our sysprep CD
+   (`image.builder.pipeline#69`).
+2. **Secret key naming** — the Secret key was `autounattend.xml` but the
+   specialize pass needs `Unattend.xml` (#234).
+3. **15-char NetBIOS limit** — the ComputerName exceeded 15 characters and
+   sysprep silently failed (#234).
 
-Verified attached and correct: Secret created and labelled, KubeVirt built the
-1 MiB ISO, `volumeStatus` shows `sysprep -> sdb`, `bootOrder: 1` keeps the boot on
-the hard disk, and the XML is well-formed with both a `specialize` and an
-`oobeSystem` pass. **The guest still stops at the OOBE region screen.**
+All fixed, plus `LocalAccountTokenFilterPolicy` for WinRM NTLM with non-built-in
+admin accounts (#255).
 
-The cause is precedence, and it is in the producer. Microsoft's implicit
-answer-file search order:
+**The image is now CIS L1 hardened** (2026-09-07). The build in
+`image.builder.pipeline` applies the `ansible-lockdown/Windows-2022-CIS` role
+with four controls disabled — two UAC Admin Approval Mode controls (2.3.17.1/2)
+that break NTLM mid-session, and two GPO security refresh controls (18.9.19.4/5)
+that kill WinRM. The resulting image is published to
+`quay.io/zigfreed/win2k22-cis-l1-golden` (private, evaluation media licensing).
 
-| Order | Location | Filename |
-|---|---|---|
-| 3 | `%WINDIR%\Panther` — where Setup caches the file it installed from | `Unattend.xml` |
-| 4 | Removable read/write media, root | `Autounattend.xml` |
-| 5 | **Removable read-only media** — the KubeVirt sysprep CD | `Autounattend.xml` |
-
-`image.builder.pipeline` builds from an answer file, Windows caches it to
-`%WINDIR%\Panther`, and the build then runs `sysprep /generalize /oobe /shutdown`
-without deleting the cached copy. Every clone therefore finds the build's own file
-at 3 before it reaches ours at 5. KubeVirt warns about precisely this: *"there is
-no answer file detected when the Sysprep Tool is triggered ... it will just use
-the cached answer file, ignoring the one we provide through the Sysprep API."*
-
-Fix is one `del` in the build's `FirstLogonCommands` before the sysprep step, plus
-a rebuild (~21 min unattended) — `ericcames/image.builder.pipeline#59`. **Nothing
-in this repo changes.** The consumer half is correct and stays as merged.
-
-**Two traps, written down because both cost real time:**
-
-- **The filename is not the bug.** Rows 4 and 5 specify `Autounattend.xml` for
-  *every* configuration pass, not just `windowsPE`. "`oobeSystem` needs
-  `unattend.xml`" is the natural guess and it is wrong; the docs settled it faster
-  than a 10-minute provisioning cycle would have.
-- **Correct plumbing proved nothing.** Secret, ISO, CD-ROM, `volumeStatus` and
-  well-formed XML were all individually verifiable and all correct while the
-  feature did precisely nothing. The check that mattered was the *consequence* —
-  did OOBE actually get skipped — not the wiring.
-
-**A related gap this exposed, not yet addressed:** there is no Windows configure
-path at all. `windemo` is referenced by zero playbooks and zero job templates,
-`register_vm.yml` / `configure_vm.yml` / `check_vm.yml` / `compliance_scan.yml`
-all target `linuxweb`, and no Windows machine credential exists. A Windows guest
-is provisioned and then never touched again, so even a working login would reach
-nothing.
+**A gap not yet addressed:** there is no Windows configure path. `windemo` is
+referenced by zero playbooks and zero job templates; a Windows guest is
+provisioned and then never touched again.
 
 #### Durable storage: private quay.io containerdisk
 
@@ -655,9 +632,10 @@ one `dc1.azure` already produces.
 2. **Terraform** — `terraform init && terraform plan` clean, then apply each tier:
    `-var os_type=linux -var vm_size_tier=small-1cpu-2gb`, then `medium`, then `large`.
    Confirm `oc get vm,vmi -n <ns>` shows Running and the instance type matches the tier.
-3. **Windows** — link the golden image, then apply `-var os_type=both -var
-   vm_size_tier=large-2cpu-6gb`; confirm the Windows VMI reaches Running and WinRM
-   answers on 5986. (This step said `large-2cpu-8gb`, a tier that has never existed.)
+3. **Windows** — link the golden image, then apply `-var os_type=windows -var
+   vm_size_tier=large`; confirm the Windows VMI reaches Running and WinRM
+   answers on 5986. (This step said `large-2cpu-8gb`, a tier that has never
+   existed, and `os_type=both`, which #301 removed.)
 4. **Resource ceiling** — with all VMs up, `oc adm top node` must stay under ~90% memory.
    This is the test that proves the tier table fits the box.
 5. **Both entry points agree** — run each phase once via its skill and once via its AAP job
@@ -669,6 +647,258 @@ one `dc1.azure` already produces.
    before every push.
 
 ---
+
+## Windows demo performance budget (#360, measured 2026-09-08)
+
+**Read this before trying to make the Windows demo faster.** Everything here is
+measured on sandbox against a `large` guest, not estimated, and the two findings
+at the bottom are the ones that change what is worth optimising.
+
+### Where the time goes
+
+Workflow job 433, cold-ish build, **27m 49s total**:
+
+| Node | Time |
+|---|---|
+| 1 Provision | 49s |
+| 2 Patch | 3m 19s |
+| 3 Configure | **20m 12s** |
+| 4 Compliance Scan | 2m 41s |
+| 5 Check | 41s |
+
+Configure, task by task (job 436 events):
+
+| Task | Time |
+|---|---|
+| Gathering Facts | 6s |
+| Install the IIS web server | **3m 42s** |
+| Reboot after IIS | **12m 26s** |
+| Open the Windows firewall for HTTP | 31s |
+| Publish the demo page | 57s |
+| Publish the product logos | 48s |
+| Publish facts.json | 58s |
+| Write the legal notice | 29s |
+
+The 12m 26s reboot was inflated by a one-off — the guest was also applying
+updates that an aborted async `win_updates` had staged — so do not quote it as
+steady state. `win_feature` did report `reboot_required`, so a reboot is
+genuinely in that path.
+
+### Finding 1 — on Windows, the round trip IS the cost
+
+Writing a 5 KB HTML file takes 57 seconds. That is not work; it is a connection,
+a PowerShell process, a module payload and a result. **Task count matters more
+than what the tasks do.**
+
+This is the opposite of the Linux roles' economics, where the same operations are
+milliseconds over SSH with pipelining. `linux_configure` is therefore the wrong
+template to copy task-for-task, and copying it is exactly the mistake #361 had to
+undo.
+
+**Rule of thumb for anything new in `roles/windows_*`: budget ~45 seconds per
+task, and prefer one task that does five things to five tasks that do one.**
+
+### Finding 2 — sysprep first boot is a hard floor of ~6m 30s
+
+That is `wait_for_connection` in node 2 on a cold build: specialize, oobeSystem,
+and the `FirstLogonCommands` that stand up the WinRM listener. Against an
+already-booted guest the same wait is **26.7 seconds**.
+
+Nothing in this repo can shorten it. It is why Linux manages 9m 9s end to end and
+Windows cannot.
+
+### Why a cold build cannot be under 10 minutes
+
+```
+provision 50s + sysprep 6m30s + update scan 2m30s + compliance 2m41s + check 41s
+  = 12m 42s   before configure does anything at all
+```
+
+**This was chased and abandoned deliberately.** The target was under 10 minutes;
+the arithmetic above says no, and **~15m 40s cold was accepted instead** (#360).
+Do not re-open it without new information about the sysprep floor.
+
+### What each proposed change is actually worth
+
+| Change | Where | Saves |
+|---|---|---|
+| Pre-install IIS in the golden image | producer, [ibp#87] | **~16 min** |
+| Collapse `windows_configure`'s file writes | this repo, #361 | ~2m 30s |
+| Bake Windows Updates into the image | producer, [ibp#88] | **~0 min** |
+
+**Patching the image saves no demo time, and that is counterintuitive enough to
+write down.** The ~2m 30s of node 2 is the Windows Update *scan*, and the scan
+costs the same whether it finds forty updates or none — established from the VM
+CPU and Network I/O panels of this repo's own Grafana dashboard, where the search
+phase shows CPU climbing with the network flat. Bake patches in for correctness
+(a golden image forty updates behind is not golden) and to make
+`windows_patching_state=installed` viable, not for speed.
+
+Projected with all three: **~8m 50s warm** (Repair against an existing guest),
+**~15m 40s cold**.
+
+[ibp#87]: https://github.com/ericcames/image.builder.pipeline/issues/87
+[ibp#88]: https://github.com/ericcames/image.builder.pipeline/issues/88
+
+### Still on the table, not done
+
+- The compliance node publishes its report and summary as two separate
+  `win_template` tasks — the same ~1 minute of round-trip overhead #361 removed
+  from `windows_configure`, untouched.
+- A scheduled pre-provision, mirroring the nightly teardowns, would make the
+  ~8m 50s warm path the default rather than something to remember to set up.
+
+---
+
+## The CIS L1 claim IS supportable (#358, closed 2026-09-08)
+
+**The Windows demo guest carries no CIS L1 hardening.** `Windows Day 1 - 4
+Compliance Scan` scores it **9 of 27 controls (33%)**, and all nine passing
+controls are stock Windows Server 2022 values. Two independent defects produced
+that, both of the same shape — **a declared value trusted instead of the
+artifact measured** — and only one of them is this repo's.
+
+### Cause 1 — the cluster never imported the image `connection.yml` names (fixed, #364)
+
+`link_windows_image.yml` decided whether to re-import from whether the `win2k22`
+DataSource was **Ready**, never from **which image** it served. A DataSource is
+Ready for ever once populated, so on any environment past its first run,
+changing `quay_windows_image` and re-running:
+
+- patched the HCO cron template with the new URL — the half that does nothing,
+  because CDI cannot authenticate a `DataImportCron` to a private registry (#224);
+- skipped the DataVolume and the DataSource repoint;
+- passed verification, whose only questions were "Ready?" and "Bound?" — both
+  true of the old image;
+- printed success.
+
+Sandbox therefore advertised `win2k22-cis-l1-golden:20260907-0516` while every
+clone booted `win2k22-golden:20260906-0300`, the producer's deliberately
+**unhardened** publish, imported 26 hours before the hardened image existed.
+
+**Fixed:** the import decision is now identity, not readiness, and the identity
+is re-read and asserted on every run — including runs that import nothing, which
+is the run that had to be able to fail.
+
+**The generalizable rule:** on KubeVirt, `DataSource Ready=True` and `PVC Bound`
+tell you *something* is served, never *what*. Ask the DataVolume:
+
+```bash
+oc get datavolume win2k22-initial-import -n openshift-virtualization-os-images \
+  -o jsonpath='{.spec.source.registry.url}{"\n"}'
+```
+
+A DataVolume's `spec.source` is immutable, so a changed tag needs delete and
+re-import, never an edit in place.
+
+### Cause 2 — the image itself was unhardened (fixed, image.builder.pipeline#92)
+
+After re-importing the correct tag and rebuilding the guest (workflow 459, five
+nodes green, 21m 08s), the score was **unchanged at 33%**. Reading the published
+containerdisk offline settled why, with no cluster involved:
+
+- **0 of 10** CIS controls that cannot be set on a clean install are present in
+  `win2k22-cis-l1-golden:20260907-0516`;
+- `\Policies\Microsoft` exists with only its six stock subkeys and **no
+  `WindowsFirewall`** among them;
+- the disk records **exactly one** sysprep run — `2026-09-05 22:14:45` to
+  `22:16:19` — two days before the tag, and one minute before the unhardened
+  `win2k22-golden:20260905-2217` was published.
+
+**This also disproves the leading hypothesis.** `sysprep /generalize` was
+believed to be stripping the hardening; for it to explain the missing
+`WindowsFirewall` key it would have had to delete exactly that key while leaving
+six stock siblings. It does not do that, and there was nothing to strip anyway.
+
+**The producer-side mechanism is now known, and it was not the one first
+proposed** (`image.builder.pipeline#92`). The guess was that the publish exported
+a stale PVC. It did not — the cluster's `win2k22-build-root` was created by the
+Sep 7 build VM from a blank source and carries that VM's own
+`kubevirt.io/created-by` UID, so the export selected the right volume. **The
+stale artifact was on the operator's laptop.** The producer's conversion step was
+guarded by `creates: disk.qcow2` while its cleanup deleted only the two larger
+intermediates, so a qcow2 survived between runs: the Sep 7 publish downloaded the
+fresh disk, expanded it, *skipped the conversion*, deleted the fresh copy, and
+packaged the Sep 5 one. The file's size — 9307619328 bytes — is recorded in the
+Sep 7 run's own publish record and matches the disk pushed on Sep 5 as the
+deliberately unhardened `win2k22-golden:20260905-2217`.
+
+`creates:` asks whether an output **exists**, never whether it is **current** —
+the same shape as cause 1 here, where *Ready* stood in for *which image*.
+
+**It does not change what this repo does.** The consumer verifies the media it is
+handed regardless of what the producer's gate does, which is the point of
+`utilities/inspect-golden-image.py` — two independent measurements, not one
+trusted upstream promise.
+
+### Cause 3 — the hardened guest could not configure its own WinRM (fixed, #377)
+
+With a genuinely hardened image finally published, a clone became unmanageable:
+port 5986 answered and reset without ever presenting a certificate, so every
+Day 1 node past Provision failed.
+
+`FirstLogonCommands` re-mints the WinRM certificate that `sysprep /generalize`
+strips — and it runs only after somebody logs in. CIS L1 is built to stop that
+happening unattended. Read off the guest's own disk:
+
+```
+legalnoticecaption = 'DoD Notice and Consent Banner'
+disablecad         = '0'      (CTRL+ALT+DEL required)
+```
+
+Either alone blocks `AutoAdminLogon`. The clone booted to a consent banner and
+waited for a click that never came, so no certificate was minted and
+`LocalAccountTokenFilterPolicy` was never set. The WinRM setup now runs from the
+**specialize** pass, staging `SetupComplete.cmd` — SYSTEM, no logon, ComputerName
+already final.
+
+**A precedence trap worth keeping:** `Winlogon\DisableCAD` is `1`, set by the
+build, while the *policy* key `Policies\System\disablecad` is `0`. Policy wins.
+
+**An earlier theory blamed CIS 18.5.1 (`AutoAdminLogon = 0`) and was wrong** —
+the unattend's `oobeSystem` pass overrides it; the guest has `AutoAdminLogon = 1`.
+
+### Resolved, and what it measures
+
+| | |
+|---|---|
+| Current image | `quay.io/zigfreed/win2k22-cis-l1-golden:20260908-1853` (private, 10.4 GB) |
+| Verified before the label was applied | **10 of 10** non-default controls, read off the qcow2 by the producer's publish gate |
+| Verified on the booted, sysprepped guest's disk | **10 of 10** |
+| Compliance scan on the running clone | **26 of 27 compliant (96%)** — 0 non-compliant, 1 not configured |
+| Full `Windows Day 1 - 0 Workflow` | five nodes green, 19.7 min |
+
+**`sysprep /generalize` strips nothing.** That was the leading suspicion for two
+days and it is now measured and wrong. It unblocked `image.builder.pipeline#87`
+and `#88`, which were gated on that question alone.
+
+### What to do for the next tag
+
+- **`utilities/inspect-golden-image.py`** reads the hardening off a published
+  containerdisk offline — `qemu-img` + `ntfsprogs` + `regipy`, no root, no
+  libguestfs, no cluster. **Run it once per new tag before linking**; exit `1`
+  means do not link. Tags are immutable, so one answer holds for ever.
+- The producer now gates itself too (`image.builder.pipeline#92`): its publish
+  refuses to apply `com.redhat.cis.level=L1` unless the disk it is packaging
+  measures hardened, and fails equally when the check cannot reach a verdict.
+  **Two independent measurements, not one trusted upstream promise** — keep both.
+- `link_windows_image.yml` decides from image *identity*, not DataSource
+  readiness (#364), and re-asserts it on every run including ones that import
+  nothing.
+
+### The one lesson, four times over
+
+Every defect here was **a status trusted instead of the artifact measured**:
+
+| | trusted | should have measured |
+|---|---|---|
+| #364 | DataSource is *Ready* | *which image* it serves |
+| ibp#91 / #92 | `creates:` — the file *exists* | whether it is *current* |
+| #377 | provision node *succeeded* | whether the guest was reachable |
+| nearly shipped | a 33% score from a "successful" provision | that Terraform had silently **reused a stale VM** |
+
+The fourth is the one to remember: check a VM's `creationTimestamp` and its
+DataVolume's source before believing any scan taken from it.
 
 ## Open items
 

@@ -11,7 +11,7 @@ research, the constraints, the decisions and the ones that were reversed — rea
 
 ## The one-button workflow
 
-`Sales Demos - Build Demo VM`. Four job templates chained on success, one survey
+`Linux Day 1 - 0 Workflow`. Four job templates chained on success, one survey
 that feeds all of them.
 
 ```mermaid
@@ -19,9 +19,9 @@ flowchart TD
     S["<b>Survey</b><br/>os_type · vm_size_tier"] --> P
 
     P["<b>Provision VM</b><br/>playbooks/provision_vm.yml<br/><i>terraform apply → register host in AAP</i>"]
-    R["<b>Register VMs</b><br/>playbooks/register_vm.yml<br/><i>wait for ssh → attach to the Red Hat CDN</i>"]
-    C["<b>Configure VMs</b><br/>playbooks/configure_vm.yml<br/><i>httpd · firewalld · Cockpit · page · patches</i>"]
-    K["<b>Check VMs</b><br/>playbooks/check_vm.yml<br/><i>log in, gather facts, cache them in AAP</i>"]
+    R["<b>Register Linux VMs</b><br/>playbooks/register_linux_vm.yml<br/><i>wait for ssh → attach to the Red Hat CDN</i>"]
+    C["<b>Configure Linux VMs</b><br/>playbooks/configure_linux_vm.yml<br/><i>httpd · firewalld · Cockpit · page · patches</i>"]
+    K["<b>Check Linux VMs</b><br/>playbooks/check_linux_vm.yml<br/><i>log in, gather facts, cache them in AAP</i>"]
 
     P -->|success| R
     R -->|success| C
@@ -52,7 +52,7 @@ front of a customer (`controller_workflows.yml:10-14`).
 **Why the wait lives in the playbook, not the workflow.** `provision` returns as
 soon as `terraform apply` finishes; the guest takes roughly another minute to
 accept ssh. In a workflow the nodes run back to back with no human pause, so
-`register_vm.yml` opens with `wait_for_connection` — which also protects the
+`register_linux_vm.yml` opens with `wait_for_connection` — which also protects the
 run-it-by-hand path.
 
 ---
@@ -63,10 +63,19 @@ run-it-by-hand path.
 
 | Question | Variable | Choices | Default |
 |---|---|---|---|
-| Operating system | `os_type` | `linux` · `windows` · `both` | `linux` |
-| VM size tier | `vm_size_tier` | `small-1cpu-2gb` · `medium-1cpu-4gb` · `large-2cpu-6gb` | `small-1cpu-2gb` |
+| Hypervisor | `hypervisor` | `ocpvirt` | `ocpvirt` |
+| VM size tier | `vm_size_tier` | `small` · `medium` · `large` | `small` |
 
-**There is deliberately no question for the target environment.** A dropdown is
+**There is deliberately no question for the operating system, and there used to
+be.** This table showed `os_type` with a `linux · windows · both` dropdown until
+#300 removed it and #301 removed the possibility behind it. With one Terraform
+state per environment, picking `windows` in that dropdown set `create_linux=false`
+and planned the *running* Linux VM for destruction — a way to delete the demo
+mid-demo. `os_type` is now pinned per template: `Linux Day 1 - 1 Provision`
+provisions Linux, `Windows Day 1 - 1 Provision` provisions Windows, and each has
+its own state.
+
+**There is deliberately no question for the target environment either.** A dropdown is
 one mis-click away from provisioning into the customer-facing cluster. Each
 controller's template is templated off its own `aap_env_name`, and
 `playbooks/tasks/assert_target_environment.yml` fails the run if `limit` and
@@ -114,7 +123,7 @@ provider driving `kubernetes_manifest`. No community KubeVirt provider.
 | `kubernetes_namespace.demo` | The VM namespace, `sales-demos-<env>` |
 | `VirtualMachineClusterInstancetype` ×3 | The `sd1.small` / `.medium` / `.large` types |
 | `kubernetes_manifest.linux_vm` | RHEL 9 guest, cloned from the `rhel9` DataSource |
-| `kubernetes_manifest.windows_vm` | Windows Server 2022, cloned from `win2k22`; boots, but stops at OOBE — see below |
+| `kubernetes_manifest.windows_vm` | Windows Server 2022, CIS L1 hardened (**verified on the clone: 26 of 27, 96%**), cloned from `win2k22` |
 | `kubernetes_service.linux` | **Headless.** Stable in-cluster DNS for the AAP inventory |
 | `kubernetes_service.linux_web` | ClusterIP on :80, existing solely to back the Route |
 | `kubernetes_manifest.linux_web_route` | The public URL, edge TLS |
@@ -150,11 +159,44 @@ All of it is configuration-as-code under `inventory/group_vars/`, applied by
 | Organization | `IT Service Automation` |
 | Project | `Sales Demos` |
 | Execution environment | `Sales Demos - OCP Virt EE` |
-| Credentials | `Sales Demos - Vault` · `Sales Demos - Linux Machine` · `Sales Demos - PAH Registry` |
+| Credentials | `Sales Demos - Vault` · `Sales Demos - Env Secrets` · `Sales Demos - Linux Machine` · `Sales Demos - Windows Machine` · `Sales Demos - PAH Registry` |
 | Inventory | `Sales Demo VMs` · `Sales Demo VMs - Control` |
-| Job templates | `Sales Demos - Provision VM` · `Register VMs` · `Configure VMs` · `Check VMs` · `Run Demo` · `Teardown VMs` |
-| Workflow | `Sales Demos - Build Demo VM` |
-| Schedules | `Sales Demos - Nightly teardown (6 PM)` (+ a 10 PM safety net in sandbox) |
+| Job templates | `Linux Day 1 - 1 Provision` · `2 Register` · `3 Configure` · `4 Compliance Scan` · `5 Check` · `Repair` · `Teardown` |
+| | `AAP Ecosystem - Install Automation Orchestrator` · `Install MCP Server` · `Install Self-Service Portal` |
+| | `AAP Observability - 1 Deploy Alloy` · `2 Deploy Dashboards` |
+| | `Cluster Day 0 - 1 Install OpenShift Virtualization` · `2 Verify Environment` · `Probe Capacity` |
+| | `Golden Image - Link RHEL 9 CIS L1` · `Link Windows 2022 CIS L1` |
+| | `Self-Service - Request Linux Server` · `Request Windows Server` |
+| | `Windows Day 1 - 1 Provision` · `2 Patch` · `3 Configure` · `4 Compliance Scan` · `5 Check` · `Repair` · `Teardown` |
+| Workflows | `Cluster Day 0` · `Linux Day 1 - 0 Workflow` · `Windows Day 1 - 0 Workflow` |
+| Labels | `linux` · `windows` · `cluster` · `aap-ecosystem` · `observability` · `golden-image` · `day-0` · `day-1` · `install` · `ocpvirt` · `read-only` · `self-service` |
+| Schedules | `Linux Day 1 - Nightly teardown (6 PM)` · `Windows Day 1 - Nightly teardown (6 PM)` (+ 10 PM safety nets in sandbox) |
+
+**Almost everything runs from AAP now, and the exceptions are deliberate.**
+Standing up an environment is one laptop command — `config.yml` — and then
+buttons. Three things stay off the platform on purpose:
+
+| Stays on the laptop | Why |
+|---|---|
+| `utilities/build-ee.sh` | Needs podman and the Red Hat offline token, which #22 and #68 keep to a single copy. Building a container image is not an AAP job. |
+| `playbooks/config.yml` | It *creates* the job templates. The thing that creates the automation is not itself automated by what it created. |
+| `sync_hub.yml` / `curate_hub.yml` | Same offline-token reason (#68). |
+
+Named here so nobody hunts for a job template that cannot exist. `setup.yml`
+also remains as the single-command laptop path — the AAP route is additive.
+
+**Domains chips are label filters, and per-user.** The `Network` / `Backup` /
+`Security` chips above the Templates list filter on labels — measured:
+`?labels__name=linux` returns 9. There is no Domains object in any API and
+nothing in `settings/`, so `config.yml` cannot set them; each person configures
+their own via the wrench icon. The labels below are what they filter on.
+
+**Names order, labels group.** The name gives an object one position in the
+alphabetical Templates list, which is why the chain steps are numbered — an SE
+following along mid-demo needs to know what runs next. Labels are the other
+axis: they filter the Templates *and* Jobs pages, and `ocpvirt` sits only on
+the templates that actually run Terraform, so filtering by it returns what
+breaks when the hypervisor changes rather than the whole family.
 
 **Two inventories, one of them empty.** `Sales Demo VMs` holds the demo VMs;
 `Sales Demo VMs - Control` stays empty and exists only for teardown, because AAP
@@ -190,9 +232,9 @@ Measured, not estimated — this is workflow job 225, start to finish:
 |---|---|---|
 | Source control update + inventory sync | 6 s + 9 s (parallel) | — |
 | **Provision VM** | 36 s | 7% |
-| **Register VMs** | 4 m 25 s | 48% |
-| **Configure VMs** | 3 m 49 s | 42% |
-| **Check VMs** | 5 s | 1% |
+| **Register Linux VMs** | 4 m 25 s | 48% |
+| **Configure Linux VMs** | 3 m 49 s | 42% |
+| **Check Linux VMs** | 5 s | 1% |
 | **Whole workflow** | **9 m 9 s** | |
 
 **Ninety percent of the run is register plus configure** — attaching to the CDN
@@ -200,7 +242,7 @@ and then pulling packages and patches over it. The machine itself exists in
 under 40 seconds. That is the honest shape of the demo, and it is why "the VM
 built in 45 seconds" and "the demo takes nine minutes" are both true.
 
-Use `Check VMs` at 5 seconds when someone asks whether the verification step is
+Use `Check Linux VMs` at 5 seconds when someone asks whether the verification step is
 real: it logs in, gathers facts and caches them, and that is all it needs to do.
 
 ### Everything else
@@ -248,39 +290,39 @@ The sub-minute clone is the number worth quoting. It is the CSI smart-clone path
 on Ceph RBD — a snapshot, not a copy — so a 60 GiB Windows disk costs about what
 a 30 GiB Linux one does.
 
-### Why you still cannot log in
+### How the Windows clone works
 
-The published image is **generalized** — the build runs
-`sysprep /generalize /oobe /shutdown` — so a clone boots into the OOBE specialize
-pass and the built-in Administrator holds a random password the build discarded.
-`terraform/ocpvirt` answers that with a `sysprep` volume: a Secret holding an
-`autounattend.xml`, attached as a read-only CD-ROM, which sets the ComputerName,
-creates the local administrator, skips OOBE, and re-mints the WinRM listener
-(#201).
+The published image is **built to be CIS L1 hardened, and generalized** — the
+build in `image.builder.pipeline` applies the `ansible-lockdown/Windows-2022-CIS`
+role, then runs `sysprep /generalize /oobe /shutdown`.
 
-**It is attached correctly and Windows ignores it**, because of where Windows
-looks. Microsoft's implicit answer-file search order:
+> **The hardening half of that sentence is demonstrable again, and this page
+> once stated the opposite.** It read that a clone scored 9 of 27 (33%) and that
+> whether the hardening reached a clone was open. Measured 2026-09-08, a clone of
+> `win2k22-cis-l1-golden:20260908-1853` scores **26 of 27 (96%)**, and the
+> hardening was read directly off the guest's own disk at **10 of 10** on
+> controls impossible to set on a clean install. **`sysprep /generalize` strips
+> nothing** — that was the leading suspicion for two days and it is now measured
+> and wrong. The 33% readings came from guests cloned from unhardened media.
 
-| Order | Location | Filename |
-|---|---|---|
-| 3 | `%WINDIR%\Panther` — where Setup caches the file it installed from | `Unattend.xml` |
-| 4 | Removable read/write media, root | `Autounattend.xml` |
-| 5 | **Removable read-only media** — our sysprep CD | `Autounattend.xml` |
+A clone boots into the OOBE specialize pass and the built-in Administrator holds
+a random password the build discarded. `terraform/ocpvirt` answers that with a `sysprep` volume: a Secret
+holding an `Unattend.xml`, attached as a read-only CD-ROM, which sets the
+ComputerName, creates the local administrator (`demoadmin`), skips OOBE, and
+re-mints the WinRM listener (#201, #234, #255).
 
-The image was built from an answer file, Windows cached it to `%WINDIR%\Panther`,
-and the build sysprepped without deleting it. So every clone finds the build's
-file at 3 before it reaches ours at 5. KubeVirt documents this exact trap: *"there
-is no answer file detected when the Sysprep Tool is triggered ... it will just use
-the cached answer file, ignoring the one we provide through the Sysprep API."*
+Three stacked bugs blocked this path until 2026-09-06:
 
-The fix is one `del` in the build's `FirstLogonCommands` plus a rebuild, and it
-belongs to the producer — `ericcames/image.builder.pipeline#59`. Nothing in this
-repo needs to change.
+1. **Cached answer file** — the producer left a build-time answer file in
+   `%WINDIR%\Panther`, which Windows found before the sysprep CD
+   (`image.builder.pipeline#69`).
+2. **Secret key naming** — the Secret key was `autounattend.xml` but the
+   specialize pass needs `Unattend.xml` (#234).
+3. **15-char NetBIOS limit** — the ComputerName exceeded 15 characters and
+   sysprep silently failed (#234).
 
-**The filename is not the bug.** Rows 4 and 5 specify `Autounattend.xml` for
-*every* configuration pass, not just `windowsPE`. Assuming `unattend.xml` is
-needed for `oobeSystem` is a natural guess, and wrong; it is written down here so
-the next person does not spend a provisioning cycle proving it.
+All three are fixed and verified end-to-end: clone reaches the desktop,
+`win_ping` succeeds from AAP (#257).
 
 The provision playbook still **preflights the DataSource and warns rather than
 refusing**, so `os_type=both` is never blocked by the Windows half.
