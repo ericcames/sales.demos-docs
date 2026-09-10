@@ -4,6 +4,13 @@ Demo documentation, talk tracks, and architecture guides. Published as a
 GitHub Pages site at
 [ericcames.github.io/sales.demos-docs](https://ericcames.github.io/sales.demos-docs).
 
+**[`CONTRIBUTING.md`](CONTRIBUTING.md) is the human-facing version of the
+conventions below** (#7). It is deliberately a second copy rather than a link:
+this file is loaded into an agent's context automatically and `CONTRIBUTING.md`
+is not, so moving the rules out of here would quietly degrade every session.
+**Change one, change the other** — and prefer `CONTRIBUTING.md` as the place a
+new rule is written first, since a person can find it.
+
 ## This repo is public
 
 No customer information, ever. No customer name, password, or API token in any
