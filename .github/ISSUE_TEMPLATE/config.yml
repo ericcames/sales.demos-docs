@@ -1,0 +1,23 @@
+---
+# Turn off the blank-issue escape hatch so every issue arrives shaped.
+blank_issues_enabled: false
+
+contact_links:
+  - name: Read the published site
+    url: https://ericcames.github.io/sales.demos-docs
+    about: >-
+      Run sheets, talk tracks, architecture and objections for every demo.
+      Start here before filing anything.
+  - name: The automation these docs describe
+    url: https://github.com/ericcames/sales.demos
+    about: >-
+      Playbooks, inventory, skills and terraform live there. A demo that does
+      not work is an issue for that repo, not this one.
+  - name: Report a committed credential or customer identifier
+    url: https://github.com/ericcames/sales.demos-docs/blob/main/.github/SECURITY.md
+    about: >-
+      Read the security policy first. Open the issue without quoting the value.
+  - name: Contributing guide
+    url: https://github.com/ericcames/sales.demos-docs/blob/main/CONTRIBUTING.md
+    about: >-
+      Branching, PRs, the two CI checks, and how to add a demo.
