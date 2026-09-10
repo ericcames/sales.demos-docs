@@ -223,7 +223,7 @@ credentials in the vault.
 
 ### Step 5 — Provision demo VMs
 
-Launch **Sales Demos - Build Demo VM** from AAP, or:
+Launch **`Linux Day 1 - 0 Workflow`** from AAP, or:
 
 ```bash
 ansible-playbook playbooks/provision_vm.yml \
@@ -240,7 +240,7 @@ ansible-playbook playbooks/provision_vm.yml \
 - [ ] `oc get nodes` shows one node, `Ready`
 - [ ] `oc get csv -A` shows AAP, CNV, LVMS, Compliance operators `Succeeded`
 - [ ] AAP gateway is reachable at `https://aap-aap.apps.<cluster>.<domain>`
-- [ ] `Sales Demos - Build Demo VM` job template exists in AAP
+- [ ] `Linux Day 1 - 0 Workflow` exists in AAP (workflows are shared config, so `config.yml` creates it on `edge` too)
 - [ ] A test VM provisions and the demo page returns 200
 
 ---

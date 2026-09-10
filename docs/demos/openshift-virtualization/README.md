@@ -59,12 +59,19 @@ control, in public, that converges instead of merely running.
 Every image the talk track needs is committed, from two different sources.
 
 **Rendered, not photographed.** Both guest-facing artifacts are Jinja templates,
-so they render on a laptop with nothing running. `utilities/render-demo-assets.py`
+so they render on a laptop with nothing running.
+[`utilities/render-demo-assets.py`](https://github.com/ericcames/sales.demos/blob/main/utilities/render-demo-assets.py)
 renders the demo page and screenshots it with headless Chrome, and prints the two
-login banners and `facts.json` as text:
+login banners and `facts.json` as text.
+
+**It lives in `sales.demos`, not here** — it reads its templates from the
+`linux_configure` role — so run it from a checkout of that repo, cloned beside
+this one:
 
 ```bash
-python3 utilities/render-demo-assets.py
+cd ../sales.demos
+python3 utilities/render-demo-assets.py          # writes into this repo via --out
+python3 utilities/render-demo-assets.py --no-png # banners only, no Chrome
 ```
 
 That writes [`demo-page.png`](../../images/demo-page.png):
