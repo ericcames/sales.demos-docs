@@ -10,6 +10,38 @@ changed and why, in the order it merged.
 
 ## [Unreleased]
 
+### Fixed -- the edge run sheet launched a job template the automation deletes (#1)
+
+- **`edge-sno/run-sheet.md` told a presenter to launch `Sales Demos - Build Demo
+  VM`**, in the Phase 3 steps and again in the verification checklist. That name
+  carries `state: absent` in `controller_workflows.yml` -- `config.yml` actively
+  *removes* it. Now `Linux Day 1 - 0 Workflow`, with a note that workflows are
+  shared config, so `config.yml` creates it on `edge` too.
+- **#13 missed this**, and the reason is worth recording: that PR resolved the
+  drifted files by taking whichever copy was newer per directory, and `edge-sno/`
+  was taken from here wholesale because it is two to three times longer than the
+  stub in `sales.demos`. Longer was the right call and is not the same as
+  current -- the OCP Virt pages got their retired template names corrected in the
+  same PR only because *those* came across from `sales.demos`.
+- **Swept the whole class rather than the two lines.** All 15 `state: absent`
+  objects checked against every page: the only remaining hits are the two
+  screenshot caveats in `openshift-virtualization/`, which say the *image* shows
+  the old title and to retake it from `Linux Day 1 - 0 Workflow`. Those are
+  correct and stay.
+
+### Fixed -- a command that cannot run where the document sits (#9)
+
+- `openshift-virtualization/README.md` gave `python3 utilities/render-demo-assets.py`
+  as if it were runnable from this repo. It lives in `sales.demos` -- it reads
+  templates from the `linux_configure` role -- and this repo's `utilities/` holds
+  only `check-no-secrets.sh`.
+- Now says so, links to the script, and shows it run from a sibling checkout
+  including the `--no-png` form. The `--out` flag added in sales.demos#422 means
+  the PNG lands back in this repo.
+- The eight broken `../../../` links this issue was opened for were fixed in #13;
+  this was the remaining half. Verified: **0 broken relative links** across
+  `docs/`.
+
 ### Fixed -- sizing tables described tiers as they were before they were resized (#14)
 
 - **`large` was documented as 2 vCPU / 6 GiB. It is 4 / 16.** `small` is 2 / 4
