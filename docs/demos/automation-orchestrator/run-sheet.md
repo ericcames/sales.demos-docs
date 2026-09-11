@@ -44,7 +44,7 @@ that, present from this.
 
 ## 0–2 · Login through AAP SSO
 
-![AO login page — SSO button, no environment badge](../../images/ao-login-page.png)
+![AO login page — SSO button, SANDBOX badge at the top](../../images/ao-login-page.png)
 
 **Show the AO login page.** Point at "Log in with Ansible Automation Platform".
 
