@@ -49,7 +49,11 @@ that, present from this.
 **Show the AO login page.** Point at "Log in with Ansible Automation Platform".
 
 Click it. The redirect lands on the AAP sign-in page — point at the
-environment badge. Log in with the AAP admin credentials. Land in AO.
+environment badge.
+
+![AAP login page — SANDBOX badge and prelogin warning](../../images/aap-login-page-sandbox.png)
+
+Log in with the AAP admin credentials. Land in AO.
 
 > **"Same credentials. One identity store. Automation Orchestrator delegates
 > authentication to the AAP gateway — no separate user database."**
@@ -194,7 +198,7 @@ the customer.
 ## Screenshots still worth capturing
 
 - [x] AO login page with "Log in with Ansible Automation Platform" button
-- [ ] AAP sign-in page showing the OIDC redirect (environment badge visible)
+- [x] AAP sign-in page showing the OIDC redirect (environment badge visible)
 - [ ] AO Integrations page showing AAP connected with template count
 - [ ] AO canvas with a completed workflow — all nodes connected
 - [ ] AO execution view mid-run, approval node waiting
