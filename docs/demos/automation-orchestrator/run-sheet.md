@@ -138,7 +138,7 @@ After approval, the remaining nodes execute. Point at the final scan result.
 
 No screen needed. Step away from the keyboard for this beat.
 
-Three points, volunteered:
+Two points, volunteered:
 
 1. **The redhat.com interactive demo shows EDA triggers and LLM analysis** —
    those are not wired up here. This demo shows the canvas and the gate, which
@@ -146,11 +146,6 @@ Three points, volunteered:
 2. **The MCP server is read-only** — it queries AO, it does not create or run
    workflows. The governance model for AI-initiated workflows is a separate
    conversation.
-3. **The post-login pages have no environment badge yet** — the login page
-   now shows the badge (aap-env-badge v1.4.0), but after SSO login the badge
-   disappears. Unlike AAP, AO does not expose a `custom_login_info` or
-   `custom_logo` setting. The product is version 2026.8, its first GA release.
-   Tracked in [ericcames/sales.demos#488](https://github.com/ericcames/sales.demos/issues/488).
 
 > **"I show you the gaps because every one of them has an issue number. The
 > things I showed you working are the things that are working."**
@@ -199,7 +194,7 @@ the customer.
 | Symptom | Move |
 |---|---|
 | AO login page returns 502 | The Route or backend pod is down. Describe the demo verbally and show AAP directly |
-| OIDC redirect fails (502 from AAP) | Click "Sign in using local account" — use `admin` / the AAP admin password |
+| OIDC redirect fails | Click "Sign in using local account" — use `admin` / the AAP admin password. Unlikely since `APP_OIDC_ALLOW_PRIVATE_NETWORKS` was set (#492) |
 | Integration shows 0 templates | Re-run `AAP Ecosystem - Configure Automation Orchestrator` from AAP, wait 60 seconds |
 | Approval node does not appear in node types | Confirm you are logged in as an authenticated user (not a service account) |
 | Workflow fails to save | Check the validation message — duplicate node names or unconnected edges are the common causes |
