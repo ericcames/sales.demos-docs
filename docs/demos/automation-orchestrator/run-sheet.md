@@ -146,9 +146,11 @@ Three points, volunteered:
 2. **The MCP server is read-only** — it queries AO, it does not create or run
    workflows. The governance model for AI-initiated workflows is a separate
    conversation.
-3. **The login page has no environment badge** — unlike AAP, AO does not yet
-   expose a `custom_login_info` or `custom_logo` setting. The product is
-   version 2026.8, its first GA release.
+3. **The post-login pages have no environment badge yet** — the login page
+   now shows the badge (aap-env-badge v1.4.0), but after SSO login the badge
+   disappears. Unlike AAP, AO does not expose a `custom_login_info` or
+   `custom_logo` setting. The product is version 2026.8, its first GA release.
+   Tracked in [ericcames/sales.demos#488](https://github.com/ericcames/sales.demos/issues/488).
 
 > **"I show you the gaps because every one of them has an issue number. The
 > things I showed you working are the things that are working."**
