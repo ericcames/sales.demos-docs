@@ -6,14 +6,14 @@ config-as-code in
 [`inventory/group_vars/aap/`](https://github.com/ericcames/sales.demos/tree/main/inventory/group_vars/aap),
 applied by `playbooks/config.yml` like everything else.
 
-Measured against `main` on 2026-09-10: **32 job templates and 4 workflows.**
+Measured against `main` on 2026-09-11: **33 job templates and 5 workflows.**
 The counts here come from `controller_templates.yml` and
 `controller_workflows.yml`, ignoring entries carrying `state: absent` — those
 are tombstones that *delete* superseded objects, not things AAP runs.
 
 ---
 
-## The four workflows
+## The five workflows
 
 A workflow is the entry point. Launch the workflow, not the templates inside
 it — the survey collects every input once and the nodes chain on success.
@@ -50,6 +50,15 @@ Windows Day 1 - 1 Provision
                     └─> Windows Day 1 - 5 Check
 ```
 
+### `AAP Ecosystem - Deploy Automation Orchestrator`
+
+Install and configure AO in one button:
+
+```
+AAP Ecosystem - Install Automation Orchestrator
+  └─> AAP Ecosystem - Configure Automation Orchestrator
+```
+
 ### `Windows Day 2 - 0 Break Fix`
 
 The compliance story — scan either side of a deliberate regression, so the
@@ -73,7 +82,7 @@ Windows Day 2 - Break Compliance
 | `Linux Day 1` | 7 | Provision, register, configure, scan, check, repair, teardown |
 | `Windows Day 1` | 7 | Provision, patch, configure, scan, check, repair, teardown |
 | `Windows Day 2` | 6 | Break/fix compliance, scan, patch, check SMB, .NET patch report |
-| `AAP Ecosystem` | 3 | Automation Orchestrator, self-service portal, MCP server |
+| `AAP Ecosystem` | 4 | Install AO, configure AO, self-service portal, MCP server |
 | `AAP Observability` | 2 | Deploy Alloy, deploy dashboards |
 | `Self-Service` | 2 | Request a Linux or Windows server via the portal |
 

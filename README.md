@@ -13,7 +13,7 @@ changes the story is a `git diff` away from changing with it.
 | **For** | Red Hat pre-sales engineers preparing and presenting a demo |
 | **Produces** | A searchable site — run sheets, talk tracks, architecture, objections |
 | **Read it** | **[ericcames.github.io/sales.demos-docs](https://ericcames.github.io/sales.demos-docs)** |
-| **Status** | Four demos published — OpenShift Virtualization, Private Automation Hub, MCP Servers, Edge / SNO |
+| **Status** | Five demos published — OpenShift Virtualization, Private Automation Hub, MCP Servers, Automation Orchestrator, Edge / SNO |
 
 The site is mkdocs-material, built and deployed from `main` by GitHub Actions.
 The markdown in `docs/` is the only source; there is nothing to build by hand.
