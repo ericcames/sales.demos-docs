@@ -44,6 +44,8 @@ that, present from this.
 
 ## 0–2 · Login through AAP SSO
 
+![AO login page — SSO button, no environment badge](../../images/ao-login-page.png)
+
 **Show the AO login page.** Point at "Log in with Ansible Automation Platform".
 
 Click it. The redirect lands on the AAP sign-in page — point at the
@@ -191,7 +193,7 @@ the customer.
 
 ## Screenshots still worth capturing
 
-- [ ] AO login page with "Log in with Ansible Automation Platform" button
+- [x] AO login page with "Log in with Ansible Automation Platform" button
 - [ ] AAP sign-in page showing the OIDC redirect (environment badge visible)
 - [ ] AO Integrations page showing AAP connected with template count
 - [ ] AO canvas with a completed workflow — all nodes connected
