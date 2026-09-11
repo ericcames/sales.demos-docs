@@ -179,13 +179,13 @@ All of it is configuration-as-code under `inventory/group_vars/`, applied by
 | Credentials | `Sales Demos - Vault` · `Sales Demos - Env Secrets` · `Sales Demos - Linux Machine` · `Sales Demos - Windows Machine` · `Sales Demos - PAH Registry` |
 | Inventory | `Sales Demo VMs` · `Sales Demo VMs - Control` |
 | Job templates | `Linux Day 1 - 1 Provision` · `2 Register` · `3 Configure` · `4 Compliance Scan` · `5 Check` · `Repair` · `Teardown` |
-| | `AAP Ecosystem - Install Automation Orchestrator` · `Install MCP Server` · `Install Self-Service Portal` |
+| | `AAP Ecosystem - Install Automation Orchestrator` · `Configure Automation Orchestrator` · `Install MCP Server` · `Install Self-Service Portal` |
 | | `AAP Observability - 1 Deploy Alloy` · `2 Deploy Dashboards` |
 | | `Cluster Day 0 - 1 Install OpenShift Virtualization` · `2 Verify Environment` · `Probe Capacity` |
 | | `Golden Image - Link RHEL 9 CIS L1` · `Link Windows 2022 CIS L1` |
 | | `Self-Service - Request Linux Server` · `Request Windows Server` |
 | | `Windows Day 1 - 1 Provision` · `2 Patch` · `3 Configure` · `4 Compliance Scan` · `5 Check` · `Repair` · `Teardown` |
-| Workflows | `Cluster Day 0` · `Linux Day 1 - 0 Workflow` · `Windows Day 1 - 0 Workflow` |
+| Workflows | `AAP Ecosystem - Deploy Automation Orchestrator` · `Cluster Day 0` · `Linux Day 1 - 0 Workflow` · `Windows Day 1 - 0 Workflow` |
 | Labels | `linux` · `windows` · `cluster` · `aap-ecosystem` · `observability` · `golden-image` · `day-0` · `day-1` · `install` · `ocpvirt` · `read-only` · `self-service` |
 | Schedules | `Linux Day 1 - Nightly teardown (6 PM)` · `Windows Day 1 - Nightly teardown (6 PM)` (+ 10 PM safety nets in sandbox) |
 

@@ -20,7 +20,7 @@ nothing except through the governed automation path — in about twenty minutes.
 |---|---|
 | [`run-sheet.md`](run-sheet.md) | **While presenting.** Minute markers, what is on screen, exact commands, recovery moves |
 | [`talk-track.md`](talk-track.md) | **While rehearsing.** The narrative and the actual words, beat by beat |
-| [`architecture.md`](architecture.md) | **When asked "how does that work".** The six servers, the credential flow, the access posture |
+| [`architecture.md`](architecture.md) | **When asked "how does that work".** The seven servers, the credential flow, the access posture |
 | [`objections.md`](objections.md) | **Before you go in.** What this audience asks — especially the security questions |
 | [`server-inventory.md`](server-inventory.md) | **When asked "what can it do".** Full tool listings, status tables, verification commands |
 | [`building-a-server.md`](building-a-server.md) | **When asked "what about *my* platform".** When no MCP server exists: whether to build one, what language, transport, packaging, hosting |

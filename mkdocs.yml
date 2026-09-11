@@ -71,6 +71,12 @@ nav:
           - Building a Server: demos/mcp-servers/building-a-server.md
           - Server Inventory: demos/mcp-servers/server-inventory.md
           - ServiceNow: demos/mcp-servers/servicenow.md
+      - Automation Orchestrator:
+          - Overview: demos/automation-orchestrator/README.md
+          - Run Sheet: demos/automation-orchestrator/run-sheet.md
+          - Talk Track: demos/automation-orchestrator/talk-track.md
+          - Architecture: demos/automation-orchestrator/architecture.md
+          - Objections: demos/automation-orchestrator/objections.md
       - Edge / Single Node OpenShift:
           - Overview: demos/edge-sno/README.md
           - Run Sheet: demos/edge-sno/run-sheet.md
@@ -94,4 +100,5 @@ nav:
       - Private Automation Hub: plan/pah-plan.md
       - Grafana Cloud: plan/grafana-plan.md
       - Network MCP: plan/network-mcp-plan.md
+      - Automation Orchestrator: plan/automation-orchestrator-plan.md
       - Platform Add-ons: plan/platform-addons-plan.md

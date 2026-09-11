@@ -6,11 +6,12 @@ audience sees the same view the assistant works from.
 
 ---
 
-## The six servers at a glance
+## The seven servers at a glance
 
-Measured 2026-09-03 (OpenShift sandbox/demo, AAP), 2026-09-06 (Grafana) and
-2026-09-09 (`openshift-edge`) against `kubernetes-mcp-server@0.0.66`, AAP 2.7
-(controller 4.8.6), and `mcp-grafana` via `uvx`.
+Measured 2026-09-03 (OpenShift sandbox/demo, AAP), 2026-09-06 (Grafana),
+2026-09-09 (`openshift-edge`) and 2026-09-11 (`ao-sandbox`) against
+`kubernetes-mcp-server@0.0.66`, AAP 2.7 (controller 4.8.6), `mcp-grafana` via
+`uvx`, and `ao-mcp-server.py` (custom).
 
 | Server | Platform | Transport | Access | Tools | Auth | Source |
 |---|---|---|---|---|---|---|
@@ -19,6 +20,7 @@ Measured 2026-09-03 (OpenShift sandbox/demo, AAP), 2026-09-06 (Grafana) and
 | `openshift-edge` | OpenShift | stdio (local) | read-write | 25 | kubeconfig | `.mcp.json` (committed) |
 | `aap-sandbox` | AAP | streamable HTTP | read-write | ~140 | bearer token | `claude mcp add --scope local` |
 | `aap-demo` | AAP | streamable HTTP | read-only | ~95 | bearer token | `claude mcp add --scope local` |
+| `ao-sandbox` | Automation Orchestrator | stdio (local) | read-only | 32 | admin password | `claude mcp add --scope local` |
 | `grafana` | Grafana Cloud | stdio (local) | read-only (Viewer) | 81 | SA token | `claude mcp add --scope local` |
 
 **One server per environment, named after it** — except Grafana. The #16
@@ -39,16 +41,21 @@ velocity. Grafana is read-only by a different mechanism — the service account
 has the Viewer role, so write tools are exposed but the token lacks permission
 to execute them.
 
-**Six is the whole list.** There is no ServiceNow, Dynatrace or network vendor
+**Seven is the whole list.** There is no ServiceNow, Dynatrace or network vendor
 server here, and the tables below are complete rather than abridged.
 
 **There is no `aap-edge` server.** `edge` runs AAP, but the MCP server for it
 has not been built: `utilities/make-aap-mcp.sh` takes only `sandbox` and
 `demo`, and it defaults anything that is not `demo` to **write** scope, so
 adding `edge` is a posture decision rather than a one-line change. If asked,
-say that plainly — three OpenShift servers, two AAP. For why
+say that plainly — three OpenShift servers, two AAP, one AO. For why
 ServiceNow is absent rather than pending, see [`servicenow.md`](servicenow.md);
 for what building one would take, [`building-a-server.md`](building-a-server.md).
+
+**There is no `ao-demo` or `ao-edge` server.** `utilities/make-ao-mcp.sh`
+supports both `sandbox` and `demo`, but only `ao-sandbox` is currently
+registered. `ao-edge` does not exist because there is no AAP MCP server for
+edge yet, and the AO server would add value only alongside one.
 
 ---
 
@@ -178,6 +185,34 @@ the tool surface), the Grafana server exposes all 81 tools regardless of the
 service account's role. Write calls (`update_dashboard`, `create_incident`,
 etc.) simply fail with `403`. The governance is in the token, not the tool
 surface.
+
+---
+
+## Automation Orchestrator MCP server — 32 tools
+
+Measured 2026-09-11. A custom Python server (`utilities/ao-mcp-server.py`)
+wrapping the AO REST API. Registered via `utilities/make-ao-mcp.sh <env>`.
+Read-only — no create, update, or delete tools.
+
+| Category | Representative tools | Count |
+|---|---|---|
+| Workflows | `workflows_list`, `workflow_get`, `workflow_versions` | 3 |
+| Executions | `executions_list`, `execution_get`, `execution_activities` | 3 |
+| Integrations | `integrations_list`, `integration_get`, `integration_tools`, `integration_models` | 4 |
+| AAP proxies | `proxies_aap_job_templates`, `proxies_aap_workflow_job_templates`, `proxies_aap_inventories`, `proxies_aap_organizations`, `proxies_aap_credentials`, `proxies_aap_execution_environments`, `proxies_aap_job_template_get` | 7 |
+| Projects | `projects_list`, `project_get` | 2 |
+| Users & groups | `users_list`, `groups_list`, `me` | 3 |
+| Credentials | `credentials_list`, `credential_types_list` | 2 |
+| Identity | `identity_providers_list` | 1 |
+| Policies | `policies_list`, `approvals_list` | 2 |
+| Settings | `settings_categories`, `setting_get` | 2 |
+| Tools | `tools_list` | 1 |
+| Service accounts | `service_accounts_list` | 1 |
+| System | `version` | 1 |
+
+**Read-only by design, not by token.** The server exposes no mutating tools at
+all. The demo story is inspection and governance — "look at what AO
+orchestrates" — not AI-driven workflow creation.
 
 ---
 
