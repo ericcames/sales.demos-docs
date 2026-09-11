@@ -62,11 +62,18 @@ Log in with the AAP admin credentials. Land in AO.
 
 ## 2–4 · Show the integration
 
-Navigate to **Integrations**. Click the AAP integration. Point at three things:
+Navigate to **Configuration → Integrations**. One row: Ansible Automation
+Platform, Enabled.
+
+![AO Integrations page — AAP connected and enabled](../../images/ao-integrations.png)
+
+Click the AAP integration. Point at three things:
 
 - Status: enabled
 - Base URL: the AAP gateway hostname
-- Job templates discovered: 33
+- Connection credential: AAP Admin
+
+![AO integration detail — AAP URL, credential, scope](../../images/ao-integration-detail.png)
 
 > **"These are your existing job templates. Nothing was migrated, nothing was
 > copied. AO sees them through the integration and can use them as workflow
@@ -76,7 +83,11 @@ Navigate to **Integrations**. Click the AAP integration. Point at three things:
 
 ## 4–10 · Build the workflow on the canvas
 
-Click **Create Workflow**. Name it.
+Click **Create Workflow**. The canvas opens with trigger options on the right.
+
+![AO workflow builder — empty canvas with trigger options](../../images/ao-workflow-builder.png)
+
+Pick **Manual trigger**, then name it.
 
 ### Preferred story: Windows Day 2 compliance (if VMs are running)
 
@@ -199,8 +210,8 @@ the customer.
 
 - [x] AO login page with "Log in with Ansible Automation Platform" button
 - [x] AAP sign-in page showing the OIDC redirect (environment badge visible)
-- [ ] AO Integrations page showing AAP connected with template count
-- [ ] AO canvas with a completed workflow — all nodes connected
+- [x] AO Integrations page showing AAP connected with template count
+- [ ] AO canvas with a completed workflow — all nodes connected (needs live rehearsal)
 - [ ] AO execution view mid-run, approval node waiting
 - [ ] AO execution view after approval, showing the audit trail
 - [ ] AO execution view at completion, all nodes succeeded
