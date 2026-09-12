@@ -85,6 +85,7 @@ nav:
           - Objections: demos/edge-sno/objections.md
   - Reference:
       - Overview: reference/README.md
+      - First-Time Setup: reference/first-time-setup.md
       - Environments: reference/environments.md
       - Running Playbooks: reference/running-playbooks.md
       - Running from AAP: reference/running-from-aap.md
