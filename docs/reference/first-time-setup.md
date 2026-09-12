@@ -5,10 +5,9 @@ One-time, per-machine setup for using
 10 minutes. After this, go straight to `/ocpvirt-setup`.
 
 This page is the full reference — every prerequisite, every verification
-command. The
-[interactive skill](https://github.com/ericcames/sales.demos/blob/main/.claude/skills/sales-demos-first-time/SKILL.md)
-(`/sales-demos-first-time` in Claude Code) runs the same steps and validates
-each one as you go.
+command.
+[`/sales-demos-first-time`](https://github.com/ericcames/sales.demos/blob/main/.claude/skills/sales-demos-first-time/SKILL.md)
+is the same thing as a Claude Code skill that runs each step interactively.
 
 !!! note "Scope"
     This covers laptop prerequisites only. Pointing at a specific RHDP
