@@ -113,7 +113,7 @@ which chains both.
 
 Then log in to AO through AAP SSO and build the demo workflow on the canvas.
 
-New to this repo? Run `/sales-demos-first-time` first.
+New to this repo? Run [`/sales-demos-first-time`](https://github.com/ericcames/sales.demos/blob/main/.claude/skills/sales-demos-first-time/SKILL.md) first.
 
 ---
 

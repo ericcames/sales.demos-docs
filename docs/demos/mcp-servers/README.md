@@ -87,7 +87,7 @@ you want to confirm independently:
 claude mcp list           # all six servers should appear
 ```
 
-New to this repo? Run `/sales-demos-first-time` first.
+New to this repo? Run [`/sales-demos-first-time`](https://github.com/ericcames/sales.demos/blob/main/.claude/skills/sales-demos-first-time/SKILL.md) first.
 
 ---
 

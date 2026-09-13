@@ -179,8 +179,8 @@ because the instance spans every environment.
 | `make-kubeconfig.sh` per environment | ~5 s | Vault decrypt + file write |
 | `make-aap-mcp.sh` per environment | ~10 s | Token creation + route lookup + client registration |
 | `make-grafana-mcp.sh` | ~5 s | Vault decrypt + client registration (no token creation) |
-| `/sales-demos-mcp` full run (all environments) | ~2 min | Includes verification |
-| `mcp_server.yml` (deploy AAP MCP to cluster) | ~3 min | Part of `/sales-demos-setup`, not part of `/sales-demos-mcp` |
+| [`/sales-demos-mcp`](https://github.com/ericcames/sales.demos/blob/main/.claude/skills/sales-demos-mcp/SKILL.md) full run (all environments) | ~2 min | Includes verification |
+| `mcp_server.yml` (deploy AAP MCP to cluster) | ~3 min | Part of [`/sales-demos-setup`](https://github.com/ericcames/sales.demos/blob/main/.claude/skills/sales-demos-setup/SKILL.md), not part of [`/sales-demos-mcp`](https://github.com/ericcames/sales.demos/blob/main/.claude/skills/sales-demos-mcp/SKILL.md) |
 | AAP MCP pod readiness after deploy | ~60 s | Route returns 503 until the pod serves |
 
 ---

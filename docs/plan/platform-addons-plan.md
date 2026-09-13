@@ -183,10 +183,10 @@ Someone else cloning this repo gets the server definitions, the environment
 split, and the access asymmetry, because all three live in tracked files rather
 than in anyone's setup. What they still need is what the repo already required:
 the vault password, and their own environment. MCP adds one prerequisite, `npx`,
-recorded in `/sales-demos-first-time` step 4.5.
+recorded in [`/sales-demos-first-time`](https://github.com/ericcames/sales.demos/blob/main/.claude/skills/sales-demos-first-time/SKILL.md) step 4.5.
 
 One rough edge, stated plainly: **a fresh clone shows a failing MCP server until
-`/sales-demos-mcp` has been run**, because the committed config references a
+[`/sales-demos-mcp`](https://github.com/ericcames/sales.demos/blob/main/.claude/skills/sales-demos-mcp/SKILL.md) has been run**, because the committed config references a
 kubeconfig that does not exist yet. The alternative was following whatever
 `~/.kube/config` happens to point at, which trades a visible, self-explaining
 failure for a silent, wrong-environment success. The visible failure is better.
@@ -290,7 +290,7 @@ shortly after deploy is normal and means "wait", not "misconfigured".
 ## Verification
 
 The rule this repo already holds itself to — *ask the target, do not trust the
-recap* — is what `/sales-demos-mcp` does: it starts the server over stdio,
+recap* — is what [`/sales-demos-mcp`](https://github.com/ericcames/sales.demos/blob/main/.claude/skills/sales-demos-mcp/SKILL.md) does: it starts the server over stdio,
 enumerates tools, and makes a live `namespaces_list` call. A written kubeconfig
 proves a file exists, not that a cluster accepts it.
 

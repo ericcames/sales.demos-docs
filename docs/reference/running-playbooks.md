@@ -86,7 +86,7 @@ the mount the `ini` lookup **raises** (`Invalid filename: 'None'`) rather than
 returning an empty string.
 
 This is a verification path, not a replacement: `ansible-playbook` stays the
-everyday command. `/sales-demos-verify-ee` walks the whole thing.
+everyday command. [`/sales-demos-verify-ee`](https://github.com/ericcames/sales.demos/blob/main/.claude/skills/sales-demos-verify-ee/SKILL.md) walks the whole thing.
 
 It has already earned it.
 [#122](https://github.com/ericcames/sales.demos/issues/122) (a hijacked python
