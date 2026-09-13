@@ -180,7 +180,7 @@ because the instance spans every environment.
 | `make-aap-mcp.sh` per environment | ~10 s | Token creation + route lookup + client registration |
 | `make-grafana-mcp.sh` | ~5 s | Vault decrypt + client registration (no token creation) |
 | `/sales-demos-mcp` full run (all environments) | ~2 min | Includes verification |
-| `mcp_server.yml` (deploy AAP MCP to cluster) | ~3 min | Part of `/ocpvirt-setup`, not part of `/sales-demos-mcp` |
+| `mcp_server.yml` (deploy AAP MCP to cluster) | ~3 min | Part of `/sales-demos-setup`, not part of `/sales-demos-mcp` |
 | AAP MCP pod readiness after deploy | ~60 s | Route returns 503 until the pod serves |
 
 ---

@@ -2,7 +2,7 @@
 
 One-time, per-machine setup for using
 [sales.demos](https://github.com/ericcames/sales.demos) from a laptop. About
-10 minutes. After this, go straight to `/ocpvirt-setup`.
+10 minutes. After this, go straight to `/sales-demos-setup`.
 
 This page is the full reference — every prerequisite, every verification
 command.
@@ -421,7 +421,7 @@ Activation Keys**.
 
 ## What comes next
 
-With Claude Code, run `/ocpvirt-setup` to install OpenShift Virtualization and
+With Claude Code, run `/sales-demos-setup` to install OpenShift Virtualization and
 apply the AAP configuration. Without it, run the playbook directly — see
 [Running playbooks](running-playbooks.md) for the command and the flags it
 requires.
