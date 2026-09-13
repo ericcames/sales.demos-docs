@@ -1,8 +1,9 @@
 # New environment
 
-Repointing [sales.demos](https://github.com/ericcames/sales.demos) at a fresh
-RHDP cluster after the old one expires. About 15 minutes of operator work, then
-10 minutes of automation.
+Standing up a fresh RHDP cluster after the old one expires. When an RHDP
+environment expires, the replacement is a bare cluster — nothing from the old
+environment carries over. About 15 minutes of operator work, then 20 minutes of
+automation.
 
 This page assumes [first-time setup](first-time-setup.md) is already done — the
 vault, collections, CLI tools, and `~/.ansible.cfg` token are in place. If any
@@ -29,8 +30,9 @@ and want to point at your own cluster, see
 | Cluster hostnames (3 values) | Vault password |
 | `aap_password` | `rhsm_org_id` / `rhsm_activation_key` |
 | `openshift_api_token` | `demo_ssh_private_key` |
-| Kubeconfig | Collections, CLI tools, `~/.ansible.cfg` |
-| AAP MCP token and URL | Everything in first-time setup |
+| `available_memory_gb` | Collections, CLI tools, `~/.ansible.cfg` |
+| Kubeconfig | Everything in first-time setup |
+| AAP MCP token and URL | |
 
 ---
 
@@ -132,7 +134,8 @@ URL) and the vault (encrypted API token):
 bash utilities/make-kubeconfig.sh $ENV
 ```
 
-**Output:** `.kube/<env>.kubeconfig` (repo-local, gitignored, `0600`).
+**Output:** `.kube/<env>.kubeconfig` (repo-local, gitignored, `0600`). A copy
+is also written to `~/.kube/<env>.kubeconfig` for tools outside the repo.
 
 ### 3. Regenerate AAP MCP token
 
@@ -146,17 +149,23 @@ bash utilities/make-aap-mcp.sh $ENV
 **Output:** `.aap/<env>.token` and `.aap/<env>.url` (gitignored, `0600`).
 
 !!! warning "Requires the AAP MCP server to be deployed"
-    `make-aap-mcp.sh` discovers the MCP route via `oc get route aap-mcp`. On
-    a repoint the server is already running and this works immediately. On a
-    **fresh** environment the server does not exist yet — run Phase E first
-    (which includes `mcp_server.yml`), then come back here.
+    `make-aap-mcp.sh` discovers the MCP route via `oc get route aap-mcp`.
+    RHDP does not ship the MCP server pre-deployed. On a fresh environment,
+    run Phase E steps 1–2 first (which deploy the MCP server), then come back
+    here. On a repoint where the MCP server is already running, this works
+    immediately.
 
 ---
 
 ## Phase D — Connect MCP servers
 
+Run
+[`/sales-demos-mcp`](https://github.com/ericcames/sales.demos/blob/main/.claude/skills/sales-demos-mcp/SKILL.md)
+to regenerate credentials and verify all MCP servers in one step. Or follow the
+manual steps below.
+
 Start Claude Code (or restart it if it is already running). Startup discovery
-reads the credential files from Phase C and connects all five servers:
+reads the credential files from Phase C and connects all servers:
 
 | Server | Credential source |
 |---|---|
@@ -174,22 +183,35 @@ started, no restart is needed — Claude Code spawns the stdio bridge on demand.
 Verify by calling a tool on the server you just repointed:
 
 ```
+mcp__openshift-<env>__namespaces_list   (fieldSelector=metadata.name=default)
 mcp__aap-<env>__me_list
-mcp__openshift-<env>__namespaces_list
 ```
 
-The first should return the admin user; the second should list namespaces on the
-new cluster.
+!!! warning "\"Connected\" does not mean \"Live\""
+    A stdio server reports "Connected" if its local process starts — it does
+    not prove the remote cluster is alive. Report **Live** only if actual data
+    comes back from the tool call above.
 
 ---
 
 ## Phase E — Set up the cluster
 
-Two steps, by design. `config.yml` creates the job templates, so it cannot be
-one of them — it runs from the laptop. Everything else runs from AAP, which is
-the product being sold.
+`config.yml` creates the job templates, so it cannot be one of them — it runs
+from the laptop. Everything else runs from AAP, which is the product being
+sold.
 
-### 1. Apply configuration from the laptop
+### 1. Commit and push `connection.yml`
+
+AAP reads the SCM checkout, not `local.yml`. `connection.yml` must reflect
+the new cluster before any AAP job template will work.
+
+```bash
+git add inventory/group_vars/$ENV/connection.yml
+git commit -m "fix: repoint $ENV to cluster-<id>"
+git push
+```
+
+### 2. Apply configuration from the laptop
 
 ```bash
 mkdir -p ~/ansible-logs
@@ -201,19 +223,41 @@ ansible-playbook playbooks/config.yml -i inventory --limit $ENV \
 ```
 
 This creates the organization, project, credentials, inventories, job templates,
-schedules, execution environment mirror, and gateway branding.
+schedules, execution environment mirror, and gateway branding. Sync the AAP
+project after the push lands: **Projects → Sales Demos → Sync**.
 
-### 2. Run Cluster Day 0 from AAP
+### 3. Deploy the AAP MCP server from AAP
+
+Launch **AAP Ecosystem - Install MCP Server** from the AAP UI. It deploys the
+MCP server CR and creates the `aap-mcp` route that `make-aap-mcp.sh` needs
+(Phase C step 3).
+
+### 4. Run Cluster Day 0 from AAP
 
 Launch the **Cluster Day 0** workflow from the AAP UI. It installs OpenShift
 Virtualization, links the RHEL 9 CIS L1 golden image, and verifies the
 environment (boot source, csi-clone, ingress, test VM build and timing).
 
-!!! warning "`connection.yml` must be committed before AAP jobs work"
-    AAP reads the SCM checkout, not `local.yml`. If `connection.yml` still
-    points at the old cluster, job templates fail with a DNS or `401` error.
-    Run `update-connection.sh` (Phase C step 1), commit, push, and sync the
-    AAP project before launching.
+!!! tip "Windows demos"
+    If this environment runs Windows, launch **Golden Image - Link Windows 2022
+    CIS L1** from the AAP UI after Cluster Day 0 completes. It pulls from a
+    private Quay repo and takes longer than the RHEL 9 link.
+
+### 5. Deploy Automation Orchestrator from AAP
+
+Launch the **AAP Ecosystem - Deploy Automation Orchestrator** workflow from the
+AAP UI. It installs CloudNativePG, creates the AO databases, deploys the
+operator, and connects AO to AAP via OIDC SSO.
+
+### 6. Deploy self-service portal from AAP
+
+Launch **AAP Ecosystem - Install Self-Service Portal** from the AAP UI. It
+deploys Red Hat Developer Hub with the AAP plugin (~11 minutes). After it
+completes, the launcher templates are visible in the portal.
+
+!!! note "Grafana Cloud"
+    No automated deployment exists yet. Alloy and dashboard configuration are
+    manual for now.
 
 ---
 
@@ -239,19 +283,36 @@ bash utilities/update-connection.sh $ENV
 
 ---
 
-## Phase G — Commit the repoint
+## Phase G — Generate environment URLs
 
-Only `connection.yml` needs committing. The vault is local-only and `local.yml`
-is gitignored.
+Regenerate the gitignored URL reference file so Claude and operators can look up
+every product URL without MCP token lookups
+([#525](https://github.com/ericcames/sales.demos/issues/525)):
+
+```bash
+ansible-playbook playbooks/generate_env_urls.yml -i inventory --limit $ENV \
+  -e target_env=$ENV \
+  -e generate_env_urls_with_creds=true \
+  --vault-id sales.demos@~/secrets/.vault_pass_sales_demos
+```
+
+Or use
+[`/sales-demos-env-urls`](https://github.com/ericcames/sales.demos/blob/main/.claude/skills/sales-demos-env-urls/SKILL.md).
+
+---
+
+## Phase H — Final commit
+
+`connection.yml` changed again in Phase F (`available_memory_gb`). Commit and
+push so AAP picks up the updated value.
 
 ```bash
 git add inventory/group_vars/$ENV/connection.yml
-git commit -m "fix: repoint $ENV to cluster-<id>"
+git commit -m "fix: update $ENV available_memory_gb after probe"
 git push
 ```
 
-Then sync the AAP project so job templates pick up the new cluster identity.
-From the AAP UI: **Projects → Sales Demos → Sync**, or via MCP:
+Then sync the AAP project: **Projects → Sales Demos → Sync**, or via MCP:
 
 ```
 mcp__aap-<env>__projects_list
@@ -273,21 +334,28 @@ ansible-vault edit playbooks/group_vars/all/secrets.yml \
                                                 # aap_password + openshift_api_token
 
 # B — reachability
-curl -sk "https://$(grep aap_hostname inventory/group_vars/$ENV/local.yml \
-  | awk -F'"' '{print $2}')/api/gateway/v1/ping/"
+curl -sk "https://<aap_hostname>/api/gateway/v1/ping/"
 
 # C — derived files
 bash utilities/update-connection.sh $ENV
 bash utilities/make-kubeconfig.sh $ENV
-bash utilities/make-aap-mcp.sh $ENV             # needs MCP server deployed
+bash utilities/make-aap-mcp.sh $ENV             # needs MCP server (Phase E step 3)
 
 # D — MCP servers
-# restart Claude Code (or start fresh)
+# restart Claude Code, or run /sales-demos-mcp
 
 # E — cluster setup
+git add inventory/group_vars/$ENV/connection.yml
+git commit -m "fix: repoint $ENV to cluster-<id>"
+git push
 ansible-playbook playbooks/config.yml -i inventory --limit $ENV \
   -e target_env=$ENV --vault-id sales.demos@~/secrets/.vault_pass_sales_demos
-# commit + push connection.yml, sync AAP project, launch Cluster Day 0
+# sync AAP project, then from the AAP UI:
+#   AAP Ecosystem - Install MCP Server
+#   Cluster Day 0 (workflow)
+#   Golden Image - Link Windows 2022 CIS L1        (optional)
+#   AAP Ecosystem - Deploy Automation Orchestrator  (workflow)
+#   AAP Ecosystem - Install Self-Service Portal
 
 # F — memory budget
 ansible-playbook playbooks/probe_env.yml -i inventory --limit $ENV \
@@ -295,8 +363,13 @@ ansible-playbook playbooks/probe_env.yml -i inventory --limit $ENV \
 # update local.yml with available_memory_gb, then:
 bash utilities/update-connection.sh $ENV
 
-# G — commit
+# G — environment URLs
+ansible-playbook playbooks/generate_env_urls.yml -i inventory --limit $ENV \
+  -e target_env=$ENV -e generate_env_urls_with_creds=true \
+  --vault-id sales.demos@~/secrets/.vault_pass_sales_demos
+
+# H — final commit
 git add inventory/group_vars/$ENV/connection.yml
-git commit -m "fix: repoint $ENV to cluster-<id>"
+git commit -m "fix: update $ENV available_memory_gb after probe"
 git push
 ```
