@@ -181,7 +181,7 @@ Then read [Running it live](run-sheet.md#running-it-live) in the run sheet — i
 changes three beats and nothing else, and it tells you when to cut back to the
 screenshot rather than debug with an audience.
 
-New to this repo? Run `/sales-demos-first-time` first.
+New to this repo? Run [`/sales-demos-first-time`](https://github.com/ericcames/sales.demos/blob/main/.claude/skills/sales-demos-first-time/SKILL.md) first.
 
 ---
 

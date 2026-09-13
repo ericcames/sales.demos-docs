@@ -64,7 +64,7 @@ chart. Which is why:
 
 - `.mcp.json` can invoke it with `npx` and get a real binary, not a Node
   reimplementation
-- `/sales-demos-first-time` step 4.5 records `npx` as the **only** command-line
+- [`/sales-demos-first-time`](https://github.com/ericcames/sales.demos/blob/main/.claude/skills/sales-demos-first-time/SKILL.md) step 4.5 records `npx` as the **only** command-line
   prerequisite MCP adds — and marks it optional at that
 
 ### Python, when you are reaching

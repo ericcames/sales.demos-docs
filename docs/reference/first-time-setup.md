@@ -2,7 +2,7 @@
 
 One-time, per-machine setup for using
 [sales.demos](https://github.com/ericcames/sales.demos) from a laptop. About
-10 minutes. After this, go straight to `/sales-demos-setup`.
+10 minutes. After this, go straight to [`/sales-demos-setup`](https://github.com/ericcames/sales.demos/blob/main/.claude/skills/sales-demos-setup/SKILL.md).
 
 This page is the full reference — every prerequisite, every verification
 command.
@@ -232,7 +232,7 @@ VM.
 | `terraform` | Yes | `provision_vm.yml`, `teardown.yml` |
 | `virtctl` | Yes | SSH into demo VMs from a laptop |
 | `podman` + `ansible-builder` | EE builds only | `build-ee.sh` |
-| `npx` / `node` | MCP servers only | `/sales-demos-mcp` |
+| `npx` / `node` | MCP servers only | [`/sales-demos-mcp`](https://github.com/ericcames/sales.demos/blob/main/.claude/skills/sales-demos-mcp/SKILL.md) |
 
 ```bash
 command -v oc >/dev/null && echo "oc: $(oc version --client 2>/dev/null | head -1)" \
@@ -421,7 +421,7 @@ Activation Keys**.
 
 ## What comes next
 
-With Claude Code, run `/sales-demos-setup` to install OpenShift Virtualization and
+With Claude Code, run [`/sales-demos-setup`](https://github.com/ericcames/sales.demos/blob/main/.claude/skills/sales-demos-setup/SKILL.md) to install OpenShift Virtualization and
 apply the AAP configuration. Without it, run the playbook directly — see
 [Running playbooks](running-playbooks.md) for the command and the flags it
 requires.
