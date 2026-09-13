@@ -26,11 +26,11 @@ likely to act on the wrong one is the moment before you have touched anything.
 Each gets a badged sign-in logo, following the same severity convention as
 `aap_config`:
 
-| Environment | Colour | |
-|---|---|---|
-| `sandbox` | green | the one you break |
-| `demo` | red | the one customers watch |
-| `edge` | purple `#6753AC` | the one you own |
+| Environment | Color | | |
+|---|---|---|---|
+| `sandbox` | green | the one you break | ![sandbox sign-in](../images/logo-sandbox.png){ width="400" } |
+| `demo` | red | the one customers watch | ![demo sign-in](../images/logo-demo.png){ width="400" } |
+| `edge` | purple | the one you own | ![edge sign-in](../images/logo-edge.png){ width="400" } |
 
 ```bash
 python3 utilities/make-env-logo.py --env sandbox
@@ -41,7 +41,7 @@ The post-login masthead is a bundled UI asset, not a setting — re-measured in
 [#54](https://github.com/ericcames/sales.demos/issues/54) with `custom_logo`
 applied, and none of the 44 gateway settings marks the environment after login.
 
-The colours come from `utilities/env_colors.py`, which the browser extension's
+The colors come from `utilities/env_colors.py`, which the browser extension's
 `colors.json` is generated from — so the sign-in page and the post-login pill
 cannot disagree about what an environment is.
 
@@ -49,10 +49,10 @@ cannot disagree about what an environment is.
     True when written, and false four commits later:
     [#426](https://github.com/ericcames/sales.demos/issues/426) added the purple
     one along with `inventory/group_vars/edge/gateway_settings.yml`. Adding a
-    fourth environment means moving three things together — a colour in
+    fourth environment means moving three things together — a color in
     `env_colors.py`, a generated pair in `assets/aap-branding/`, and a
     `gateway_settings.yml`. `check-env-logos.py` catches the last two; nothing
-    catches a missing colour.
+    catches a missing color.
 
 The generated files live in
 [`assets/aap-branding/`](https://github.com/ericcames/sales.demos/tree/main/assets/aap-branding),
@@ -74,7 +74,7 @@ utilities/aap-env-badge/
 ```
 
 It paints a `SANDBOX` / `DEMO` / `EDGE` pill in the middle of the masthead in
-the same colours. It covers five UIs in one load and changes nothing on any
+the same colors. It covers five UIs in one load and changes nothing on any
 cluster:
 
 | UI | Route prefix | How it resolves |
@@ -88,12 +88,12 @@ cluster:
 "Cache" means `chrome.storage.local` — written by AAP when it resolves, keyed
 by cluster domain (everything after `.apps.`). All five UIs share the same
 cluster, so the key is identical. Opening AAP in another tab turns a grey pill
-coloured on every other tab without a reload.
+colored on every other tab without a reload.
 
 The manifest matches `*.dyn.redhatworkshops.io` (sandbox, demo) and
 `*.internal.ames.net` (edge), so the extension works on all three environments.
 
-**It asks AAP which environment it is** rather than recognising the hostname, so
+**It asks AAP which environment it is** rather than recognizing the hostname, so
 there is nothing to regenerate when RHDP hands you a new cluster. It reads
 `target_env`, which this repo already sets on its job templates. A cluster that
 answers but declares no environment gets a neutral `UNRECOGNIZED ENV` pill —
