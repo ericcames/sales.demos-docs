@@ -173,8 +173,8 @@ being the 200 half of `route-503.png` in the same browser frame.
 Two things, in order:
 
 ```bash
-/ocpvirt-new-env      # proves the environment is warm — builds and times a real VM
-/ocpvirt-provision    # or launch "Linux Day 1 - 0 Workflow" in AAP
+/sales-demos-verify-env   # proves the environment is warm — builds and times a real VM
+/sales-demos-provision    # or launch "Linux Day 1 - 0 Workflow" in AAP
 ```
 
 Then read [Running it live](run-sheet.md#running-it-live) in the run sheet — it

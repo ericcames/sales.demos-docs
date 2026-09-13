@@ -401,7 +401,7 @@ claude mcp list   # all six servers should appear
 | AAP MCP returns `401` | Token expired or deleted | Re-create: `bash utilities/make-aap-mcp.sh <env>` |
 | AAP MCP write tools missing | `aap_mcp_allow_write_operations` is false | Intentional on `demo`. Changing it requires delete-and-recreate — re-run `mcp_server.yml` |
 | `npx: command not found` | Node not installed | See preflight in the `/sales-demos-mcp` skill |
-| `no aap-mcp route` | MCP server not deployed | Run `/ocpvirt-setup` or `playbooks/mcp_server.yml` first |
+| `no aap-mcp route` | MCP server not deployed | Run `/sales-demos-setup` or `playbooks/mcp_server.yml` first |
 | `grafana` not in `claude mcp list` | Server not registered yet | Run `bash utilities/make-grafana-mcp.sh`, then restart Claude Code |
 | Grafana tool returns `401` | SA token revoked or expired | Recreate the token in the Grafana Cloud UI, update the vault, re-run `make-grafana-mcp.sh` |
 | Grafana tool returns `403` | SA has Viewer role, cannot write | Intentional — read-only governance is in the token. If write access is needed, change the SA role in the Grafana UI |
