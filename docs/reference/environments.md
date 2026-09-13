@@ -28,9 +28,9 @@ Each gets a badged sign-in logo, following the same severity convention as
 
 | Environment | Color | | |
 |---|---|---|---|
-| `sandbox` | green | the one you break | ![sandbox sign-in](../images/logo-sandbox.png){ width="400" } |
-| `demo` | red | the one customers watch | ![demo sign-in](../images/logo-demo.png){ width="400" } |
-| `edge` | purple | the one you own | ![edge sign-in](../images/logo-edge.png){ width="400" } |
+| `sandbox` | green | the one you break | ![sandbox sign-in](../images/logo-sandbox.png){ width="400" style="background:#1a1a1a;padding:8px;border-radius:4px" } |
+| `demo` | red | the one customers watch | ![demo sign-in](../images/logo-demo.png){ width="400" style="background:#1a1a1a;padding:8px;border-radius:4px" } |
+| `edge` | purple | the one you own | ![edge sign-in](../images/logo-edge.png){ width="400" style="background:#1a1a1a;padding:8px;border-radius:4px" } |
 
 ```bash
 python3 utilities/make-env-logo.py --env sandbox
