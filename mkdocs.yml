@@ -88,6 +88,7 @@ nav:
       - Overview: reference/README.md
       - First-Time Setup: reference/first-time-setup.md
       - Environments: reference/environments.md
+      - New Environment: reference/new-environment.md
       - Running Playbooks: reference/running-playbooks.md
       - Running from AAP: reference/running-from-aap.md
       - Execution Environment: reference/execution-environment.md
