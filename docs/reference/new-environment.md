@@ -9,10 +9,13 @@ This page assumes [first-time setup](first-time-setup.md) is already done — th
 vault, collections, CLI tools, and `~/.ansible.cfg` token are in place. If any
 of those are missing, do that page first.
 
-It also assumes you are tracking the upstream repo, not a fork. If you forked
-and want to point at your own cluster, see
-[Reusing this repo](reusing-this-repo.md) instead — the mechanism is different
-(`connection.yml` on your branch, not `local.yml`).
+It also assumes you have **push access** to the upstream repo — you are a
+collaborator, not a read-only clone. The commit/push steps below update
+`connection.yml` on the remote so AAP's SCM checkout targets the new cluster.
+If you cloned or forked without push access, you can still bootstrap entirely
+from the laptop — `config.yml` writes your cluster identity into the AAP
+inventory as host variables, so AAP templates work without pushing. See
+[Reusing this repo](reusing-this-repo.md) for the full clone-vs-fork guide.
 
 !!! info "Scope: RHDP environments only"
     This covers `sandbox` and `demo` — ephemeral RHDP environments that expire
@@ -196,20 +199,28 @@ mcp__aap-<env>__me_list
 
 ## Phase E — Set up the cluster
 
-`config.yml` creates the job templates, so it cannot be one of them — it runs
-from the laptop. Everything else runs from AAP, which is the product being
-sold.
+Every bootstrap playbook runs from the laptop — they all target `hosts: aap`,
+authenticate via the vault, and use `kubernetes.core` modules. `config.yml`
+creates the AAP job templates, so it runs first; the rest use the same
+`ansible-playbook` pattern. Once bootstrap is done, the same playbooks are
+available as AAP job templates for day-2 use.
 
-### 1. Commit and push `connection.yml`
+### 1. Commit and push `connection.yml` (collaborators only)
 
-AAP reads the SCM checkout, not `local.yml`. `connection.yml` must reflect
-the new cluster before any AAP job template will work.
+AAP reads the SCM checkout, not `local.yml`. Pushing `connection.yml` updates
+the remote so AAP's project sync targets the new cluster.
 
 ```bash
 git add inventory/group_vars/$ENV/connection.yml
 git commit -m "fix: repoint $ENV to cluster-<id>"
 git push
 ```
+
+!!! info "Cloners: skip this step"
+    If you cloned without push access, `config.yml` (next step) writes your
+    cluster identity into the AAP inventory as host variables. AAP host vars
+    override SCM-sourced group vars, so templates target your cluster without
+    pushing. See [Reusing this repo](reusing-this-repo.md).
 
 ### 2. Apply configuration from the laptop
 
@@ -223,37 +234,97 @@ ansible-playbook playbooks/config.yml -i inventory --limit $ENV \
 ```
 
 This creates the organization, project, credentials, inventories, job templates,
-schedules, execution environment mirror, and gateway branding. Sync the AAP
-project after the push lands: **Projects → Sales Demos → Sync**.
+schedules, execution environment mirror, and gateway branding. If you pushed
+in step 1, sync the AAP project after the push lands:
+**Projects → Sales Demos → Sync**.
 
-### 3. Deploy the AAP MCP server from AAP
+### 3. Install OpenShift Virtualization
 
-Launch **AAP Ecosystem - Install MCP Server** from the AAP UI. It deploys the
-MCP server CR and creates the `aap-mcp` route that `make-aap-mcp.sh` needs
-(Phase C step 3).
+```bash
+export ANSIBLE_LOG_PATH=~/ansible-logs/install-cnv-${ENV}-$(date +%F-%H%M).log
 
-### 4. Run Cluster Day 0 from AAP
+ansible-playbook playbooks/install_cnv.yml -i inventory --limit $ENV \
+  -e target_env=$ENV \
+  --vault-id sales.demos@~/secrets/.vault_pass_sales_demos
+```
 
-Launch the **Cluster Day 0** workflow from the AAP UI. It installs OpenShift
-Virtualization, links the RHEL 9 CIS L1 golden image, and verifies the
-environment (boot source, csi-clone, ingress, test VM build and timing).
+### 4. Link the RHEL 9 golden image
+
+```bash
+export ANSIBLE_LOG_PATH=~/ansible-logs/link-rhel9-${ENV}-$(date +%F-%H%M).log
+
+ansible-playbook playbooks/link_rhel9_image.yml -i inventory --limit $ENV \
+  -e target_env=$ENV \
+  --vault-id sales.demos@~/secrets/.vault_pass_sales_demos
+```
 
 !!! tip "Windows demos"
-    If this environment runs Windows, launch **Golden Image - Link Windows 2022
-    CIS L1** from the AAP UI after Cluster Day 0 completes. It pulls from a
+    If this environment runs Windows, also run
+    `playbooks/link_windows_image.yml` after this step. It pulls from a
     private Quay repo and takes longer than the RHEL 9 link.
 
-### 5. Deploy Automation Orchestrator from AAP
+### 5. Verify the environment
 
-Launch the **AAP Ecosystem - Deploy Automation Orchestrator** workflow from the
-AAP UI. It installs CloudNativePG, creates the AO databases, deploys the
-operator, and connects AO to AAP via OIDC SSO.
+```bash
+export ANSIBLE_LOG_PATH=~/ansible-logs/prepare-env-${ENV}-$(date +%F-%H%M).log
 
-### 6. Deploy self-service portal from AAP
+ansible-playbook playbooks/prepare_env.yml -i inventory --limit $ENV \
+  -e target_env=$ENV \
+  --vault-id sales.demos@~/secrets/.vault_pass_sales_demos
+```
 
-Launch **AAP Ecosystem - Install Self-Service Portal** from the AAP UI. It
-deploys Red Hat Developer Hub with the AAP plugin (~11 minutes). After it
+Checks boot source, csi-clone, ingress, and times a test VM build.
+
+### 6. Deploy the AAP MCP server
+
+```bash
+export ANSIBLE_LOG_PATH=~/ansible-logs/mcp-server-${ENV}-$(date +%F-%H%M).log
+
+ansible-playbook playbooks/mcp_server.yml -i inventory --limit $ENV \
+  -e target_env=$ENV \
+  --vault-id sales.demos@~/secrets/.vault_pass_sales_demos
+```
+
+Deploys the MCP server CR and creates the `aap-mcp` route that
+`make-aap-mcp.sh` needs (Phase C step 3). If you deferred `make-aap-mcp.sh`
+earlier, run it now.
+
+### 7. Deploy Automation Orchestrator
+
+```bash
+export ANSIBLE_LOG_PATH=~/ansible-logs/install-ao-${ENV}-$(date +%F-%H%M).log
+
+ansible-playbook playbooks/install_ao.yml -i inventory --limit $ENV \
+  -e target_env=$ENV \
+  --vault-id sales.demos@~/secrets/.vault_pass_sales_demos
+
+export ANSIBLE_LOG_PATH=~/ansible-logs/configure-ao-${ENV}-$(date +%F-%H%M).log
+
+ansible-playbook playbooks/configure_ao.yml -i inventory --limit $ENV \
+  -e target_env=$ENV \
+  --vault-id sales.demos@~/secrets/.vault_pass_sales_demos
+```
+
+Installs CloudNativePG, creates the AO databases, deploys the operator, and
+connects AO to AAP via OIDC SSO.
+
+### 8. Deploy self-service portal
+
+```bash
+export ANSIBLE_LOG_PATH=~/ansible-logs/portal-${ENV}-$(date +%F-%H%M).log
+
+ansible-playbook playbooks/portal.yml -i inventory --limit $ENV \
+  -e target_env=$ENV \
+  --vault-id sales.demos@~/secrets/.vault_pass_sales_demos
+```
+
+Deploys Red Hat Developer Hub with the AAP plugin (~11 minutes). After it
 completes, the launcher templates are visible in the portal.
+
+!!! note "Helm required"
+    `portal.yml` needs the `helm` binary on the laptop. The execution
+    environment includes it since
+    [#324](https://github.com/ericcames/sales.demos/issues/324).
 
 !!! note "Grafana Cloud"
     No automated deployment exists yet. Alloy and dashboard configuration are
@@ -301,7 +372,7 @@ Or use
 
 ---
 
-## Phase H — Final commit
+## Phase H — Final commit (collaborators only)
 
 `connection.yml` changed again in Phase F (`available_memory_gb`). Commit and
 push so AAP picks up the updated value.
@@ -318,19 +389,28 @@ Then sync the AAP project: **Projects → Sales Demos → Sync**, or via MCP:
 mcp__aap-<env>__projects_list
 ```
 
+!!! info "Cloners: skip this step"
+    `config.yml` already wrote `available_memory_gb` as a host variable in the
+    AAP inventory. Re-run `config.yml` after updating `local.yml` with the new
+    value to push it to AAP — no commit or push needed.
+
 ---
 
 ## Compact checklist
 
-For repeat use. Every command assumes `ENV` is set.
+For repeat use. Every command assumes `ENV` is set. The `VAULT` shorthand
+keeps the lines readable.
 
 ```bash
 ENV=sandbox
+VAULT="--vault-id sales.demos@~/secrets/.vault_pass_sales_demos"
+AP="ansible-playbook"
+COMMON="-i inventory --limit $ENV -e target_env=$ENV $VAULT"
+mkdir -p ~/ansible-logs
 
 # A — sources of truth
 vi inventory/group_vars/$ENV/local.yml          # 3 URLs + SSH key
-ansible-vault edit playbooks/group_vars/all/secrets.yml \
-  --vault-id sales.demos@~/secrets/.vault_pass_sales_demos
+ansible-vault edit playbooks/group_vars/all/secrets.yml $VAULT
                                                 # aap_password + openshift_api_token
 
 # B — reachability
@@ -339,36 +419,34 @@ curl -sk "https://<aap_hostname>/api/gateway/v1/ping/"
 # C — derived files
 bash utilities/update-connection.sh $ENV
 bash utilities/make-kubeconfig.sh $ENV
-bash utilities/make-aap-mcp.sh $ENV             # needs MCP server (Phase E step 3)
+bash utilities/make-aap-mcp.sh $ENV             # needs MCP server (step E6)
 
 # D — MCP servers
 # restart Claude Code, or run /sales-demos-mcp
 
-# E — cluster setup
-git add inventory/group_vars/$ENV/connection.yml
-git commit -m "fix: repoint $ENV to cluster-<id>"
-git push
-ansible-playbook playbooks/config.yml -i inventory --limit $ENV \
-  -e target_env=$ENV --vault-id sales.demos@~/secrets/.vault_pass_sales_demos
-# sync AAP project, then from the AAP UI:
-#   AAP Ecosystem - Install MCP Server
-#   Cluster Day 0 (workflow)
-#   Golden Image - Link Windows 2022 CIS L1        (optional)
-#   AAP Ecosystem - Deploy Automation Orchestrator  (workflow)
-#   AAP Ecosystem - Install Self-Service Portal
+# E — cluster setup (all from the laptop)
+git add inventory/group_vars/$ENV/connection.yml        # collaborators only
+git commit -m "fix: repoint $ENV to cluster-<id>"       # skip if cloner
+git push                                                # skip if cloner
+$AP playbooks/config.yml $COMMON
+$AP playbooks/install_cnv.yml $COMMON
+$AP playbooks/link_rhel9_image.yml $COMMON
+# $AP playbooks/link_windows_image.yml $COMMON          # optional: Windows
+$AP playbooks/prepare_env.yml $COMMON
+$AP playbooks/mcp_server.yml $COMMON
+$AP playbooks/install_ao.yml $COMMON
+$AP playbooks/configure_ao.yml $COMMON
+$AP playbooks/portal.yml $COMMON                        # needs helm
 
 # F — memory budget
-ansible-playbook playbooks/probe_env.yml -i inventory --limit $ENV \
-  -e target_env=$ENV --vault-id sales.demos@~/secrets/.vault_pass_sales_demos
+$AP playbooks/probe_env.yml $COMMON
 # update local.yml with available_memory_gb, then:
 bash utilities/update-connection.sh $ENV
 
 # G — environment URLs
-ansible-playbook playbooks/generate_env_urls.yml -i inventory --limit $ENV \
-  -e target_env=$ENV -e generate_env_urls_with_creds=true \
-  --vault-id sales.demos@~/secrets/.vault_pass_sales_demos
+$AP playbooks/generate_env_urls.yml $COMMON -e generate_env_urls_with_creds=true
 
-# H — final commit
+# H — final commit (collaborators only)
 git add inventory/group_vars/$ENV/connection.yml
 git commit -m "fix: update $ENV available_memory_gb after probe"
 git push
