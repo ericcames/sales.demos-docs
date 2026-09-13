@@ -73,9 +73,25 @@ is a browser extension:
 utilities/aap-env-badge/
 ```
 
-It paints a `SANDBOX` / `DEMO` pill in the middle of the masthead in the same
-colours and matches both environments in one load. It changes nothing on the
-cluster.
+It paints a `SANDBOX` / `DEMO` / `EDGE` pill in the middle of the masthead in
+the same colours. It covers five UIs in one load and changes nothing on any
+cluster:
+
+| UI | Route prefix | How it resolves |
+|---|---|---|
+| AAP | `aap-*` | Asks AAP directly (`target_env` on job templates) |
+| Automation Orchestrator | `ao-automation-orchestrator` | Cache, then AO's proxy API ([#477](https://github.com/ericcames/sales.demos/issues/477)) |
+| Self-service portal | `rhaap-portal-*` | Cache only ([#536](https://github.com/ericcames/sales.demos/issues/536)) |
+| OCP console | `console-openshift-console` | Cache only ([#539](https://github.com/ericcames/sales.demos/issues/539)) |
+| OCP OAuth login | `oauth-openshift` | Cache only ([#539](https://github.com/ericcames/sales.demos/issues/539)) |
+
+"Cache" means `chrome.storage.local` — written by AAP when it resolves, keyed
+by cluster domain (everything after `.apps.`). All five UIs share the same
+cluster, so the key is identical. Opening AAP in another tab turns a grey pill
+coloured on every other tab without a reload.
+
+The manifest matches `*.dyn.redhatworkshops.io` (sandbox, demo) and
+`*.internal.ames.net` (edge), so the extension works on all three environments.
 
 **It asks AAP which environment it is** rather than recognising the hostname, so
 there is nothing to regenerate when RHDP hands you a new cluster. It reads
