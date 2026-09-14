@@ -5,7 +5,7 @@ Three, and they are not the same kind of thing.
 | Environment | What it is | Posture |
 |---|---|---|
 | `sandbox` | The RHDP environment you build against and break | Read-write |
-| `demo` | The RHDP environment you show customers | Read-only over MCP |
+| `demo` | The RHDP environment you show customers | Read-only over MCP ([below](#mcp-servers-per-environment)) |
 | `edge` | A persistent bare-metal Single Node OpenShift cluster on a NUC | Read-write |
 
 `edge` differs from the RHDP pair by construction: it does not expire, DNS is
@@ -36,10 +36,13 @@ Each gets a badged sign-in logo, following the same severity convention as
 python3 utilities/make-env-logo.py --env sandbox
 ```
 
-This sets the gateway's `custom_logo`, which changes the **sign-in page only**.
-The post-login masthead is a bundled UI asset, not a setting — re-measured in
-[#54](https://github.com/ericcames/sales.demos/issues/54) with `custom_logo`
-applied, and none of the 44 gateway settings marks the environment after login.
+This writes `assets/aap-branding/logo-<env>.png` and its `.png.b64` sidecar,
+both committed. `config.yml` applies the sidecar as the gateway's `custom_logo`
+through `inventory/group_vars/<env>/gateway_settings.yml`, which changes the
+**sign-in page only**. The post-login masthead is a bundled UI asset, not a
+setting — measured in [#54](https://github.com/ericcames/sales.demos/issues/54) with `custom_logo` applied and re-checked on
+AAP 2.7 in [#101](https://github.com/ericcames/sales.demos/issues/101): none of the gateway settings marks the environment
+after login.
 
 The colors come from `utilities/env_colors.py`, which the browser extension's
 `colors.json` is generated from — so the sign-in page and the post-login pill
@@ -104,12 +107,53 @@ failed silently ([#87](https://github.com/ericcames/sales.demos/issues/87)).
 
 ---
 
+## MCP servers per environment
+
+The environment is in every server's name, so choosing a server is choosing its
+posture — one server whose target changed underneath you is exactly the
+[#16](https://github.com/ericcames/sales.demos/issues/16) failure, with write tools attached.
+
+| Server | `sandbox` | `demo` | `edge` |
+|---|---|---|---|
+| OpenShift — `openshift-<env>` | read-write | **read-only** | read-write |
+| AAP — `aap-<env>` | writes allowed | **writes refused** | none |
+| Self-service portal — `portal-<env>` | read-only | read-only | none |
+| Automation Orchestrator — `ao-<env>` | read-only | read-only | none |
+
+**`demo`'s read-only posture is two separate guards, and they must move
+together.** Relaxing one and not the other gives a false sense of what the
+environment allows:
+
+- **OpenShift** — the `--read-only` flag on `openshift-demo` in
+  [`.mcp.json`](https://github.com/ericcames/sales.demos/blob/main/.mcp.json), enforced by the client.
+- **AAP** — `aap_mcp_allow_write_operations: false` in
+  [`inventory/group_vars/demo/mcp.yml`](https://github.com/ericcames/sales.demos/blob/main/inventory/group_vars/demo/mcp.yml)
+  (`true` for sandbox), enforced by the server. `mcp_server.yml` refuses to run
+  if it is undefined, and a change deletes and recreates the MCP server, because
+  a plain re-apply would keep enforcing the old permission.
+
+The portal and AO servers are read-only by what their tools can do, on every
+environment. `edge` has only `openshift-edge`: an `aap-edge` is a posture
+decision nobody has made yet, and AO is not installed there. The Grafana server
+is not per-environment — Grafana Cloud outlives the clusters.
+[`/sales-demos-mcp`](https://github.com/ericcames/sales.demos/blob/main/.claude/skills/sales-demos-mcp/SKILL.md)
+sets all of them up.
+
+---
+
 ## One host per environment, and why
 
 Each environment has its own host in `inventory/hosts.yml` — `sandbox-local`,
-`demo-local`. That matters: when both groups shared one host, `--limit` filtered
+`demo-local`, `edge-local`. That matters: when both groups shared one host, `--limit` filtered
 hosts but not `group_vars`, so both environments' variables merged and
 `--limit demo` silently used sandbox's hostname and token
 ([#16](https://github.com/ericcames/sales.demos/issues/16)).
 
 **Never point two environment groups at the same host.**
+
+Everything else that differs per environment sits beside it in
+`inventory/group_vars/<env>/`: `connection.yml` (committed), `local.yml` (your
+gitignored repoint — see [New environment](new-environment.md#quick-start)),
+`gateway_settings.yml` (the sign-in logo), and `mcp.yml` for `sandbox` and
+`demo`. Credentials are the exception: they are keyed under `env_secrets.<env>`
+in the vault, never in `group_vars/<env>/`.
