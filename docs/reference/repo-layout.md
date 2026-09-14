@@ -14,10 +14,10 @@ you have not cloned it yet.
 .claude/skills/<name>/SKILL.md   in-repo skills, discovered when the repo is open
 assets/aap-branding/             AAP gateway config inputs — NOT documentation
 collections/requirements.yml     what your laptop and the EE install
+env-urls.yml                     GITIGNORED, generated — product URLs + credentials per env
 hub/                             what Private Automation Hub SYNCS (generated)
 inventory/
   hosts.yml                        one host per environment — never share one
-  env-urls.yml                     GITIGNORED, generated — product URLs per env
   group_vars/
     aap/                             shared config: job templates, workflows, credentials
     sandbox/  demo/  edge/           per-environment connection settings:
@@ -31,6 +31,13 @@ playbooks/                       the work: one playbook per phase
 terraform/ocpvirt/               keyed by PLATFORM, not demo — demos reuse platforms
 utilities/                       build, check and generate scripts
 ```
+
+**`env-urls.yml` is at the root, not in `inventory/`.** Every command passes
+`-i inventory`, and Ansible parses every file in that directory as an inventory
+source — the generated file used to live there and printed
+`Skipping key (portal) in group (sandbox)` warnings on every run
+([#582](https://github.com/ericcames/sales.demos/issues/582)). Regenerating
+removes a leftover copy at the old path.
 
 **AAP objects are config-as-code in `inventory/group_vars/aap/`.**
 `controller_templates.yml` and `controller_workflows.yml` hold the job templates
