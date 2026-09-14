@@ -33,12 +33,12 @@ Source: `.mcp.json` (`--read-only`), `inventory/group_vars/demo/mcp.yml`,
 
 > **"The server definitions are in `.mcp.json` — committed, public, auditable.
 > But the kubeconfig is gitignored and generated per machine. The AAP bearer
-> token is registered with `claude mcp add --scope local`, which writes to your
-> local Claude config, not to any tracked file. The vault-encrypted secrets file
+> token lives in a gitignored `.aap/` file that the committed stdio entry reads
+> at launch — never in a tracked file. The vault-encrypted secrets file
 > is not tracked either — untracking it is what makes the repo reusable."**
 
-Source: `.mcp.json`, `.gitignore` (`.kube/`), `CLAUDE.md` (secrets
-architecture).
+Source: `.mcp.json`, `.gitignore` (`.kube/`, `.aap/`),
+`utilities/aap-mcp-stdio.sh`, `CLAUDE.md` (secrets architecture).
 
 ---
 
