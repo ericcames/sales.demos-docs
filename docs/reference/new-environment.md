@@ -9,13 +9,12 @@ This page assumes [first-time setup](first-time-setup.md) is already done — th
 vault, collections, CLI tools, and `~/.ansible.cfg` token are in place. If any
 of those are missing, do that page first.
 
-It also assumes you have **push access** to the upstream repo — you are a
-collaborator, not a read-only clone. The commit/push steps below update
-`connection.yml` on the remote so AAP's SCM checkout targets the new cluster.
-If you cloned or forked without push access, you can still bootstrap entirely
-from the laptop — `config.yml` writes your cluster identity into the AAP
-inventory as host variables, so AAP templates work without pushing. See
-[Reusing this repo](reusing-this-repo.md) for the full clone-vs-fork guide.
+No push access is needed. Your cluster identity lives in a gitignored
+`local.yml`, and `config.yml` writes it into the AAP inventory as host
+variables, so AAP job templates target the new cluster without a commit. The
+optional commit steps below only refresh `connection.yml` as the upstream
+reference for fresh clones. See [Reusing this repo](reusing-this-repo.md) for
+the full clone-vs-fork guide.
 
 !!! info "Scope: RHDP environments only"
     This covers `sandbox` and `demo` — ephemeral RHDP environments that expire
@@ -26,13 +25,52 @@ inventory as host variables, so AAP templates work without pushing. See
 
 ---
 
+## Quick start
+
+This is the whole procedure with Claude Code. The phases below are what
+[`/sales-demos-bootstrap`](https://github.com/ericcames/sales.demos/blob/main/.claude/skills/sales-demos-bootstrap/SKILL.md) does for you, written out for when you want to run a piece by hand.
+
+**1. Copy three values from the RHDP environment page.**
+
+| Value | Where it goes |
+|---|---|
+| AAP URL — `https://aap-aap.apps.cluster-<id>.dyn.redhatworkshops.io` | The prompt in step 3. The cluster ID in it gives the API URL and apps domain. |
+| AAP admin password | The vault, `env_secrets.<env>.aap_password` (step 2) |
+| kubeadmin password | The vault, `env_secrets.<env>.kubeadmin_password` (step 2). `openshift_api_token` is derived from it — never pasted. |
+
+**2. Put the two passwords in the vault.** Run this in a terminal in your
+`sales.demos` checkout. The prompts hide what you type, so it needs a real
+terminal, and the passwords never enter a Claude transcript. Press Enter on a
+prompt to keep the value already there.
+
+```bash
+bash utilities/set-env-passwords.sh sandbox
+```
+
+**3. Paste the prompt into Claude Code**, started in the `sales.demos`
+checkout. Replace `sandbox` with `demo` if that is the environment, and the URL
+with yours:
+
+```text
+/sales-demos-bootstrap sandbox https://aap-aap.apps.cluster-<id>.dyn.redhatworkshops.io
+```
+
+It writes `local.yml`, derives the API token, runs `setup.yml` (~25–30
+minutes), connects the MCP servers, and tells you when to restart Claude Code.
+
+!!! warning "Never paste a password into the prompt"
+    Anything in the prompt is kept in the session transcript. The passwords
+    belong in step 2; the URL is the only value the prompt needs.
+
+---
+
 ## What changes and what does not
 
 | Changes | Stays the same |
 |---|---|
 | Cluster hostnames (3 values) | Vault password |
-| `aap_password` | `rhsm_org_id` / `rhsm_activation_key` |
-| `openshift_api_token` | `demo_ssh_private_key` |
+| `aap_password`, `kubeadmin_password` | `rhsm_org_id` / `rhsm_activation_key` |
+| `openshift_api_token` (derived) | `demo_ssh_private_key` |
 | `available_memory_gb` | Collections, CLI tools, `~/.ansible.cfg` |
 | Kubeconfig | Everything in first-time setup |
 | AAP MCP token and URL | |
@@ -74,20 +112,29 @@ private key is in the vault.
 
 ### 2. Vault credentials
 
-Two keys under `env_secrets.<env>`:
+Two keys under `env_secrets.<env>`, both from the RHDP environment page:
 
 | Key | Where to get it |
 |---|---|
-| `aap_password` | RHDP provisioning email |
-| `openshift_api_token` | OpenShift console → *Copy login command* → the `sha256~` or `eyJ` value |
+| `aap_password` | AAP admin password |
+| `kubeadmin_password` | OpenShift kubeadmin password |
 
 ```bash
-ansible-vault edit playbooks/group_vars/all/secrets.yml \
-  --vault-id sales.demos@~/secrets/.vault_pass_sales_demos
+bash utilities/set-env-passwords.sh $ENV
 ```
 
-**RHDP tokens are short-lived.** Expect to refresh `openshift_api_token` far
-more often than anything else on this page.
+Then derive `openshift_api_token` from `kubeadmin_password` — it needs the
+`local.yml` from step 1, because it logs in to that cluster:
+
+```bash
+bash utilities/derive-ocp-token.sh $ENV --update-vault
+```
+
+Do not copy the token from the OpenShift console. The RHDP portal renders it
+with em dashes in place of hyphens, which corrupts the JWT
+([#559](https://github.com/ericcames/sales.demos/issues/559)). If derivation
+fails with a 401, `kubeadmin_password` is still the old environment's — re-run
+`set-env-passwords.sh`.
 
 ---
 
@@ -414,8 +461,8 @@ mkdir -p ~/ansible-logs
 
 # A — sources of truth
 vi inventory/group_vars/$ENV/local.yml          # 3 URLs + SSH key
-ansible-vault edit playbooks/group_vars/all/secrets.yml $VAULT
-                                                # aap_password + openshift_api_token
+bash utilities/set-env-passwords.sh $ENV         # aap_password + kubeadmin_password
+bash utilities/derive-ocp-token.sh $ENV --update-vault   # openshift_api_token
 
 # B — reachability
 curl -sk "https://<aap_hostname>/api/gateway/v1/ping/"
