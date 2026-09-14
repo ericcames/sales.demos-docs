@@ -452,7 +452,7 @@ red `DEMO`:
 
 Green is the one you break. Red is the one the customer is watching.
 
-**Then prove the environment is warm.** `/ocpvirt-new-env` builds and times a
+**Then prove the environment is warm.** [`/sales-demos-verify-env`](https://github.com/ericcames/sales.demos/blob/main/.claude/skills/sales-demos-verify-env/SKILL.md) builds and times a
 real VM in about a minute and fails loudly if the cluster is cold.
 
 **Keep the screenshot open in a tab regardless.** If the run stalls, do not

@@ -15,6 +15,10 @@ Pick a demo from the **Demos** tab above. Each one has:
 
 ## For builders
 
+New to the code? Start at the repo's
+[🚀 Getting started](https://github.com/ericcames/sales.demos#-getting-started),
+then [First-time setup](reference/first-time-setup.md).
+
 The **Design Plans** tab has the engineering plans behind each use case — the
 research, the decisions, and the phase plan.
 

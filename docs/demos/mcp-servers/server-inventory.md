@@ -394,14 +394,14 @@ claude mcp list   # all six servers should appear
 |---|---|---|
 | MCP server shows as failed at startup | Kubeconfig does not exist yet | Run the generator, then restart Claude Code |
 | `401 Unauthorized` on a tool call | Token in the vault is stale or the environment expired | Update `env_secrets.<env>.openshift_api_token`, re-run the generator |
-| `could not resolve <env> token` | Vault password wrong, or `env_secrets.<env>` missing | `/sales-demos-first-time` step 2 |
+| `could not resolve <env> token` | Vault password wrong, or `env_secrets.<env>` missing | [`/sales-demos-first-time`](https://github.com/ericcames/sales.demos/blob/main/.claude/skills/sales-demos-first-time/SKILL.md) step 2 |
 | `dial tcp: no such host` | The RHDP environment has expired | Check `connection.yml` points at a live cluster |
 | Tools present but every call fails | Kubeconfig points at a different cluster than you think | `oc whoami --show-server` with `KUBECONFIG` set |
 | AAP MCP returns `503` | Route admitted, pod not serving yet | Wait — `oc get deploy aap-mcp -n aap`; normal for ~60 s after deploy |
 | AAP MCP returns `401` | Token expired or deleted | Re-create: `bash utilities/make-aap-mcp.sh <env>` |
 | AAP MCP write tools missing | `aap_mcp_allow_write_operations` is false | Intentional on `demo`. Changing it requires delete-and-recreate — re-run `mcp_server.yml` |
-| `npx: command not found` | Node not installed | See preflight in the `/sales-demos-mcp` skill |
-| `no aap-mcp route` | MCP server not deployed | Run `/ocpvirt-setup` or `playbooks/mcp_server.yml` first |
+| `npx: command not found` | Node not installed | See preflight in the [`/sales-demos-mcp`](https://github.com/ericcames/sales.demos/blob/main/.claude/skills/sales-demos-mcp/SKILL.md) skill |
+| `no aap-mcp route` | MCP server not deployed | Run [`/sales-demos-setup`](https://github.com/ericcames/sales.demos/blob/main/.claude/skills/sales-demos-setup/SKILL.md) or `playbooks/mcp_server.yml` first |
 | `grafana` not in `claude mcp list` | Server not registered yet | Run `bash utilities/make-grafana-mcp.sh`, then restart Claude Code |
 | Grafana tool returns `401` | SA token revoked or expired | Recreate the token in the Grafana Cloud UI, update the vault, re-run `make-grafana-mcp.sh` |
 | Grafana tool returns `403` | SA has Viewer role, cannot write | Intentional — read-only governance is in the token. If write access is needed, change the SA role in the Grafana UI |

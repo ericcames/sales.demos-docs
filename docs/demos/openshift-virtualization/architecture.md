@@ -288,7 +288,7 @@ measured end to end on sandbox on 2026-09-05.
 Terraform creates the VM, the `windemo` inventory group exists with WinRM
 configured on 5986, and the outputs are the same shape as Linux. OpenShift
 Virtualization ships `win2k22` as an **empty DataSource placeholder**, because
-Red Hat cannot redistribute Windows media; `ocpvirt-windows-image` fills it the
+Red Hat cannot redistribute Windows media; `sales-demos-windows-image` fills it the
 same way CNV fills `rhel9`, with a `DataImportCron` that imports a containerdisk
 from a private registry and takes the placeholder over.
 

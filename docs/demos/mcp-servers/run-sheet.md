@@ -24,7 +24,7 @@ that, present from this.
    - [`.mcp.json`](https://github.com/ericcames/sales.demos/blob/main/.mcp.json) in the repo (shows what is committed)
    - The AAP controller UI, logged in (for the job template beat)
 
-If the servers are not working, run `/sales-demos-mcp` — it takes about two
+If the servers are not working, run [`/sales-demos-mcp`](https://github.com/ericcames/sales.demos/blob/main/.claude/skills/sales-demos-mcp/SKILL.md) — it takes about two
 minutes. Do not debug in front of an audience.
 
 ---

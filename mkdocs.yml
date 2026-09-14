@@ -22,6 +22,7 @@ theme:
         icon: material/brightness-4
         name: Switch to light mode
   features:
+    - content.code.copy
     - navigation.instant
     - navigation.tabs
     - navigation.sections
@@ -85,11 +86,14 @@ nav:
           - Objections: demos/edge-sno/objections.md
   - Reference:
       - Overview: reference/README.md
+      - First-Time Setup: reference/first-time-setup.md
       - Environments: reference/environments.md
+      - New Environment: reference/new-environment.md
       - Running Playbooks: reference/running-playbooks.md
       - Running from AAP: reference/running-from-aap.md
       - Execution Environment: reference/execution-environment.md
       - Reusing This Repo: reference/reusing-this-repo.md
+      - Repo Layout: reference/repo-layout.md
       - Project History:
           - Overview: reference/history/README.md
           - sales.demos: reference/history/sales-demos.md
@@ -102,3 +106,4 @@ nav:
       - Network MCP: plan/network-mcp-plan.md
       - Automation Orchestrator: plan/automation-orchestrator-plan.md
       - Platform Add-ons: plan/platform-addons-plan.md
+  - sales.demos ↗: https://github.com/ericcames/sales.demos#-getting-started

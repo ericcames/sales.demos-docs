@@ -3,18 +3,23 @@
 Operator reference for
 [sales.demos](https://github.com/ericcames/sales.demos) — how to run the
 automation, point it at your own cluster, and understand what AAP is actually
-executing.
+executing. New here? The repo's
+[🚀 Getting started](https://github.com/ericcames/sales.demos#-getting-started)
+is the front door; these pages are the detail behind it.
 
 **Presenting a demo? You do not need any of this.** Go to
 [Demos](../demos/README.md), pick yours, and read the run sheet.
 
 | Page | Read it when |
 |---|---|
+| [First-time setup](first-time-setup.md) | You are setting up a new machine to use this repo, or a prerequisite check is failing |
 | [Environments](environments.md) | You need to know which cluster you are on, or why the sign-in logo is badged |
+| [New environment](new-environment.md) | Your RHDP cluster expired and you need to point at a fresh one |
 | [Running playbooks](running-playbooks.md) | You are running a phase from a laptop, or about to merge a playbook change |
 | [Running from AAP](running-from-aap.md) | You want the workflows and job templates AAP actually has |
 | [Execution environment](execution-environment.md) | A job template fails in a way a laptop run does not reproduce |
 | [Reusing this repo](reusing-this-repo.md) | You cloned or forked it and want it pointed at your own cluster |
+| [Repo layout](repo-layout.md) | You are looking for a file, or wondering why `secrets.yml` or `local.yml` is not where you would guess |
 | [Project history](history/README.md) | You followed a reference to a `CHANGELOG.md` that no longer exists, or want the reasoning behind a past decision |
 
 ---

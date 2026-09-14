@@ -156,7 +156,7 @@ Source: [`servicenow.md`](servicenow.md), `hub/certified-requirements.yml`.
 > **"The kubeconfig and the AAP bearer token both expire. When they do, tool
 > calls start failing with 401 — no graceful degradation, no warning. The fix
 > is to re-run the generator: `make-kubeconfig.sh` for OpenShift,
-> `make-aap-mcp.sh` for AAP. The whole `/sales-demos-mcp` skill does both."**
+> `make-aap-mcp.sh` for AAP. The whole [`/sales-demos-mcp`](https://github.com/ericcames/sales.demos/blob/main/.claude/skills/sales-demos-mcp/SKILL.md) skill does both."**
 
 The RHDP environment itself can expire, which takes the token with it — both
 environments were dead on 2026-09-02 (#101). Check reachability before trusting

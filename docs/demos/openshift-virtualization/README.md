@@ -173,15 +173,15 @@ being the 200 half of `route-503.png` in the same browser frame.
 Two things, in order:
 
 ```bash
-/ocpvirt-new-env      # proves the environment is warm — builds and times a real VM
-/ocpvirt-provision    # or launch "Linux Day 1 - 0 Workflow" in AAP
+/sales-demos-verify-env   # proves the environment is warm — builds and times a real VM
+/sales-demos-provision    # or launch "Linux Day 1 - 0 Workflow" in AAP
 ```
 
 Then read [Running it live](run-sheet.md#running-it-live) in the run sheet — it
 changes three beats and nothing else, and it tells you when to cut back to the
 screenshot rather than debug with an audience.
 
-New to this repo? Run `/sales-demos-first-time` first.
+New to this repo? Run [`/sales-demos-first-time`](https://github.com/ericcames/sales.demos/blob/main/.claude/skills/sales-demos-first-time/SKILL.md) first.
 
 ---
 
