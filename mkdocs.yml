@@ -93,6 +93,7 @@ nav:
       - Running from AAP: reference/running-from-aap.md
       - Execution Environment: reference/execution-environment.md
       - Reusing This Repo: reference/reusing-this-repo.md
+      - Repo Layout: reference/repo-layout.md
       - Project History:
           - Overview: reference/history/README.md
           - sales.demos: reference/history/sales-demos.md
@@ -105,3 +106,4 @@ nav:
       - Network MCP: plan/network-mcp-plan.md
       - Automation Orchestrator: plan/automation-orchestrator-plan.md
       - Platform Add-ons: plan/platform-addons-plan.md
+  - sales.demos ↗: https://github.com/ericcames/sales.demos#-getting-started
