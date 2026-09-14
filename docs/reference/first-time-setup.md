@@ -1,8 +1,10 @@
 # First-time setup
 
 One-time, per-machine setup for using
-[sales.demos](https://github.com/ericcames/sales.demos) from a laptop. About
-10 minutes. After this, go straight to [`/sales-demos-setup`](https://github.com/ericcames/sales.demos/blob/main/.claude/skills/sales-demos-setup/SKILL.md).
+[sales.demos](https://github.com/ericcames/sales.demos) from a laptop — the
+detail behind the repo's
+[🚀 Getting started](https://github.com/ericcames/sales.demos#-getting-started).
+About 10 minutes. After this, go straight to [`/sales-demos-setup`](https://github.com/ericcames/sales.demos/blob/main/.claude/skills/sales-demos-setup/SKILL.md).
 
 This page is the full reference — every prerequisite, every verification
 command.

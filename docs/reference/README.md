@@ -3,7 +3,9 @@
 Operator reference for
 [sales.demos](https://github.com/ericcames/sales.demos) — how to run the
 automation, point it at your own cluster, and understand what AAP is actually
-executing.
+executing. New here? The repo's
+[🚀 Getting started](https://github.com/ericcames/sales.demos#-getting-started)
+is the front door; these pages are the detail behind it.
 
 **Presenting a demo? You do not need any of this.** Go to
 [Demos](../demos/README.md), pick yours, and read the run sheet.
@@ -17,6 +19,7 @@ executing.
 | [Running from AAP](running-from-aap.md) | You want the workflows and job templates AAP actually has |
 | [Execution environment](execution-environment.md) | A job template fails in a way a laptop run does not reproduce |
 | [Reusing this repo](reusing-this-repo.md) | You cloned or forked it and want it pointed at your own cluster |
+| [Repo layout](repo-layout.md) | You are looking for a file, or wondering why `secrets.yml` or `local.yml` is not where you would guess |
 | [Project history](history/README.md) | You followed a reference to a `CHANGELOG.md` that no longer exists, or want the reasoning behind a past decision |
 
 ---
