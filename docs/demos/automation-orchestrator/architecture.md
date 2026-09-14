@@ -199,9 +199,10 @@ temporal (x1), redis (x1).
 
 - **No server-side branding on AO.** The `AutomationOrchestrator` CR has no
   `custom_login_info` or `custom_logo` field — the product is version 2026.8
-  and does not yet offer branding. The browser extension (`aap-env-badge`
-  v1.6.0) fills the gap: it paints the SANDBOX/DEMO pill on every AO page,
-  login and post-login (#477, #496).
+  and does not yet offer branding. The `aap-env-badge` browser extension fills
+  the gap: it paints the SANDBOX/DEMO pill on every AO page, login and
+  post-login ([sales.demos#477](https://github.com/ericcames/sales.demos/issues/477),
+  [#496](https://github.com/ericcames/sales.demos/issues/496)).
 - **The AO MCP server is read-only.** It wraps 32 GET endpoints. Creating or
   executing workflows via MCP is not yet possible.
 - **No `aap-edge` AAP MCP server.** AO on edge has no MCP entry point. The
