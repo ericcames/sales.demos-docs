@@ -147,7 +147,7 @@ having two different conversations about audit readiness.
 
 ## Beat 5 · The honest bits (TODO)
 
-> **"Three things this demo does not show, and I want to be straight about
+> **"Two things this demo does not show, and I want to be straight about
 > them."**
 
 > **"First — the interactive demo on redhat.com shows EDA triggers and
@@ -158,10 +158,6 @@ having two different conversations about audit readiness.
 > **"Second — the AO MCP server, the thing that lets an AI assistant query this
 > system, is read-only today. You can inspect workflows and executions but not
 > create them programmatically."**
-
-> **"Third — AO's login page does not carry the environment badge that AAP's
-> does. It is a new product, version 2026.8, and branding customization is not
-> in the operator yet."**
 
 **Why this beat exists.** These are the questions someone will discover in
 evaluation. Volunteering them first — before anyone asks — is worth more than

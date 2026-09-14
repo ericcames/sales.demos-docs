@@ -53,7 +53,8 @@ environment badge.
 
 ![AAP login page — SANDBOX badge and prelogin warning](../../images/aap-login-page-sandbox.png)
 
-Log in with the AAP admin credentials. Land in AO.
+Log in with the AAP admin credentials. Land in AO — the green SANDBOX badge
+persists in the AO masthead after login.
 
 > **"Same credentials. One identity store. Automation Orchestrator delegates
 > authentication to the AAP gateway — no separate user database."**
@@ -207,8 +208,8 @@ the customer.
 
 - [x] AO login page with "Log in with Ansible Automation Platform" button
 - [x] AAP sign-in page showing the OIDC redirect (environment badge visible)
-- [x] AO Integrations page showing AAP connected with template count
-- [ ] AO canvas with a completed workflow — all nodes connected (needs live rehearsal)
+- [ ] AO Integrations page showing AAP connected with template count (recapture with SANDBOX badge visible)
+- [ ] AO canvas with a completed workflow — all nodes connected (needs live rehearsal, capture with badge)
 - [ ] AO execution view mid-run, approval node waiting
 - [ ] AO execution view after approval, showing the audit trail
 - [ ] AO execution view at completion, all nodes succeeded
