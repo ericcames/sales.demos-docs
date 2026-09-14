@@ -269,8 +269,10 @@ tool will inherit the user's permissions for API token-based authentication."*
 So the token, not just `allow_write_operations`, bounds what the agent can do —
 creating it as `admin` gives the agent admin.
 
-That token is **not** in `.mcp.json`, which is committed. It is registered with
-`claude mcp add --scope local`, writing to the operator's own config. And it is
+That token is **not** in `.mcp.json`, which is committed. It was registered
+with `claude mcp add --scope local`, writing to the operator's own config; since
+[#515](https://github.com/ericcames/sales.demos/issues/515) it lives in a gitignored `.aap/<env>.token` that a committed
+stdio entry reads instead. Either way it is never in a tracked file. And it is
 a documented exception to `CLAUDE.md`'s rule that a created token must be
 deleted in an `always:` block — an MCP client needs a durable credential, so
 cleanup would destroy the thing it was made for. Three things keep that honest:

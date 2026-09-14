@@ -22,7 +22,7 @@ flowchart TD
         OE["<b>openshift-edge</b><br/>read-write · 25 tools"]
     end
 
-    subgraph cluster ["In-cluster (streamable HTTP)"]
+    subgraph cluster ["In-cluster (streamable HTTP, bridged to stdio)"]
         AS["<b>aap-sandbox</b><br/>read-write · ~140 tools"]
         AD["<b>aap-demo</b><br/>read-only · ~95 tools"]
     end
@@ -34,8 +34,8 @@ flowchart TD
     CC -->|"kubeconfig<br/>(gitignored)"| OS
     CC -->|"kubeconfig<br/>(gitignored)"| OD
     CC -->|"kubeconfig<br/>(gitignored)"| OE
-    CC -->|"bearer token<br/>(scope local)"| AS
-    CC -->|"bearer token<br/>(scope local)"| AD
+    CC -->|"bearer token<br/>(.aap/, gitignored)"| AS
+    CC -->|"bearer token<br/>(.aap/, gitignored)"| AD
     CC -->|"SA token<br/>(scope local)"| GR
 ```
 
@@ -67,8 +67,8 @@ Full tool listings and verification commands are in
 | `openshift-sandbox` | OpenShift | stdio (local) | read-write | 25 | kubeconfig | `.mcp.json` (committed) |
 | `openshift-demo` | OpenShift | stdio (local) | read-only | 16 | kubeconfig | `.mcp.json` (committed) |
 | `openshift-edge` | OpenShift | stdio (local) | read-write | 25 | kubeconfig | `.mcp.json` (committed) |
-| `aap-sandbox` | AAP | streamable HTTP | read-write | ~140 | bearer token | `claude mcp add --scope local` |
-| `aap-demo` | AAP | streamable HTTP | read-only | ~95 | bearer token | `claude mcp add --scope local` |
+| `aap-sandbox` | AAP | stdio → streamable HTTP (supergateway) | read-write | ~140 | bearer token | `.mcp.json` (committed) |
+| `aap-demo` | AAP | stdio → streamable HTTP (supergateway) | read-only | ~95 | bearer token | `.mcp.json` (committed) |
 | `grafana` | Grafana Cloud | stdio (local) | read-only (Viewer) | 81 | SA token | `claude mcp add --scope local` |
 
 Measured 2026-09-03 (OpenShift sandbox/demo, AAP), 2026-09-06 (Grafana) and
@@ -133,7 +133,8 @@ passed as environment variables, read from the vault by `make-grafana-mcp.sh`.
 | `AnsibleMCPServer` CR in the `aap` namespace | The in-cluster MCP server, deployed by `playbooks/mcp_server.yml` |
 | `aap-mcp` Route | Ingress for the MCP server (`ingress_type: Route`, not LoadBalancer — RHDP constraint) |
 | Personal access token | OAuth2 bearer token, created via the gateway API |
-| `claude mcp add --scope local` registration | Client-side config, not tracked |
+| `.aap/<env>.token`, `.aap/<env>.url` | Gitignored credential files (`0600`) written by `make-aap-mcp.sh` |
+| `.mcp.json` entries | Committed stdio definitions running `utilities/aap-mcp-stdio.sh <env>`, which bridges to the Route with `npx supergateway` ([#515](https://github.com/ericcames/sales.demos/issues/515)) |
 
 ---
 
@@ -159,7 +160,8 @@ diagram. Summary:
 - **OpenShift:** vault → `make-kubeconfig.sh` → `.kube/<env>.kubeconfig`
   (gitignored) → read by `kubernetes-mcp-server` at startup
 - **AAP:** vault → `make-aap-mcp.sh` → creates OAuth token via gateway API →
-  `claude mcp add --scope local` (user config, not tracked)
+  `.aap/<env>.token` + `.aap/<env>.url` (gitignored) → read at launch by the
+  committed `.mcp.json` stdio entry, which bridges to the in-cluster server
 - **Grafana Cloud:** vault → `make-grafana-mcp.sh` → `claude mcp add --scope
   local` with env vars (user config, not tracked) → read by `mcp-grafana` at
   startup
@@ -209,5 +211,5 @@ because the instance spans every environment.
 |---|---|
 | Bearer tokens (manual — see [`server-inventory.md`](server-inventory.md#aap-bearer-token)) | `.mcp.json` (committed) |
 | Kubeconfigs (re-generated on next run) | `AnsibleMCPServer` CR (in-cluster, survives client-side cleanup) |
-| `claude mcp add` registrations (local only) | Server definitions and access posture |
+| `.aap/` token files, and the AO and Grafana `claude mcp add` registrations (local only) | Server definitions and access posture |
 | Grafana SA token (revoke in Grafana UI) | Grafana Cloud instance and service account |

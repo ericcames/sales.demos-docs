@@ -18,8 +18,8 @@ Measured 2026-09-03 (OpenShift sandbox/demo, AAP), 2026-09-06 (Grafana),
 | `openshift-sandbox` | OpenShift | stdio (local) | read-write | 25 | kubeconfig | `.mcp.json` (committed) |
 | `openshift-demo` | OpenShift | stdio (local) | read-only | 16 | kubeconfig | `.mcp.json` (committed) |
 | `openshift-edge` | OpenShift | stdio (local) | read-write | 25 | kubeconfig | `.mcp.json` (committed) |
-| `aap-sandbox` | AAP | streamable HTTP | read-write | ~140 | bearer token | `claude mcp add --scope local` |
-| `aap-demo` | AAP | streamable HTTP | read-only | ~95 | bearer token | `claude mcp add --scope local` |
+| `aap-sandbox` | AAP | stdio → streamable HTTP (supergateway) | read-write | ~140 | bearer token | `.mcp.json` (committed) |
+| `aap-demo` | AAP | stdio → streamable HTTP (supergateway) | read-only | ~95 | bearer token | `.mcp.json` (committed) |
 | `ao-sandbox` | Automation Orchestrator | stdio (local) | read-only | 32 | admin password | `claude mcp add --scope local` |
 | `grafana` | Grafana Cloud | stdio (local) | read-only (Viewer) | 81 | SA token | `claude mcp add --scope local` |
 
@@ -243,23 +243,28 @@ never briefly world-readable.
 
 ```
 secrets.yml (vault-encrypted)
-    └── aap_admin_password
-connection.yml (plaintext, committed)
+    └── env_secrets.<env>.aap_password
+connection.yml / local.yml (plaintext)
     └── aap_hostname
 
         ↓  utilities/make-aap-mcp.sh <env>
 
 1. Creates a personal access token via the gateway API
    POST /api/gateway/v1/tokens/
-   scope: "write" (sandbox) or "read" (demo)
+   scope: "write" on every environment — the server's
+   aap_mcp_allow_write_operations is the real guard
 
 2. Finds the aap-mcp Route via the kubeconfig
    oc get route aap-mcp -n aap
 
-3. Registers with Claude Code
-   claude mcp add --transport http --scope local
+3. Writes .aap/<env>.token and .aap/<env>.url
+   (gitignored, 0600)
 
-        ↓  stored in user's local Claude config (not tracked)
+        ↓  .mcp.json (committed): bash utilities/aap-mcp-stdio.sh <env>
+
+npx supergateway — stdio <-> streamable HTTP, bearer auth
+
+        ↓
 
 aap-<env> MCP server (streamable HTTP, in-cluster)
 ```

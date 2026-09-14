@@ -192,9 +192,11 @@ Registered via `utilities/make-ao-mcp.sh`, which:
   AI consumer, not a Swagger reader.
 - **Read-only.** No create, update, or delete tools. The demo story is "look at
   what AO orchestrates," not "let the AI build workflows."
-- **`--scope local`, not `.mcp.json`.** Same pattern as the AAP MCP server — the
-  token is a credential, stored in the operator's local Claude config rather than
-  the tracked file.
+- **`--scope local`, not `.mcp.json`.** The AO admin password is a credential,
+  passed as environment variables on a local `claude mcp add` entry rather than
+  the tracked file. When AO was built this matched the AAP MCP server; AAP has
+  since moved to a committed `.mcp.json` stdio entry that reads a gitignored
+  token file ([#515](https://github.com/ericcames/sales.demos/issues/515)), and AO has not.
 - **stdio transport.** Runs as a local process. No in-cluster deployment, unlike
   the AAP MCP server.
 
