@@ -118,9 +118,12 @@ Three utilities, in this order. Each depends on the one before it.
 
 ### 1. Propagate `local.yml` into `connection.yml`
 
-AAP reads `connection.yml` from its SCM checkout — `local.yml` is gitignored
-and invisible to it. This script bridges the gap
-([#513](https://github.com/ericcames/sales.demos/issues/513)):
+`connection.yml` is the committed upstream reference that fresh clones start
+from. This script copies your `local.yml` values into it
+([#513](https://github.com/ericcames/sales.demos/issues/513)), so collaborators
+can commit it once the environment is stable. It is **not** how AAP learns your
+cluster — `config.yml` does that in Phase E, from `local.yml` directly (see
+[Reusing this repo](reusing-this-repo.md)):
 
 ```bash
 bash utilities/update-connection.sh $ENV
@@ -205,10 +208,13 @@ creates the AAP job templates, so it runs first; the rest use the same
 `ansible-playbook` pattern. Once bootstrap is done, the same playbooks are
 available as AAP job templates for day-2 use.
 
-### 1. Commit and push `connection.yml` (collaborators only)
+### 1. Commit and push `connection.yml` (collaborators only, optional)
 
-AAP reads the SCM checkout, not `local.yml`. Pushing `connection.yml` updates
-the remote so AAP's project sync targets the new cluster.
+This keeps the upstream reference current for fresh clones. It does **not**
+repoint AAP — `config.yml` (next step) writes your cluster identity into the AAP
+inventory as host variables, and those outrank whatever the checkout carries.
+Skip it while the environment is still settling; a stale `connection.yml` during
+active work is expected.
 
 ```bash
 git add inventory/group_vars/$ENV/connection.yml
@@ -217,10 +223,8 @@ git push
 ```
 
 !!! info "Cloners: skip this step"
-    If you cloned without push access, `config.yml` (next step) writes your
-    cluster identity into the AAP inventory as host variables. AAP host vars
-    override SCM-sourced group vars, so templates target your cluster without
-    pushing. See [Reusing this repo](reusing-this-repo.md).
+    Without push access there is nothing to do here — the next step carries your
+    `local.yml` into AAP. See [Reusing this repo](reusing-this-repo.md).
 
 ### 2. Apply configuration from the laptop
 
