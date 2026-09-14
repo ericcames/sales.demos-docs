@@ -2,7 +2,8 @@
 
 [sales.demos](https://github.com/ericcames/sales.demos) is public and meant to
 be reusable. Two things stand between a clone and a working demo: pointing it at
-*your* cluster, and — if you run it from AAP — pointing AAP at *your* fork.
+*your* cluster, and — only if you want to carry your own code changes — pointing
+AAP at *your* fork.
 
 ---
 
@@ -18,13 +19,13 @@ openshift_api_url:     "https://api.cluster-<id>.dyn.redhatworkshops.io:6443"
 openshift_apps_domain: "apps.cluster-<id>.dyn.redhatworkshops.io"
 ```
 
-**There are two legitimate ways to change them, and which is right depends on
-where you run from.**
+**One input covers both places you run from: a gitignored `local.yml`.** It
+reaches AAP too — not through git, but through `config.yml`.
 
-| You are | Repoint by | Why |
-|---|---|---|
-| On a laptop, tracking this repo for updates | a gitignored `local.yml` overlay | You pull upstream fixes without ever conflicting |
-| Forked, running from AAP | editing `connection.yml` on your own branch | Gitignored files are **not** in the SCM checkout a job template runs from |
+| You run from | How your `local.yml` values get there |
+|---|---|
+| A laptop | Ansible loads `local.yml` directly, after `connection.yml` |
+| An AAP job template | `config.yml` writes the effective values into the AAP inventory as host variables ([#528](https://github.com/ericcames/sales.demos/issues/528)) |
 
 ### From a laptop: the `local.yml` overlay
 
@@ -62,26 +63,51 @@ Confirm what is actually in effect rather than trusting the file you edited:
 ansible -i inventory --limit sandbox aap -m debug -a 'msg={{ aap_hostname }}'
 ```
 
-### From AAP: edit `connection.yml`
+### From AAP: `config.yml` carries `local.yml` for you
 
-An AAP job template gets its playbooks and inventory from the SCM project
-checkout, and a gitignored file is not in it. So `local.yml` does nothing for a
-job template, and repointing one means committing the change:
+A job template gets its playbooks from the SCM project checkout, and a
+gitignored file is not in it — so the checkout alone would target the committed
+cluster. **You do not fix that by committing `connection.yml`.** Run
+`config.yml` from the laptop, where `local.yml` *is* loaded:
 
 ```bash
-git checkout -b my-environment
-$EDITOR inventory/group_vars/sandbox/connection.yml
+ansible-playbook playbooks/config.yml -i inventory --limit sandbox \
+  -e target_env=sandbox \
+  --vault-id sales.demos@~/secrets/.vault_pass_sales_demos
 ```
 
-You can do both: the overlay for laptop runs, the committed file for AAP. They
-do not interfere — `local.yml` simply is not present in the checkout.
+`inventory/group_vars/aap/controller_hosts.yml` has it write your cluster
+identity — `aap_hostname`, `openshift_api_url`, `openshift_apps_domain`, the
+golden image tags, `available_memory_gb`, and a few more — as **host variables**
+on the `<env>-local` host in the *Sales Demo VMs* inventory. Host variables
+outrank the group variables that arrive from the checkout, and that inventory's
+SCM source does not overwrite them on sync, so every job template targets your
+cluster. No push, no fork, no conflict on your next pull.
+
+Two things follow:
+
+- **Re-run `config.yml` whenever `local.yml` changes.** AAP only learns your
+  values when it runs; editing the file alone changes nothing in AAP.
+- **Check the host, not the file.** In AAP, open *Inventories → Sales Demo VMs →
+  Hosts → `<env>-local` → Variables* and confirm the hostnames are yours.
+
+Credentials are not among those variables — they still arrive at run time
+through the *Sales Demos - Env Secrets* credential.
+
+!!! note "Collaborators with push access"
+    `connection.yml` is still the upstream reference for fresh clones, so when
+    an environment is stable a collaborator commits it with
+    `utilities/update-connection.sh <env>`
+    ([#513](https://github.com/ericcames/sales.demos/issues/513)). That is a
+    separate, deliberate step — not how you repoint AAP.
 
 ---
 
 ## Forking
 
-Running from AAP means forking, and four things in the repo name *that* repo or
-its author. Two are variables; two are deliberately left alone
+You only need a fork to run **your own changes** — targeting your own cluster
+does not need one (see above). If you do fork, four things in the repo name
+*that* repo or its author. Two are variables; two are deliberately left alone
 ([#132](https://github.com/ericcames/sales.demos/issues/132)).
 
 **Point AAP's project at your fork.** This is the one that bites, because
