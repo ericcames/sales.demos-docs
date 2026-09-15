@@ -25,8 +25,11 @@ theme:
     - content.code.copy
     - navigation.instant
     - navigation.tabs
-    - navigation.sections
-    - navigation.expand
+    # Topics in the left nav are collapsible and start collapsed (#75):
+    # navigation.sections rendered every group as a fixed, always-open header
+    # and navigation.expand opened them all. navigation.indexes makes a topic's
+    # first page (its Overview) the page its name opens.
+    - navigation.indexes
     - navigation.top
     - search.suggest
     - search.highlight
