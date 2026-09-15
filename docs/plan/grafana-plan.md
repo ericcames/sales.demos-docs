@@ -302,11 +302,12 @@ Decisions worth keeping:
   five-minute staleness window.
 - **No contact point.** A receiver would put an address in a public repo.
 
-## Status — the instance expires 2026-09-20
+## Status — the trial ends 2026-09-20, the stack stays
 
-The free-tier Grafana Cloud stack behind this plan expires on 2026-09-20 and
-will not be renewed. The automation stays in sales.demos; the dashboard, alerts,
-MCP answers and screenshots are captured before then in
+The trial behind this plan ends on 2026-09-20, when the account switches to the
+**Free plan** automatically rather than being deleted — measured usage sits at
+about 23% of the free series allowance and 10% of the log allowance, so the demo
+keeps working. The automation, dashboard, alerts, MCP answers and screenshots are in
 [`demos/observability/grafana/`](../demos/observability/grafana/README.md),
 which also has the step-by-step
 [rebuild on a new account](../demos/observability/grafana/rebuild.md).

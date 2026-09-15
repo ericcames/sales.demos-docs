@@ -2,7 +2,7 @@
 
 What Claude could do with Grafana, how it was wired, and why it could not
 change anything. Every answer quoted here was captured from the live instance
-on 2026-09-15, before the instance expires on 2026-09-20.
+on 2026-09-15, on the sandbox cluster.
 
 For every other MCP server in this repo — OpenShift, AAP, Automation
 Orchestrator, the portal — see

@@ -10,8 +10,8 @@ twenty minutes.
 | **Length** | 20 minutes (15 + 5 for questions) |
 | **Audience** | Platform engineers, SREs and automation leads who already run monitoring and want to see it managed as code and read by an assistant |
 | **Reader** | The Ansible pre-sales engineer presenting it |
-| **Needs a live environment?** | **Not after 2026-09-20** — the Grafana Cloud instance expires then and is not being renewed. The screenshots and captured MCP answers here are the record. To run it live, [rebuild it](rebuild.md) on a new free account |
-| **Status** | **Draft** — built and rehearsed on sandbox 2026-09-15; screenshots pending |
+| **Needs a live environment?** | **No, but there is one.** Every beat is captured in screenshots here. The Grafana Cloud stack keeps running: on 2026-09-20 the trial ends and the account moves to the **Free plan**, which this demo fits inside |
+| **Status** | **Draft** — built and rehearsed on sandbox 2026-09-15; a few screenshots outstanding |
 
 **New to Grafana?** Read [`grafana-101.md`](grafana-101.md) first. It assumes
 nothing.
@@ -27,7 +27,7 @@ nothing.
 | [`talk-track.md`](talk-track.md) | **While rehearsing.** The narrative and the actual words |
 | [`playbooks.md`](playbooks.md) | **When asked "what did Ansible actually do".** Every playbook, job template, credential and resource |
 | [`mcp-server.md`](mcp-server.md) | **When asked "what can the AI do with it".** The 81 tools, real answers, and the proof it cannot write |
-| [`architecture.md`](architecture.md) | **When asked "how does that work".** Data flow, the three tokens, timings, what expires |
+| [`architecture.md`](architecture.md) | **When asked "how does that work".** Data flow, the three tokens, timings, what the free plan changes |
 | [`usage-and-cost.md`](usage-and-cost.md) | **When asked "what does this cost" or "how do we send less".** Measured volumes and reduction options |
 | [`rebuild.md`](rebuild.md) | **When you want it running again.** A new free account to a working demo in about 45 minutes |
 | [`objections.md`](objections.md) | **Before you go in.** What this audience asks, answered honestly |
@@ -59,8 +59,8 @@ without being given the keys to it.
 
 ## Why it works without an instance
 
-Everything a live run would put on screen is captured before the instance
-expires:
+Every beat is captured, so a lost cluster or a dead conference network costs
+you nothing:
 
 - **Dashboard and panel images** were rendered by Grafana itself, through the
   image renderer, for the sandbox cluster with a full day of data behind them.
@@ -70,9 +70,9 @@ expires:
   the live stack, trimmed but not edited.
 - **The automation itself** is unchanged in git, and was run from AAP.
 
-**The honest caveat:** these are pictures of a working system, not a working
-system. If the audience wants to see a query run, that is a rebuild — 45 minutes
-the day before, not in the meeting.
+**The honest caveat:** screenshots are pictures of a working system. The stack
+itself is still up, so a live run is possible — but check it first with the
+question below rather than assuming.
 
 ---
 

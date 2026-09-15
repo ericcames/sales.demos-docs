@@ -10,6 +10,16 @@ Metrics** and **Adaptive Logs**, both covered below.
 
 ---
 
+## The trial ends, the stack stays
+
+On **2026-09-20** the account leaves its unlimited-usage trial. Grafana switches
+it to the **Free plan** automatically — the stack is not deleted:
+
+![The in-product notice: on Sep 20 the account switches to the Free plan](../../../images/grafana-trial-notice.png)
+
+That matters because this demo fits inside the free plan with room to spare. The
+numbers below are the evidence.
+
 ## The free tier, and where we sat in it
 
 | Signal | Free-tier allowance | Our usage | Headroom |

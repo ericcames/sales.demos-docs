@@ -1,7 +1,7 @@
 # Architecture — Grafana Cloud
 
 Reference for the presenter. What exists, what builds what, which credential can
-do what, and what is lost when the instance expires.
+do what, and what changes when the trial ends.
 
 For **why** it is built this way, read the design plan:
 [`plan/grafana-plan.md`](../../../plan/grafana-plan.md). For each playbook in
@@ -59,10 +59,9 @@ flowchart LR
 - **One dashboard and one rule group serve every cluster.** Alloy stamps a
   `cluster` label on every series and log line; the dashboard has a Cluster
   picker and each alert fires per cluster.
-- **Grafana Cloud outlives the clusters, but not forever.** It was chosen over a
-  self-hosted Grafana because it survives an RHDP environment being rebuilt. It
-  does not survive its own free trial ending, which is why this folder is a
-  record.
+- **Grafana Cloud outlives the clusters.** It was chosen over a self-hosted
+  Grafana because it survives an RHDP environment being rebuilt. When the trial
+  ends the account moves to the Free plan and keeps running; the demo fits.
 
 ---
 
@@ -166,9 +165,9 @@ Detail and reduction options: [`usage-and-cost.md`](usage-and-cost.md).
 
 ---
 
-## What expires, and what survives
+## What the free plan changes
 
-| Goes with the instance | Survives in git |
+| Lost when the trial ends | Kept |
 |---|---|
 | Metric and log history | `deploy_alloy.yml` — the whole collection pipeline |
 | The three tokens | `cluster-health.json` — the dashboard |

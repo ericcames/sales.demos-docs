@@ -3,8 +3,8 @@
 **Rehearse from this. Present from [`run-sheet.md`](run-sheet.md).**
 
 Everything a live run would put on screen is embedded in this folder's pages,
-so the whole track works with no Grafana instance — which is just as well,
-because the one it was built on expires on 2026-09-20.
+so the whole track works with no Grafana instance, and with one: the stack
+stays up on the Free plan when the trial ends on 2026-09-20.
 
 ---
 
@@ -187,8 +187,9 @@ set-up.
 > **"Three things. There are no traces — nothing in this platform emits them, so
 > that part of Grafana is empty. The 'Nodes Ready' panel says three on a
 > one-node cluster, which is wrong, and a one-line pull request. And the Grafana
-> instance behind these screenshots was a free trial that has since expired —
-> they're pictures of a working system, not a working system."**
+> instance behind these screenshots runs on Grafana's free plan — ten thousand
+> metric series and fifty gigabytes of logs a month. Two clusters fit inside
+> that. A real estate would not, and that is a sizing conversation, not a demo."**
 
 **Why this beat exists.** A room of SREs has seen demos skip the hard parts.
 Being first to the limitations is what makes them believe the rest.

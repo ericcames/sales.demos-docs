@@ -198,7 +198,8 @@ the screen.
 
 ## When you are finished
 
-Free accounts expire. Before yours does:
+A free account keeps running — Grafana moves a finished trial onto the Free plan
+rather than deleting the stack. Tidy up anyway when you stop using it:
 
 1. Capture anything you want to keep — this folder is the example.
 2. Delete the three tokens in the Grafana UI. Nothing automates this.

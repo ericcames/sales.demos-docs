@@ -8,7 +8,7 @@ that, present from this.
 |---|---|
 | **Length** | 20 minutes — 15 presenting, 5 questions |
 | **Audience** | Platform engineers, SREs, automation leads |
-| **Needs an environment?** | **No.** The instance expires 2026-09-20; present from the screenshots. Live is a [rebuild](rebuild.md) the day before |
+| **Needs an environment?** | **No** — the screenshots carry it. Live works too: the stack stays up on the Free plan after 2026-09-20 |
 | **Assets** | the images in this folder's pages; the three committed files in sales.demos |
 
 ---
@@ -135,7 +135,7 @@ Pick two:
 
 - **No traces** — nothing here emits them
 - **"Nodes Ready: 3"** is wrong on a single-node cluster
-- **The instance expires on 2026-09-20** — after that, this is a record, not a live system
+- **The free plan is a real limit** — 10,000 metric series and 50 GB of logs a month, and two clusters use about a quarter of the series
 - **Alerts don't notify anyone** — deliberately, because this repo is public
 
 ---

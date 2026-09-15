@@ -18,7 +18,7 @@ building the automation. For *why* something is built the way it is, read
 | [MCP Servers — Agentic Automation with Governance](mcp-servers/) | Platform engineers and automation leads | 20 min | **Draft** ([#153](https://github.com/ericcames/sales.demos/issues/153)) |
 | [Automation Orchestrator](automation-orchestrator/) | Platform engineers and automation leads | 20 min | **Ready** |
 | [Edge / Single Node OpenShift](edge-sno/) | Platform engineers and edge infrastructure architects | Setup ~90 min hands-on; the demo itself is the 30 min OCP Virt track | **Ready** |
-| [Observability — Grafana Cloud](observability/grafana/) | Platform engineers, SREs and automation leads | 20 min | **Draft** — instance expires 2026-09-20; screenshots in progress ([#82](https://github.com/ericcames/sales.demos-docs/issues/82)) |
+| [Observability — Grafana Cloud](observability/grafana/) | Platform engineers, SREs and automation leads | 20 min | **Draft** — screenshots in progress ([#82](https://github.com/ericcames/sales.demos-docs/issues/82)) |
 
 ---
 
