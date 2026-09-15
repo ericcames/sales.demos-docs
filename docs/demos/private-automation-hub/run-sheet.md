@@ -264,16 +264,16 @@ runs the preflight first.
 
 ## Screenshots
 
-Captured from the live sandbox and demo environments, committed in
-`docs/images/`. Click a thumbnail for the full-size image:
+Captured from the live sandbox and demo environments. Click a thumbnail
+for the full-size image:
 
-1. `docs/images/pah-repositories-empty.png` — Repositories, never synced (demo env)
+1. Repositories, never synced (demo env)
    <br>[![Repositories — never synced](../../images/pah-repositories-empty.png){ width="320" }](../../images/pah-repositories-empty.png)
-2. `docs/images/pah-repositories-populated.png` — Repositories, populated with `approved` (sandbox env)
+2. Repositories, populated with `approved` (sandbox env)
    <br>[![Repositories — populated](../../images/pah-repositories-populated.png){ width="320" }](../../images/pah-repositories-populated.png)
-3. `docs/images/pah-remote-community.png` — Edit community remote dialog
+3. Edit community remote dialog
    <br>[![Edit community remote](../../images/pah-remote-community.png){ width="320" }](../../images/pah-remote-community.png)
-4. `docs/images/pah-remote-certified.png` — Edit rh-certified remote dialog
+4. Edit rh-certified remote dialog
    <br>[![Edit rh-certified remote](../../images/pah-remote-certified.png){ width="320" }](../../images/pah-remote-certified.png)
-5. `docs/images/pah-remote-validated.png` — Edit validated remote dialog
+5. Edit validated remote dialog
    <br>[![Edit validated remote](../../images/pah-remote-validated.png){ width="320" }](../../images/pah-remote-validated.png)
