@@ -717,6 +717,13 @@ already-booted guest the same wait is **26.7 seconds**.
 Nothing in this repo can shorten it. It is why Linux manages 9m 9s end to end and
 Windows cannot.
 
+> **Re-measured 2026-09-15 on the rebuilt sandbox (`cluster-v9n68`): 301.9s.**
+> Workflow job 79, node 2's `wait_for_connection`. The floor is real but not a
+> fixed 6m 30s — it moved by a minute and a half. The cluster changed and so did
+> the first-logon commands (#377), and neither was measured on its own, so the
+> cause is not attributed. The finding stands; only the number is a range now:
+> **~5m to ~6m 30s.**
+
 ### Why a cold build cannot be under 10 minutes
 
 ```
@@ -728,13 +735,35 @@ provision 50s + sysprep 6m30s + update scan 2m30s + compliance 2m41s + check 41s
 the arithmetic above says no, and **~15m 40s cold was accepted instead** (#360).
 Do not re-open it without new information about the sysprep floor.
 
+> **Re-measured 2026-09-15 — new information about the floor, and the conclusion
+> still holds.** Workflow job 79, one `large` guest, **12m 00s** wall-clock:
+>
+> ```
+> provision 30s + sysprep 5m02s + update search 1m04s + compliance 1m04s + check 18s
+>   = 7m 58s   before configure and the update install
+> + install one update 1m25s + configure 2m20s  →  12m 00s total
+> ```
+>
+> Every term shrank, and a cold build is **still not under 10 minutes**: the
+> sysprep wait plus the scan alone is 6 minutes. What changed is the expectation:
+> ~15m 40s was a projection, and one measured cold build has now come in under
+> it. Measured cold builds span 12–28 minutes. Every run is in
+> [`timings.md`](../demos/openshift-virtualization/timings.md).
+
 ### What each proposed change is actually worth
 
 | Change | Where | Saves |
 |---|---|---|
-| Pre-install IIS in the golden image | producer, [ibp#87] | **~16 min** |
+| Pre-install IIS in the golden image | producer, [ibp#87] | **~16 min** — re-measured 2026-09-15: **~1.5 min** (see below) |
 | Collapse `windows_configure`'s file writes | this repo, #361 | ~2m 30s |
 | Bake Windows Updates into the image | producer, [ibp#88] | **~0 min** |
+
+> **The IIS figure was the one-off reboot.** On 2026-09-15 (workflow job 79, job
+> 82) installing `Web-Server` took **88.1s** and reported
+> `reboot_required: False`, so no reboot ran and the whole Configure node took
+> 140s. The ~16 minutes above was 3m 42s of install plus the 12m 26s reboot this
+> section already flagged as inflated. Pre-installing IIS is still a reasonable
+> image decision — it is no longer a demo-time one.
 
 **Patching the image saves no demo time, and that is counterintuitive enough to
 write down.** The ~2m 30s of node 2 is the Windows Update *scan*, and the scan
