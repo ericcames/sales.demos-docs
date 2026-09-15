@@ -51,6 +51,13 @@ It sits in the same relationship to `run-sheet.md` that `architecture.md`
 already does — reference the run sheet cites. **Add a sixth file only for that
 reason**, not because a use case feels like it needs more room.
 
+`automation-orchestrator/` adds two for that reason:
+[`build-guide.md`](automation-orchestrator/build-guide.md), the canvas build
+click by click for the same reason as `clickops.md`, and
+[`troubleshooting.md`](automation-orchestrator/troubleshooting.md), the cause and
+fix behind each one-line recovery move, because the rehearsal hit errors whose
+text does not explain them.
+
 ---
 
 ## The rules these follow

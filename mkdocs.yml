@@ -83,7 +83,9 @@ nav:
           - Overview: demos/automation-orchestrator/README.md
           - Run Sheet: demos/automation-orchestrator/run-sheet.md
           - Talk Track: demos/automation-orchestrator/talk-track.md
+          - Build Guide: demos/automation-orchestrator/build-guide.md
           - Architecture: demos/automation-orchestrator/architecture.md
+          - Troubleshooting: demos/automation-orchestrator/troubleshooting.md
           - Objections: demos/automation-orchestrator/objections.md
       - Edge / Single Node OpenShift:
           - Overview: demos/edge-sno/README.md

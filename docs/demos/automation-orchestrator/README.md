@@ -54,17 +54,72 @@ with every RHDP environment — substitute the Route from the
 
 ---
 
-## The four documents
+## The six documents
 
 | File | Read it when |
 |---|---|
-| [`run-sheet.md`](run-sheet.md) | **While presenting.** Minute markers, what is on screen, exact commands, recovery moves |
+| [`run-sheet.md`](run-sheet.md) | **While presenting.** Minute markers, what is on screen, the timing budget, recovery moves |
 | [`talk-track.md`](talk-track.md) | **While rehearsing.** The narrative and the actual words, beat by beat |
-| [`architecture.md`](architecture.md) | **When asked "how does that work".** The install flow, the integration, the MCP server |
+| [`build-guide.md`](build-guide.md) | **Learning the build.** The canvas click-by-click, every field value and screenshot |
+| [`architecture.md`](architecture.md) | **When asked "how does that work".** The install flow, what happens at run time, the workflow as code |
+| [`troubleshooting.md`](troubleshooting.md) | **When something breaks.** Every error seen in rehearsal, verbatim, with cause and fix |
 | [`objections.md`](objections.md) | **Before you go in.** What this audience asks, answered from the code |
 
-Present from the run sheet. Rehearse from the talk track. The other two are
+Present from the run sheet. Rehearse from the talk track. The other four are
 reference.
+
+> **Seven files, not the template's five.** The canvas build is thirty-odd
+> clicks with field values and screenshots, and the rehearsal surfaced errors
+> whose causes are not obvious from their text. Either
+> would swamp a run sheet that has to stay scannable, so `build-guide.md` and
+> `troubleshooting.md` are reference the run sheet cites — the same
+> relationship `architecture.md` already has to it.
+
+---
+
+## The workflow
+
+`Windows Day 2 - Compliance Remediation`: scan the Windows guest, and only if a
+CIS control failed, ask a named person before fixing it and scanning again.
+
+```mermaid
+flowchart LR
+    T(["Manual trigger"]) --> S["<b>scan</b><br/>Windows Day 2 - Compliance Scan"]
+    S --> C{"<b>compliance_check</b><br/>any control failed?"}
+    C -->|True| A[/"<b>security_approval</b><br/>named approver"/]
+    C -.->|"False: unconnected, run ends"| E1(["done"])
+    A -->|Approved| F["<b>fix</b><br/>Windows Day 2 - Fix Compliance"]
+    A -.->|"Rejected: unconnected, run ends"| E2(["done"])
+    F --> R["<b>rescan</b><br/>Windows Day 2 - Compliance Scan"]
+```
+
+The three AAP steps are ordinary job templates. What AO adds is the diamond and
+the parallelogram — a branch on a job's result, and a gate a person has to
+open.
+
+### Measured
+
+Sandbox, 2026-09-15, execution `76e8be52`:
+
+| Step | Time |
+|---|---|
+| `scan` | 32 s |
+| `compliance_check` | 0 s |
+| `security_approval` | 1 m 31 s — as long as you talk |
+| `fix` | 11 s |
+| `rescan` | 32 s — `compliant: true` |
+| **Whole run** | **2 m 48 s**, about **76 s** of it automation |
+
+### What works, and what does not
+
+| Works | Does not, yet |
+|---|---|
+| Login through AAP SSO | AO branding — no `custom_login_info` on the CR ([sales.demos#477](https://github.com/ericcames/sales.demos/issues/477)) |
+| Every AAP job template visible on the canvas — 36 on sandbox | Expressions by step name — AO references steps by internal ID |
+| Branching on a job's `set_stats` artifacts | Boolean literals in conditions — compare numbers |
+| Named-user approval with an audit record | Group approvers — the AAP identity provider maps no groups |
+| AAP steps in a run, from any user ([sales.demos#621](https://github.com/ericcames/sales.demos/issues/621)) | Browsing AAP with a credential another AO user created ([sales.demos#622](https://github.com/ericcames/sales.demos/issues/622)) |
+| The workflow reloaded from code on any environment ([sales.demos#474](https://github.com/ericcames/sales.demos/issues/474)) | Creating or running workflows through the MCP server — it is read-only |
 
 ---
 
@@ -72,8 +127,8 @@ reference.
 
 1. **Log in to AO through AAP SSO** — one click, same credentials. AO redirects
    to the AAP gateway; once authenticated, you land on the AO dashboard.
-2. **Build a workflow on the visual canvas** — drag AAP job templates from the
-   integration, add a conditional node and an approval node.
+2. **Build a workflow on the visual canvas** — add AAP job templates from the
+   integration, a condition on the scan's result, and an approval step.
 3. **Run it** — AAP executes the jobs, AO orchestrates the sequence and gates the
    approval. The audience watches nodes light up on the canvas as each step
    completes.
@@ -111,7 +166,22 @@ Two things, in order:
 Or launch the AAP workflow `AAP Ecosystem - Deploy Automation Orchestrator`,
 which chains both.
 
-Then log in to AO through AAP SSO and build the demo workflow on the canvas.
+Then log in to AO through AAP SSO and build the demo workflow on the canvas
+with the [build guide](build-guide.md).
+
+### Recreate it
+
+The rehearsed workflow does not live only in one cluster's database. It is
+committed by name in
+[`inventory/group_vars/aap/ao_workflows.yml`](https://github.com/ericcames/sales.demos/blob/main/inventory/group_vars/aap/ao_workflows.yml),
+and two skills turn it back into a working demo on any environment:
+
+| Skill | AAP job template | Does |
+|---|---|---|
+| [`/sales-demos-orchestrator-workflow`](https://github.com/ericcames/sales.demos/blob/main/.claude/skills/sales-demos-orchestrator-workflow/SKILL.md) | `AAP Ecosystem - Load Automation Orchestrator Workflows` | Loads `Windows Day 2 - Compliance Remediation (as code)`, resolving every name to this environment's IDs. Under a minute; a re-run changes nothing |
+| [`/sales-demos-orchestrator-rehearse`](https://github.com/ericcames/sales.demos/blob/main/.claude/skills/sales-demos-orchestrator-rehearse/SKILL.md) | `AAP Ecosystem - Rehearse Automation Orchestrator Demo` | Preflights every fault the first rehearsal hit and breaks compliance; optionally runs to the approval gate; reports a run's timings and approval record |
+
+Neither approves anything. A person approving in AO is the demo.
 
 New to this repo? Run [`/sales-demos-first-time`](https://github.com/ericcames/sales.demos/blob/main/.claude/skills/sales-demos-first-time/SKILL.md) first.
 

@@ -220,13 +220,25 @@ Three drift instances found and fixed:
 
 ## Open items
 
-- [ ] **Demo guide and run sheet** —
+- [x] **Demo guide and run sheet** —
   [#470](https://github.com/ericcames/sales.demos/issues/470), the parent issue.
-  Run-sheet timings pending rehearsal.
-- [ ] **Workflow as code** —
-  [#474](https://github.com/ericcames/sales.demos/issues/474). AO supports YAML
-  export/import; committing the demo workflow would make it reproducible.
-  Document and stop.
+  Rehearsed end to end on sandbox 2026-09-15: 2 m 48 s, about 76 s automation.
+- [x] **`ao-worker` SSRF allowlist** —
+  [#621](https://github.com/ericcames/sales.demos/issues/621). Every run failed
+  in under a second; `configure_ao.yml` now writes the ConfigMap
+  `ao-admin-settings`, which `ao-backend` and `ao-worker` both load.
+- [x] **AO credential ownership** —
+  [#622](https://github.com/ericcames/sales.demos/issues/622). Only a
+  credential's creator can browse AAP with it; runs are not checked. Documented,
+  and `configure_ao.yml` finds its credential by name.
+- [x] **Workflow as code** —
+  [#474](https://github.com/ericcames/sales.demos/issues/474). Not an export —
+  `ao_workflows.yml` names job templates, credentials and approvers, and
+  `/sales-demos-orchestrator-workflow` resolves them per environment.
+- [x] **Rehearsal preflight** —
+  [#623](https://github.com/ericcames/sales.demos/issues/623).
+  `/sales-demos-orchestrator-rehearse` checks each fault the first rehearsal
+  hit, runs to the approval gate, and reports timings.
 - [ ] **AO branding** —
   [#426](https://github.com/ericcames/sales.demos/issues/426),
   [#477](https://github.com/ericcames/sales.demos/issues/477). No
