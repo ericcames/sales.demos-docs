@@ -268,12 +268,12 @@ Captured from the live sandbox and demo environments, committed in
 `docs/images/`. Click a thumbnail for the full-size image:
 
 1. `docs/images/pah-repositories-empty.png` — Repositories, never synced (demo env)
-   <br><a href="../../images/pah-repositories-empty.png"><img width="320" src="../../images/pah-repositories-empty.png" alt="Repositories — never synced"></a>
+   <br>[![Repositories — never synced](../../images/pah-repositories-empty.png){ width="320" }](../../images/pah-repositories-empty.png)
 2. `docs/images/pah-repositories-populated.png` — Repositories, populated with `approved` (sandbox env)
-   <br><a href="../../images/pah-repositories-populated.png"><img width="320" src="../../images/pah-repositories-populated.png" alt="Repositories — populated"></a>
+   <br>[![Repositories — populated](../../images/pah-repositories-populated.png){ width="320" }](../../images/pah-repositories-populated.png)
 3. `docs/images/pah-remote-community.png` — Edit community remote dialog
-   <br><a href="../../images/pah-remote-community.png"><img width="320" src="../../images/pah-remote-community.png" alt="Edit community remote"></a>
+   <br>[![Edit community remote](../../images/pah-remote-community.png){ width="320" }](../../images/pah-remote-community.png)
 4. `docs/images/pah-remote-certified.png` — Edit rh-certified remote dialog
-   <br><a href="../../images/pah-remote-certified.png"><img width="320" src="../../images/pah-remote-certified.png" alt="Edit rh-certified remote"></a>
+   <br>[![Edit rh-certified remote](../../images/pah-remote-certified.png){ width="320" }](../../images/pah-remote-certified.png)
 5. `docs/images/pah-remote-validated.png` — Edit validated remote dialog
-   <br><a href="../../images/pah-remote-validated.png"><img width="320" src="../../images/pah-remote-validated.png" alt="Edit validated remote"></a>
+   <br>[![Edit validated remote](../../images/pah-remote-validated.png){ width="320" }](../../images/pah-remote-validated.png)

@@ -19,18 +19,18 @@ required. The narrative behind each beat, with the actual words, is in
    thumbnail for the full-size image:
 
    1. `docs/images/demo-page-live.png` — the destination
-      <br><a href="../../images/demo-page-live.png"><img width="320" src="../../images/demo-page-live.png" alt="The demo page served by a real guest"></a>
+      <br>[![The demo page served by a real guest](../../images/demo-page-live.png){ width="320" }](../../images/demo-page-live.png)
    2. `docs/images/aap-survey.png` — the interface
-      <br><a href="../../images/aap-survey.png"><img width="320" src="../../images/aap-survey.png" alt="The launch survey"></a>
+      <br>[![The launch survey](../../images/aap-survey.png){ width="320" }](../../images/aap-survey.png)
    3. `docs/images/ocp-vms-before.png` and `ocp-vms-after.png` — the pair
-      <br><a href="../../images/ocp-vms-before.png"><img width="320" src="../../images/ocp-vms-before.png" alt="The demo namespace before the run"></a>
-      <a href="../../images/ocp-vms-after.png"><img width="320" src="../../images/ocp-vms-after.png" alt="The demo namespace after the run"></a>
+      <br>[![The demo namespace before the run](../../images/ocp-vms-before.png){ width="320" }](../../images/ocp-vms-before.png)
+      [![The demo namespace after the run](../../images/ocp-vms-after.png){ width="320" }](../../images/ocp-vms-after.png)
    4. `docs/images/aap-workflow-running.png` — the chain
-      <br><a href="../../images/aap-workflow-running.png"><img width="320" src="../../images/aap-workflow-running.png" alt="The workflow visualizer, provision in progress"></a>
+      <br>[![The workflow visualizer, provision in progress](../../images/aap-workflow-running.png){ width="320" }](../../images/aap-workflow-running.png)
    5. `docs/images/route-503.png` — the URL live and correctly serving nothing yet
-      <br><a href="../../images/route-503.png"><img width="320" src="../../images/route-503.png" alt="The Route before the web server exists — Application is not available"></a>
+      <br>[![The Route before the web server exists — Application is not available](../../images/route-503.png){ width="320" }](../../images/route-503.png)
    6. `docs/images/aap-job-timings.png` — the evidence
-      <br><a href="../../images/aap-job-timings.png"><img width="320" src="../../images/aap-job-timings.png" alt="The controller's job list for a complete run"></a>
+      <br>[![The controller's job list for a complete run](../../images/aap-job-timings.png){ width="320" }](../../images/aap-job-timings.png)
    7. `docs/demos/openshift-virtualization/talk-track.md` — for the banners
    8. `https://github.com/ericcames/sales.demos` — the close
 2. Have this run sheet on a second screen if you have one.
