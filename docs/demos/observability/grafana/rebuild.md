@@ -53,7 +53,11 @@ In **your stack** (`https://<stack>.grafana.net`):
 
 **Value 2 — `grafana_cloud_sa_token`:** starts `glsa_`.
 
-![Service accounts page, Viewer and Editor, tokens hidden](../../../images/grafana-service-accounts.png)
+![The two service accounts: claude-code-mcp with the Viewer role, sales-demos-editor with the Editor role](../../../images/grafana-service-accounts.png)
+
+*Both accounts, side by side. The Viewer one is what the MCP server holds; the
+Editor one is what the playbooks use. Token values are never shown after
+creation, and are left out of this image entirely.*
 
 ### 3. The Editor token — for the playbooks
 
