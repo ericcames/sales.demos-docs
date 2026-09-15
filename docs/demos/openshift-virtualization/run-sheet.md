@@ -18,18 +18,18 @@ required. The narrative behind each beat, with the actual words, is in
 1. Open these in tabs, in this order — this **is** your slide deck. Click a
    thumbnail for the full-size image:
 
-   1. `docs/images/demo-page-live.png` — the destination
+   1. The destination
       <br>[![The demo page served by a real guest](../../images/demo-page-live.png){ width="320" }](../../images/demo-page-live.png)
-   2. `docs/images/aap-survey.png` — the interface
+   2. The interface
       <br>[![The launch survey](../../images/aap-survey.png){ width="320" }](../../images/aap-survey.png)
-   3. `docs/images/ocp-vms-before.png` and `ocp-vms-after.png` — the pair
+   3. The pair
       <br>[![The demo namespace before the run](../../images/ocp-vms-before.png){ width="320" }](../../images/ocp-vms-before.png)
       [![The demo namespace after the run](../../images/ocp-vms-after.png){ width="320" }](../../images/ocp-vms-after.png)
-   4. `docs/images/aap-workflow-running.png` — the chain
+   4. The chain
       <br>[![The workflow visualizer, provision in progress](../../images/aap-workflow-running.png){ width="320" }](../../images/aap-workflow-running.png)
-   5. `docs/images/route-503.png` — the URL live and correctly serving nothing yet
+   5. The URL live and correctly serving nothing yet
       <br>[![The Route before the web server exists — Application is not available](../../images/route-503.png){ width="320" }](../../images/route-503.png)
-   6. `docs/images/aap-job-timings.png` — the evidence
+   6. The evidence
       <br>[![The controller's job list for a complete run](../../images/aap-job-timings.png){ width="320" }](../../images/aap-job-timings.png)
    7. `docs/demos/openshift-virtualization/talk-track.md` — for the banners
    8. `https://github.com/ericcames/sales.demos` — the close
