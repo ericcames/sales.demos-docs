@@ -10,7 +10,7 @@ twenty minutes.
 | **Length** | 20 minutes (15 + 5 for questions) |
 | **Audience** | Platform engineers, SREs and automation leads who already run monitoring and want to see it managed as code and read by an assistant |
 | **Reader** | The Ansible pre-sales engineer presenting it |
-| **Needs a live environment?** | **Not after 2026-09-22** — the Grafana Cloud instance expires then and is not being renewed. The screenshots and captured MCP answers here are the record. To run it live, [rebuild it](rebuild.md) on a new free account |
+| **Needs a live environment?** | **Not after 2026-09-20** — the Grafana Cloud instance expires then and is not being renewed. The screenshots and captured MCP answers here are the record. To run it live, [rebuild it](rebuild.md) on a new free account |
 | **Status** | **Draft** — built and rehearsed on sandbox 2026-09-15; screenshots pending |
 
 **New to Grafana?** Read [`grafana-101.md`](grafana-101.md) first. It assumes

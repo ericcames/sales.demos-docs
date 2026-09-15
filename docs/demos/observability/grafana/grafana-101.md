@@ -112,7 +112,7 @@ check: glance at it before anyone is watching.
   are normal; a line that stays high is not. The coloured bands are thresholds:
   green under 60%, yellow, then red above 80%.
 - **Memory Usage** and **Filesystem Usage** — **gauges**: one value, with the
-  same green-yellow-red idea. Sandbox's `/var` sat at 79%, in the yellow.
+  same green-yellow-red idea. Sandbox's `/var` sat at 81%, in the yellow.
 - **Network Throughput** — traffic **in above the zero line, out below it**.
   The negative numbers are not an error; it is a way of drawing both on one axis.
 
@@ -162,6 +162,14 @@ Live pod log lines from the four collected namespaces, newest first. Use the
 2. Switch the editor to **Code**
 3. Type a query, press **Run query** (or Shift+Enter)
 
+The **Metrics Drilldown** app is the no-typing route to the same data: it lists
+every metric the stack holds, so you can see what is there before writing a
+query. These are the KubeVirt and AAP families this platform sends:
+
+![The metric catalogue, KubeVirt metrics](../../../images/grafana-metrics-catalog.png)
+
+![The metric catalogue, AAP awx_ metrics](../../../images/grafana-explore-metrics-awx.png)
+
 Queries worth trying:
 
 | Question | PromQL |
@@ -193,6 +201,12 @@ lines containing that text.
 ## Alerts
 
 ![Alert rules list, one rule firing](../../../images/grafana-alert-firing.png)
+
+Opening a rule shows exactly what it does — the query, the threshold, the
+labels and when it last evaluated. This one came from git, and the "Last
+updated by" line names the Editor service account the playbook uses:
+
+![The Running VM count dropped rule, with its query and threshold](../../../images/grafana-alert-rule.png)
 
 **Alerting › Alert rules**, folder *Sales Demos*. Five rules, each shown with a
 state:

@@ -302,9 +302,9 @@ Decisions worth keeping:
   five-minute staleness window.
 - **No contact point.** A receiver would put an address in a public repo.
 
-## Status — the instance expires 2026-09-22
+## Status — the instance expires 2026-09-20
 
-The free-tier Grafana Cloud stack behind this plan expires on 2026-09-22 and
+The free-tier Grafana Cloud stack behind this plan expires on 2026-09-20 and
 will not be renewed. The automation stays in sales.demos; the dashboard, alerts,
 MCP answers and screenshots are captured before then in
 [`demos/observability/grafana/`](../demos/observability/grafana/README.md),

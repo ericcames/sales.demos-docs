@@ -4,7 +4,7 @@
 
 Everything a live run would put on screen is embedded in this folder's pages,
 so the whole track works with no Grafana instance — which is just as well,
-because the one it was built on expires on 2026-09-22.
+because the one it was built on expires on 2026-09-20.
 
 ---
 

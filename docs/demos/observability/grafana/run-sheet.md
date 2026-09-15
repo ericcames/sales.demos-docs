@@ -8,7 +8,7 @@ that, present from this.
 |---|---|
 | **Length** | 20 minutes — 15 presenting, 5 questions |
 | **Audience** | Platform engineers, SREs, automation leads |
-| **Needs an environment?** | **No.** The instance expires 2026-09-22; present from the screenshots. Live is a [rebuild](rebuild.md) the day before |
+| **Needs an environment?** | **No.** The instance expires 2026-09-20; present from the screenshots. Live is a [rebuild](rebuild.md) the day before |
 | **Assets** | the images in this folder's pages; the three committed files in sales.demos |
 
 ---
@@ -135,7 +135,7 @@ Pick two:
 
 - **No traces** — nothing here emits them
 - **"Nodes Ready: 3"** is wrong on a single-node cluster
-- **The instance expires on 2026-09-22** — after that, this is a record, not a live system
+- **The instance expires on 2026-09-20** — after that, this is a record, not a live system
 - **Alerts don't notify anyone** — deliberately, because this repo is public
 
 ---
@@ -181,8 +181,9 @@ debug in front of them — cut to the tab and carry on.
 
 ## Screenshots still worth capturing
 
-Capture from **sandbox** once it has 24 hours of continuous data (from
-2026-09-19), before the instance expires on 2026-09-22.
+Capture from **sandbox**. Alloy has been sending since 2026-09-15 17:35 UTC, so
+there is a full day of data from 2026-09-16 evening onwards. The trial ends
+**2026-09-20 15:32 UTC**, so everything must be captured by 2026-09-19.
 
 - [ ] `grafana-dashboard-full.png` — full dashboard, Cluster = sandbox, Last 24 hours
 - [ ] `grafana-overview-row.png`, `grafana-nodes-row.png`, `grafana-vm-row.png`, `grafana-aap-row.png`, `grafana-logs-panel.png`
