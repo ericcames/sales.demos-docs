@@ -210,6 +210,23 @@ temporal (x1), redis (x1).
 - **The demo workflow must be built manually on the canvas.** AO supports YAML
   export and import, but no automation commits the workflow as code yet
   ([#474](https://github.com/ericcames/sales.demos/issues/474)).
+- **Configure allows AAP through the SSRF check on `ao-backend` only.** Browsing
+  templates works, but every AAP step in a workflow run fails in `ao-worker`
+  with "base_url is not permitted by SSRF policy" until `ao-worker` gets
+  `APP_INTEGRATION_URL_ALLOWED_HOSTS` too — rehearsed with the ConfigMap
+  `ao-admin-settings`, which both Deployments already load
+  ([sales.demos#621](https://github.com/ericcames/sales.demos/issues/621)).
+- **The AO credential configure creates fails AAP authentication**, and a
+  re-run skips it rather than repairing it. A Basic Auth credential created in
+  the AO UI works
+  ([sales.demos#622](https://github.com/ericcames/sales.demos/issues/622)).
+- **Expressions reference steps by internal ID, not name.** The AO docs show
+  `${step_name.field}`; this build rejects it at save time. Conditions also
+  cannot use `true`/`false` literals — compare numbers. Measured on sandbox,
+  2026-09-15.
+- **TLS verification is disabled on the AAP integration**
+  (`insecure_skip_tls_verify: true` in `configure_ao.yml`), because RHDP clusters
+  serve self-signed certificates. The integration detail page shows it.
 
 ---
 
