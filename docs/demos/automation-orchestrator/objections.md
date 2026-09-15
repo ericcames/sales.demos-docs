@@ -20,9 +20,11 @@ AAP workflows chain job templates on success or failure — linear or branching,
 but always defined in YAML with a fixed graph. AO adds:
 
 - A **visual canvas** — drag nodes, connect them, run the result
-- **Conditional logic nodes** that branch on a previous step's output
-- **Approval nodes** with configurable policies — who approves, how many, what
-  happens on timeout
+- **Conditional logic nodes** that branch on a previous step's output — in the
+  rehearsal, on the number of CIS controls the scan reported as failed
+- **Approval nodes** — named approver users or groups, a message that can carry
+  earlier steps' results, and a decision window (one day by default) after which
+  the request expires
 - A **Temporal-based execution engine** — workflow state is durable and survives
   pod restarts
 - **Cross-platform potential** — the node type catalog includes HTTP request,
@@ -36,22 +38,26 @@ but always defined in YAML with a fixed graph. AO adds:
 Sources:
 [GA blog](https://www.redhat.com/en/blog/unify-it-workflows-scale-new-automation-orchestrator-ansible-automation-platform),
 [Add AAP to workflows](https://docs.redhat.com/en/documentation/automation_orchestrator/2026.8/develop-add_ansible_automation_platform_to_automation_orchestrator_workflows),
-[Node type catalog](https://docs.redhat.com/en/documentation/automation_orchestrator/2026.8/reference-node_type_catalog)
+[Node type catalog](https://docs.redhat.com/en/documentation/automation_orchestrator/2026.8/reference-node_type_catalog),
+approval settings measured on sandbox, 2026-09-15
+([sales.demos#470](https://github.com/ericcames/sales.demos/issues/470#issuecomment-5674156533))
 
 ---
 
 ## "Do we have to migrate our job templates?"
 
 **No.** AO connects to AAP as an integration and sees every job template the
-connected credential can see. On sandbox, that is 33 templates — every one this
-repo defines. No migration, no duplication. Your templates stay in AAP, where
-they are version-controlled and tested.
+connected credential can see. On sandbox on 2026-09-15 that was 36 templates —
+the 33 this repo defines plus 3 the RHDP catalog item pre-installs. No
+migration, no duplication. Your templates stay in AAP, where they are
+version-controlled and tested, and each AO step runs as an ordinary AAP job.
 
 > **"AO orchestrates your existing templates. It does not replace them or copy
 > them."**
 
 Source:
-[GA blog](https://www.redhat.com/en/blog/unify-it-workflows-scale-new-automation-orchestrator-ansible-automation-platform)
+[GA blog](https://www.redhat.com/en/blog/unify-it-workflows-scale-new-automation-orchestrator-ansible-automation-platform),
+`ao-sandbox` MCP `proxies_aap_job_templates`, 2026-09-15
 
 ---
 
@@ -108,7 +114,7 @@ Source: `playbooks/install_ao.yml` header comment,
 |---|---|---|
 | AO admin password | Kubernetes Secret `ao-admin-password` | `install_ao.yml` — seeded from `aap_password`, so the two match |
 | OIDC client | AAP OAuth2 application named "Syntara" | `configure_ao.yml` — `POST setup_aap_oidc` |
-| AAP integration credential | AO's database | `configure_ao.yml` — `POST /credentials` |
+| AAP integration credential | AO's database | `configure_ao.yml` — `POST /credentials`. It currently fails AAP authentication when a workflow step uses it ([sales.demos#622](https://github.com/ericcames/sales.demos/issues/622)) |
 | MCP server token | Operator's local Claude config (not tracked) | `make-ao-mcp.sh` — gateway personal access token |
 
 Source: `playbooks/configure_ao.yml`, `playbooks/install_ao.yml`
@@ -117,11 +123,15 @@ Source: `playbooks/configure_ao.yml`, `playbooks/install_ao.yml`
 
 ## "Is it really idempotent?"
 
-**The install and configure playbooks are.** The one exception: `POST
-setup_aap_oidc` returns 502 if the OAuth2 application "Syntara" already exists
-on AAP. The playbook checks for an existing identity provider first and skips
-the call — so a second run is safe, it just cannot self-heal a half-created OIDC
-setup.
+**The install and configure playbooks are.** Two exceptions:
+
+- `POST setup_aap_oidc` returns 502 if the OAuth2 application "Syntara" already
+  exists on AAP. The playbook checks for an existing identity provider first and
+  skips the call — so a second run is safe, it just cannot self-heal a
+  half-created OIDC setup.
+- The AAP credential is skipped when it exists, so a re-run cannot repair a
+  broken or out-of-date one
+  ([sales.demos#622](https://github.com/ericcames/sales.demos/issues/622)).
 
 > **"If the OIDC setup is partially broken, delete the 'Syntara' OAuth
 > application in AAP's gateway UI and re-run the configure playbook."**
@@ -136,13 +146,16 @@ Source: `playbooks/configure_ao.yml` header, lines 29-31
 SSRF protection to block private IP addresses on integration URLs, and the AAP
 hostname resolves to a private IP from inside the cluster. The configure
 playbook patches `APP_INTEGRATION_URL_ALLOWED_HOSTS` on the `ao-backend`
-deployment. If the operator reconciles and drops it, re-run the configure
-playbook.
+deployment, which is enough to log in and browse templates — but **workflow
+steps run in `ao-worker`**, which needs the same setting
+([sales.demos#621](https://github.com/ericcames/sales.demos/issues/621)).
 
 | Symptom | Fix |
 |---|---|
 | AO login page loads but "Log in with AAP" fails | Re-run `configure_ao.yml` — the SSRF allowlist was reconciled away |
 | AO shows 0 job templates | Re-run `configure_ao.yml` — the integration credential or allowlist is stale |
+| Every AAP workflow step fails at once: "base_url is not permitted by SSRF policy" | Give `ao-worker` the allowlist: ConfigMap `ao-admin-settings` with `APP_INTEGRATION_URL_ALLOWED_HOSTS`, then restart `ao-worker` ([#621](https://github.com/ericcames/sales.demos/issues/621)) |
+| An AAP step's Organization dropdown: "AAP Authentication Failed" | Use a Basic Auth credential created in the AO UI ([#622](https://github.com/ericcames/sales.demos/issues/622)) |
 | AO is unreachable (503 / no Route) | Re-run `AAP Ecosystem - Deploy Automation Orchestrator` — it converges |
 | Database gone | `oc delete namespace automation-orchestrator` and re-deploy from scratch |
 

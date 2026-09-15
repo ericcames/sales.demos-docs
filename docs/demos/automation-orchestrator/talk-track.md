@@ -2,8 +2,8 @@
 
 **Rehearse from this. Present from [`run-sheet.md`](run-sheet.md).**
 
-Everything a live run would put on screen is embedded below, so the whole track
-works with no cluster.
+The key screens from the rehearsal on sandbox (2026-09-15) are embedded below,
+so the whole track can be read with no cluster.
 
 ---
 
@@ -38,7 +38,7 @@ exactly this.
 
 ---
 
-## Beat 1 · The login (TODO)
+## Beat 1 · The login
 
 Show the AO login page. Click "Log in with Ansible Automation Platform". AAP's
 sign-in page appears — same credentials, same environment badge. Land back in
@@ -56,10 +56,10 @@ this thing knows about the AAP they already run.
 
 ---
 
-## Beat 2 · The integration (TODO)
+## Beat 2 · The integration
 
-Navigate to Integrations. Show the AAP integration — its status, and the 33
-job templates it discovered. Click into the template list.
+Navigate to Integrations. Show the AAP integration, then open an AAP step's
+template picker — the 36 job templates AO discovered from AAP.
 
 > **"These are your existing AAP templates — nothing was migrated, nothing was
 > duplicated. AO connected to AAP and discovered them."**
@@ -76,7 +76,7 @@ decided, and nothing after this will change it.
 
 ---
 
-## Beat 3 · The canvas (TODO)
+## Beat 3 · The canvas
 
 Build a workflow live on the AO canvas. This is the centerpiece — everything
 before sets it up, everything after lands it.
@@ -86,19 +86,25 @@ before sets it up, everything after lands it.
 Use this when demo VMs are running. The compliance break/fix is short, safe
 mid-demo, and shows logic nodes and human oversight together.
 
-1. Drag `Windows Day 2 - Compliance Scan` onto the canvas
-2. Add a conditional node — branch on the scan result
-3. On the "failed" branch: add an approval node ("Security lead must approve
-   the fix")
-4. After approval: `Windows Day 2 - Fix Compliance`
-5. After the fix: another `Windows Day 2 - Compliance Scan` (verify the fix)
+1. `scan` — **Windows Day 2 - Compliance Scan**
+2. `compliance_check` — a condition on the scan's result: did any CIS control
+   fail?
+3. On the **True** branch: `security_approval` — a named approver must say yes
+4. On **Approved**: `fix` — **Windows Day 2 - Fix Compliance**
+5. `rescan` — **Windows Day 2 - Compliance Scan** again, to prove the fix
 
-Pair it with `Windows Day 2 - Break Compliance` to set up the failure condition
-beforehand.
+Run `Windows Day 2 - Break Compliance` beforehand to set up the failure.
+
+![The rehearsed workflow on the AO canvas](../../images/ao-canvas-complete.png)
+
+**The condition reads the scan's own result.** The scan publishes
+`windows_compliance` — pass, fail, score, compliant — as AAP job artifacts, and
+AO hands those to the next step. Nothing is parsed out of log text.
 
 ### Fallback story: Linux Day 1 chain
 
-Use this when no VMs exist yet — building the workflow also provisions one.
+Use this when no VMs exist yet — building the workflow also provisions one. Not
+rehearsed.
 
 1. `Linux Day 1 - 1 Provision`
 2. `Linux Day 1 - 2 Register`
@@ -122,21 +128,30 @@ constructs their current platform does not have.
 
 ---
 
-## Beat 4 · The execution (TODO)
+## Beat 4 · The execution
 
-Run the workflow. Show the execution view — each node progressing, the approval
-waiting.
+Run the workflow. Show the execution view — the scan finishing, the condition
+taking the True branch, the approval waiting.
 
-When the approval node is reached, pause. Let them see the workflow blocked.
-Then approve it. Show the audit trail — who approved, when, which execution.
+When the approval node is reached, pause. Let them see the workflow blocked:
+the header reads **Paused** and **Pending approval**, and the message already
+carries the scan's numbers — *"1 failed control(s), score 96%"*.
+
+![The workflow paused at the approval gate](../../images/ao-execution-approval-waiting.png)
+
+Then approve it with a note. Show the audit trail — who approved, when, which
+execution, and why.
+
+![The approval record](../../images/ao-approval-record.png)
 
 > **"That approval is not a Slack message someone might miss. It is a gate in
 > the workflow engine. The job does not run until the gate opens, and the gate
 > records who opened it."**
 
-If the approval takes time to reach (because earlier nodes are running), use the
-wait to point out the execution timeline — each node's start, duration, and
-status updating live.
+After the approval, the fix and the re-scan take under a minute together; the
+re-scan comes back 28 of 28 controls passing. The whole run is under three
+minutes, and all but about 76 seconds of it is the time you spend talking at
+the gate.
 
 **Why this beat exists.** Approval is the feature that justifies AO for
 regulated environments. A compliance officer who hears "we track approvals in
@@ -145,7 +160,7 @@ having two different conversations about audit readiness.
 
 ---
 
-## Beat 5 · The honest bits (TODO)
+## Beat 5 · The honest bits
 
 > **"Two things this demo does not show, and I want to be straight about
 > them."**
@@ -167,7 +182,7 @@ straight about the broken ones.
 
 ---
 
-## Beat 6 · Close (TODO)
+## Beat 6 · Close
 
 > **"You saw your templates — the ones you have today — orchestrated with
 > branches and approvals, running on a workflow engine that survives a pod
@@ -203,8 +218,13 @@ the approval node in it.
 |---|---|
 | AO is GA, version 2026.8 | [Release notes](https://docs.redhat.com/en/documentation/automation_orchestrator/2026.8/whats_new-automation_orchestrator_release_notes) |
 | Add-on to AAP 2.7 or later | [GA blog](https://www.redhat.com/en/blog/unify-it-workflows-scale-new-automation-orchestrator-ansible-automation-platform), Justin Braun, 2026-08-21 |
-| 33 job templates visible through integration | Measured on sandbox via `ao-sandbox` MCP `proxies_aap_job_templates`, 2026-09-11 |
+| 36 job templates visible through integration | Measured on sandbox via `ao-sandbox` MCP `proxies_aap_job_templates`, 2026-09-15 |
 | Same credentials via SSO | [`playbooks/configure_ao.yml`](https://github.com/ericcames/sales.demos/blob/main/playbooks/configure_ao.yml) — OIDC identity provider setup |
+| The scan publishes `windows_compliance` as job artifacts | [sales.demos#613](https://github.com/ericcames/sales.demos/issues/613) — both `compliant: true` and `compliant: false` verified from AAP |
+| AO passes AAP job artifacts to later steps | [Use job output in a downstream step](https://docs.redhat.com/en/documentation/automation_orchestrator/2026.8/develop-use_job_output_in_a_downstream_step); measured on sandbox, 2026-09-15 ([#470](https://github.com/ericcames/sales.demos/issues/470#issuecomment-5674156533)) |
+| Condition branches, one branch per run | [Add a conditional step](https://docs.redhat.com/en/documentation/automation_orchestrator/2026.8/develop-add_a_conditional_step_to_a_workflow) |
+| Approval message carried "1 failed control(s), score 96%"; the record holds decision, approver, time and note | `ao-sandbox` MCP `approvals_list`, measured on sandbox, 2026-09-15 ([#470](https://github.com/ericcames/sales.demos/issues/470#issuecomment-5674156533)) |
+| Whole run 2 m 48 s, about 76 s of automation; re-scan 28 of 28 | Execution `76e8be52`, AAP jobs 93–95, measured on sandbox, 2026-09-15 ([#470](https://github.com/ericcames/sales.demos/issues/470#issuecomment-5674156533)) |
 | 1.91 vCPU / 2.47 GiB footprint | Measured in [#141](https://github.com/ericcames/sales.demos/issues/141), before/after `probe_env.yml` |
 | Three databases required (not two) | [`playbooks/install_ao.yml`](https://github.com/ericcames/sales.demos/blob/main/playbooks/install_ao.yml) header comment |
 | The May press release said tech preview | [Summit press release](https://www.redhat.com/en/about/press-releases/red-hat-establishes-ansible-automation-platform-trusted-execution-layer-it-operations-agentic-era), 2026-05-12 |

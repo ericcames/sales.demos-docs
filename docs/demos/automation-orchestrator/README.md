@@ -10,7 +10,7 @@ over the AAP they already have — in about twenty minutes.
 | **Audience** | Platform engineers and automation leads evaluating workflow orchestration beyond what AAP provides natively |
 | **Reader** | The Ansible pre-sales engineer presenting it |
 | **Needs a live environment?** | **Yes** — the workflow canvas and AAP integration are live |
-| **Status** | Draft — guide written, run-sheet timings pending rehearsal |
+| **Status** | Ready — rehearsed end to end on sandbox, 2026-09-15 |
 
 ---
 
