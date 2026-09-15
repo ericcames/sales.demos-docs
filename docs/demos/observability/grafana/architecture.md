@@ -161,9 +161,6 @@ Detail and reduction options: [`usage-and-cost.md`](usage-and-cost.md).
   every node.
 - **Network Throughput plots transmit as negative** so receive and transmit
   share one axis. Correct, but unexplained on the panel.
-- **The agent cannot stop or start the demo VMs.** The OpenShift MCP server's
-  `vm_lifecycle` is refused for VMs built by this repo's Terraform
-  ([sales.demos#632](https://github.com/ericcames/sales.demos/issues/632)).
 - **No notifications.** Alerts fire in Grafana; nothing is emailed or posted,
   on purpose, because a receiver would put an address in a public repo.
 
