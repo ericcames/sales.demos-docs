@@ -11,6 +11,8 @@ that, present from this.
 | **Needs an environment?** | **Yes** — the compelling beats are live workflow builds on the canvas |
 | **Assets** | AO login page, AAP sign-in page, AO canvas, AO execution view, AO approval record |
 | **Rehearsed** | End to end on sandbox (`cluster-v9n68`), 2026-09-15 — [evidence](https://github.com/ericcames/sales.demos/issues/470#issuecomment-5674156533) |
+| **Learn the build from** | [`build-guide.md`](build-guide.md) — every field, every screenshot |
+| **When something breaks** | [`troubleshooting.md`](troubleshooting.md) — every error seen, verbatim |
 
 ---
 
@@ -20,32 +22,21 @@ that, present from this.
    1. AO: `https://ao-automation-orchestrator.apps.<cluster>.dyn.redhatworkshops.io/`
    2. AAP: `https://aap-aap.apps.<cluster>.dyn.redhatworkshops.io/`
    3. This run sheet
-2. Verify AO is reachable — the login page should render.
-3. Verify the integration sees templates: from a Claude Code session with
-   `ao-sandbox`, call `proxies_aap_job_templates` — expect **36** templates
-   (the 33 this repo defines plus 3 the RHDP catalog item pre-installs).
-4. Decide whether to run the **Windows Day 2** story (needs a running Windows
-   VM) or the **Linux Day 1** fallback. Check the VMs:
-   `openshift-sandbox` → `resources_list` (VirtualMachine, namespace
-   `sales-demos-<env>`).
-5. **Break the guest so the workflow has something to fix.** Launch
-   `Windows Day 2 - Break Compliance` from AAP (limit `windemo`, about 7 s). A
-   `Windows Day 2 - Compliance Scan` afterwards should report
-   `fail: 1`, `compliant: false`.
-6. **Check the two known configuration gaps** before you are on stage — both
-   make the build or the run fail in front of the audience:
-   1. The ConfigMap `ao-admin-settings` exists in namespace
-      `automation-orchestrator` and `ao-worker` has
-      `APP_INTEGRATION_URL_ALLOWED_HOSTS` set
-      ([sales.demos#621](https://github.com/ericcames/sales.demos/issues/621)).
-   2. An AAP step's **Organization** dropdown loads. If it errors, create a
-      Basic Auth credential for the step
-      ([sales.demos#622](https://github.com/ericcames/sales.demos/issues/622)).
-7. **Build the workflow once, privately, and keep it.** It stays in AO's
-   database for the life of the environment and is your fallback if the live
-   build goes wrong. Nothing commits it as code yet
-   ([sales.demos#474](https://github.com/ericcames/sales.demos/issues/474)).
-8. Decide your close before you begin — see **Landing it** at the bottom.
+2. **Run the preflight and break the guest** —
+   [`/sales-demos-orchestrator-rehearse`](https://github.com/ericcames/sales.demos/blob/main/.claude/skills/sales-demos-orchestrator-rehearse/SKILL.md),
+   or `AAP Ecosystem - Rehearse Automation Orchestrator Demo` from AAP. About
+   20 s. It checks every fault the first rehearsal hit, then runs
+   `Windows Day 2 - Break Compliance` so the scan finds `fail: 1`.
+3. **Load the fallback** —
+   [`/sales-demos-orchestrator-workflow`](https://github.com/ericcames/sales.demos/blob/main/.claude/skills/sales-demos-orchestrator-workflow/SKILL.md).
+   `Windows Day 2 - Compliance Remediation (as code)` is your safety net if the
+   live build goes wrong.
+4. **Log in through SSO and check you have your own AAP credential.** An AAP
+   step's Organization dropdown must load. `AAP Admin` belongs to the local
+   `admin`, so an SSO presenter needs one they created
+   ([sales.demos#622](https://github.com/ericcames/sales.demos/issues/622)).
+5. No Windows VM? Use the **Linux Day 1** fallback story.
+6. Decide your close before you begin — see **Landing it** at the bottom.
 
 ---
 
@@ -64,17 +55,8 @@ that, present from this.
 
 ## 0–2 · Login through AAP SSO
 
-![AO login page — SSO button, SANDBOX badge at the top](../../images/ao-login-page.png)
-
-**Show the AO login page.** Point at "Log in with Ansible Automation Platform".
-
-Click it. The redirect lands on the AAP sign-in page — point at the
-environment badge.
-
-![AAP login page — SANDBOX badge and prelogin warning](../../images/aap-login-page-sandbox.png)
-
-Log in with the AAP admin credentials. Land in AO — the green SANDBOX badge
-persists in the AO masthead after login.
+**AO login page** → "Log in with Ansible Automation Platform" → the AAP sign-in
+page (point at the environment badge) → AO dashboard.
 
 > **"Same credentials. One identity store. Automation Orchestrator delegates
 > authentication to the AAP gateway — no separate user database."**
@@ -83,22 +65,9 @@ persists in the AO masthead after login.
 
 ## 2–4 · Show the integration
 
-Navigate to **Configuration → Integrations**. One row: Ansible Automation
-Platform, Enabled.
-
-![AO Integrations page — AAP connected and enabled](../../images/ao-integrations.png)
-
-**Status reads `Unknown` and Enabled resources reads `0`.** That is expected on
-this build — the integration still lists every template. Do not stop to
-explain it unless someone asks.
-
-Click the AAP integration. Point at three things:
-
-- State: Enabled
-- URL: the AAP gateway hostname
-- Connection credential: AAP Admin
-
-![AO integration detail — AAP URL, credential, scope](../../images/ao-integration-detail.png)
+**Configuration → Integrations** → Ansible Automation Platform, Enabled. Click
+it: state, AAP gateway URL, connection credential. Status `Unknown` / `0`
+resources is normal — do not stop on it.
 
 > **"These are your existing job templates. Nothing was migrated, nothing was
 > copied. AO sees them through the integration and can use them as workflow
@@ -108,48 +77,21 @@ Click the AAP integration. Point at three things:
 
 ## 4–10 · Build the workflow on the canvas
 
-Click **Create Workflow**. The canvas opens with trigger options on the right.
+**Create Workflow** → **Manual trigger** → name
+`Windows Day 2 - Compliance Remediation`, project `default`. Add every step with
+the **⊞ on the output before it**.
 
-![AO workflow builder — empty canvas with trigger options](../../images/ao-workflow-builder.png)
+| # | Step | ⊞ on | Type | Set |
+|---|---|---|---|---|
+| 1 | `scan` | trigger | AAP Execution | `IT Service Automation`, **Windows Day 2 - Compliance Scan**, limit `windemo` |
+| 2 | `compliance_check` | `scan` | Logic → Condition → Custom | copy icon on **scan → artifacts**, then `${activity_<id>.artifacts.windows_compliance.fail} > 0` |
+| 3 | `security_approval` | **True** | Approval | your SSO user; message naming CIS 2.3.6.6 on web-win-1 |
+| 4 | `fix` | **Approved** | AAP Execution | **Windows Day 2 - Fix Compliance**, same org and limit |
+| 5 | `rescan` | `fix` | AAP Execution | **Windows Day 2 - Compliance Scan** |
+| 6 | **Save** | | | leave **False** and **Rejected** unconnected — the ⚠ is expected |
 
-Pick **Manual trigger**. Name the workflow `Windows Day 2 - Compliance
-Remediation` and set **Project** to `default`.
-
-### Preferred story: Windows Day 2 compliance (if VMs are running)
-
-Add every step with the **⊞ on the output of the step before it**, not the
-**Add step** button at the top — that one adds a step connected to nothing.
-
-1. **`scan`** — ⊞ on the trigger → **AAP Execution**.
-   Organization `IT Service Automation`, job template
-   **Windows Day 2 - Compliance Scan**, limit `windemo`. Rename the step from
-   "Launch AAP job template" to `scan`.
-
-   ![AO AAP step — organization and the template picker listing AAP's job templates](../../images/ao-job-templates.png)
-
-2. **`compliance_check`** — ⊞ on `scan` → **Logic → Condition**. Choose
-   **Custom expression**. In the Input panel, click the copy icon on **scan →
-   artifacts**, paste, and finish it as:
-
-   ```
-   ${activity_<id>.artifacts.windows_compliance.fail} > 0
-   ```
-
-   **Insert the reference with the copy icon; never type it.** AO references a
-   step by its internal `activity_…` ID, not its name, and compare a number —
-   `== false` fails at run time.
-
-   ![AO condition step — the expression, the scan step's real output, evaluated_result true](../../images/ao-condition-node.png)
-
-3. **`security_approval`** — ⊞ on **True** → **Approval**. Approver users: your
-   own SSO user. Message:
-   `Security lead: approve remediation of CIS 2.3.6.6 (RequireStrongKey) on web-win-1.`
-4. **`fix`** — ⊞ on **Approved** → **AAP Execution**,
-   **Windows Day 2 - Fix Compliance**, same organization and limit.
-5. **`rescan`** — ⊞ on `fix` → **AAP Execution**,
-   **Windows Day 2 - Compliance Scan** again.
-6. Leave **False** and **Rejected** unconnected, then **Save**. The yellow ⚠ on
-   those two outputs is expected.
+**Never type a step reference — use the copy icon. Never compare to
+`false` — compare a number.**
 
 ![AO canvas — trigger, scan, compliance_check, security_approval, fix, rescan](../../images/ao-canvas-complete.png)
 
@@ -174,43 +116,29 @@ Add every step with the **⊞ on the output of the step before it**, not the
 
 ## 10–14 · Run the workflow
 
-Click **Run** → **Run now**. Point at each node as it progresses:
-
-- `scan` dispatches to AAP — about **32 s**
-- `compliance_check` takes the **True** branch immediately
-- `security_approval` **waits**: the header shows **Paused** and
-  **Pending approval**
+**Run** → **Run now**. `scan` (~32 s) → `compliance_check` takes **True** →
+`security_approval` **waits**: **Paused**, **Pending approval**.
 
 ![AO execution — scan and compliance_check done, security_approval pending, fix not started](../../images/ao-execution-approval-waiting.png)
 
 > **"This is blocking. The job will not proceed until someone with the right
 > permissions approves it. That is not a notification — it is a gate."**
 
-Click **Review approval**. Point at the message — the failed-control count and
-score came from the scan. Click **Approve**, type a note, then click **Submit
-decision**. **Approve alone does nothing** until you submit.
+**Review approval** — point at the scan's numbers in the message →
+**Approve** → note → **Submit decision**. *Approve alone does nothing.*
 
 ![AO review approval — Approved selected, a decision note, the message with the scan's numbers](../../images/ao-approval-decision.png)
 
-`fix` runs (about **11 s**), then `rescan` (about **32 s**). The run ends
-**Completed**.
+`fix` (~11 s) → `rescan` (~32 s) → **Completed**.
 
 ![AO execution — every step green, Completed in 2 m 48 s](../../images/ao-execution-complete.png)
 
-Open **Details → security_approval**. Show the audit entry: decision, who
-decided, when, and the note.
+**Details → security_approval** — decision, who, when, the note.
 
 ![AO approval record — Approved by the SSO user, decision time, decision notes](../../images/ao-approval-record.png)
 
-The **Overview** tab lists every step with its duration and a **View job in
-AAP** link on each AAP step — click through to show the same job in AAP.
-
-![AO run details — six steps with start, end and duration](../../images/ao-execution-timeline.png)
-
-In AAP, the same run is three ordinary jobs — 93, 94 and 95 — in the Jobs list
-next to everything else AAP runs.
-
-![AAP Jobs — the workflow's scan, fix and rescan jobs (93–95) beside the rehearsal's setup jobs](../../images/aap-jobs-from-ao.png)
+**Overview** tab → **View job in AAP** on any step: the run is three ordinary
+AAP jobs.
 
 ---
 
@@ -255,13 +183,6 @@ Then ONE question. Pick based on what they asked during the demo:
 Every beat in this run sheet is already live — there is no offline version of
 this demo. The canvas build is the demo.
 
-| Beat | What to verify first |
-|---|---|
-| Login | AO login page loads; "Log in with Ansible Automation Platform" button is present |
-| Integration | `proxies_aap_job_templates` returns 36 templates |
-| Canvas | An AAP step's Organization dropdown loads ([#622](https://github.com/ericcames/sales.demos/issues/622)) |
-| Execution | A Windows VM is running and `Windows Day 2 - Break Compliance` has run |
-
 ### Budget for job execution time
 
 Measured on sandbox, 2026-09-15, execution `76e8be52`:
@@ -278,25 +199,24 @@ Measured on sandbox, 2026-09-15, execution `76e8be52`:
 Each AAP step costs about 5 s more than the job itself — AAP starting the job
 pod, then AO noticing the job finished.
 
-**Keep a fallback.** If AO stalls during the live build, open the workflow you
-built privately before the session. If the run stalls, describe the workflow
-verbally and show the integration page as evidence. Do not debug in front of
-the customer.
+**Keep a fallback.** If the live build stalls, open
+`Windows Day 2 - Compliance Remediation (as code)` and run that. If the run
+stalls, describe the workflow verbally and show the integration page as
+evidence. Do not debug in front of the customer.
 
 ### Recovery moves
 
+The cause and the full fix for each is in
+[`troubleshooting.md`](troubleshooting.md).
+
 | Symptom | Move |
 |---|---|
-| AO login page returns 502 | The Route or backend pod is down. Describe the demo verbally and show AAP directly |
-| OIDC redirect fails | Click "Sign in using local account" — use `admin` / the AAP admin password. Unlikely since `APP_OIDC_ALLOW_PRIVATE_NETWORKS` was set (#492) |
-| Integration shows 0 templates | Re-run `AAP Ecosystem - Configure Automation Orchestrator` from AAP, wait 60 seconds |
-| AAP step's Organization dropdown: "AAP Authentication Failed" | The credential `configure_ao.yml` created does not authenticate ([#622](https://github.com/ericcames/sales.demos/issues/622)). Click **Change** under the credential and use a Basic Auth credential with the AAP admin user |
-| Save shows "references unknown activity or scope" | A reference was typed by step name. Re-insert it with the copy icon in the Input panel — AO references steps by ID |
-| Save shows "Saved with N issues" | The build can be saved unfinished. Expand the banner — issues on an unconnected output are expected |
-| Run fails in under a second: "base_url is not permitted by SSRF policy" | `ao-worker` cannot reach AAP ([#621](https://github.com/ericcames/sales.demos/issues/621)). Create ConfigMap `ao-admin-settings` with `APP_INTEGRATION_URL_ALLOWED_HOSTS` and restart `ao-worker` — about 30 s |
-| Run fails at the condition: 'references "false"' | The expression used a boolean literal. Compare a number: `… .fail} > 0` |
-| The approval looks stuck after Approve | Click **Submit decision** — Approve only selects the decision |
-| A renamed step still shows "Launch AAP job template" | Re-open the step, set the name again, click outside the box, **Update** |
-| Condition needs checking without a full run | Open the condition and click **Run step** — it re-runs the steps before it and shows `evaluated_result` |
-| AO unreachable (503 or timeout) | Re-run `AAP Ecosystem - Deploy Automation Orchestrator` from AAP — it converges |
-| AAP job fails inside the workflow | Open the job in AAP to see the error. The most common cause is a missing VM — provision first |
+| Organization dropdown: "AAP Authentication Failed" | **Change** the step's credential to one you created |
+| Save: "references unknown activity or scope" | Re-insert the reference with the copy icon |
+| Save: "Saved with N issues" | Expected for unconnected outputs — carry on |
+| Renamed step still says "Launch AAP job template" | Rename again, click outside, **Update** |
+| Run fails in under a second: "base_url is not permitted by SSRF policy" | The loaded copy fails the same way. Narrate the rest; re-run Configure afterwards |
+| Condition fails: 'references "false"' | Compare a number: `… .fail} > 0` |
+| Run ends at the condition, no approval | The guest was compliant — run Break Compliance, run again |
+| Approval looks stuck | **Submit decision** |
+| AO returns 502, 503 or times out | Describe the demo verbally, show AAP directly |

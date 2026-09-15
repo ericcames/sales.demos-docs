@@ -114,7 +114,7 @@ Source: `playbooks/install_ao.yml` header comment,
 |---|---|---|
 | AO admin password | Kubernetes Secret `ao-admin-password` | `install_ao.yml` — seeded from `aap_password`, so the two match |
 | OIDC client | AAP OAuth2 application named "Syntara" | `configure_ao.yml` — `POST setup_aap_oidc` |
-| AAP integration credential | AO's database | `configure_ao.yml` — `POST /credentials`. It currently fails AAP authentication when a workflow step uses it ([sales.demos#622](https://github.com/ericcames/sales.demos/issues/622)) |
+| AAP integration credential | AO's database | `configure_ao.yml` — `POST /credentials`, named **AAP Admin**. Only its creator can browse AAP with it in the builder; a presenter logged in through SSO makes their own ([sales.demos#622](https://github.com/ericcames/sales.demos/issues/622)) |
 | MCP server token | Operator's local Claude config (not tracked) | `make-ao-mcp.sh` — gateway personal access token |
 
 Source: `playbooks/configure_ao.yml`, `playbooks/install_ao.yml`
@@ -129,9 +129,14 @@ Source: `playbooks/configure_ao.yml`, `playbooks/install_ao.yml`
   exists on AAP. The playbook checks for an existing identity provider first and
   skips the call — so a second run is safe, it just cannot self-heal a
   half-created OIDC setup.
-- The AAP credential is skipped when it exists, so a re-run cannot repair a
-  broken or out-of-date one
+- The AAP credential is found by name (**AAP Admin**) and skipped when it
+  exists, so a re-run does not replace one someone changed by hand
   ([sales.demos#622](https://github.com/ericcames/sales.demos/issues/622)).
+
+**So is loading the demo workflow.**
+[`/sales-demos-orchestrator-workflow`](https://github.com/ericcames/sales.demos/blob/main/.claude/skills/sales-demos-orchestrator-workflow/SKILL.md)
+saves a new version only when the steps, edges or triggers differ from the
+committed file — a second run changes nothing.
 
 > **"If the OIDC setup is partially broken, delete the 'Syntara' OAuth
 > application in AAP's gateway UI and re-run the configure playbook."**
@@ -144,18 +149,23 @@ Source: `playbooks/configure_ao.yml` header, lines 29-31
 
 **The most common failure is the SSRF allowlist.** AO uses `langchain_core`'s
 SSRF protection to block private IP addresses on integration URLs, and the AAP
-hostname resolves to a private IP from inside the cluster. The configure
-playbook patches `APP_INTEGRATION_URL_ALLOWED_HOSTS` on the `ao-backend`
-deployment, which is enough to log in and browse templates — but **workflow
-steps run in `ao-worker`**, which needs the same setting
+hostname resolves to a private IP from inside the cluster. Browsing templates
+happens in `ao-backend`, but **workflow steps run in `ao-worker`**, so both
+need `APP_INTEGRATION_URL_ALLOWED_HOSTS`. The configure playbook writes it to
+the ConfigMap `ao-admin-settings`, which both Deployments load, and checks it
+from inside an `ao-worker` pod
 ([sales.demos#621](https://github.com/ericcames/sales.demos/issues/621)).
+
+> **"Every failure the first rehearsal hit is now a preflight check."**
+> [`/sales-demos-orchestrator-rehearse`](https://github.com/ericcames/sales.demos/blob/main/.claude/skills/sales-demos-orchestrator-rehearse/SKILL.md)
+> asks the component that failed, not the one that looked fine.
 
 | Symptom | Fix |
 |---|---|
 | AO login page loads but "Log in with AAP" fails | Re-run `configure_ao.yml` — the SSRF allowlist was reconciled away |
 | AO shows 0 job templates | Re-run `configure_ao.yml` — the integration credential or allowlist is stale |
-| Every AAP workflow step fails at once: "base_url is not permitted by SSRF policy" | Give `ao-worker` the allowlist: ConfigMap `ao-admin-settings` with `APP_INTEGRATION_URL_ALLOWED_HOSTS`, then restart `ao-worker` ([#621](https://github.com/ericcames/sales.demos/issues/621)) |
-| An AAP step's Organization dropdown: "AAP Authentication Failed" | Use a Basic Auth credential created in the AO UI ([#622](https://github.com/ericcames/sales.demos/issues/622)) |
+| Every AAP workflow step fails at once: "base_url is not permitted by SSRF policy" | Re-run `configure_ao.yml` — `ao-worker` is missing the allowlist ([#621](https://github.com/ericcames/sales.demos/issues/621)) |
+| An AAP step's Organization dropdown: "AAP Authentication Failed" | The credential belongs to another AO user. Create your own and pick it on the step ([#622](https://github.com/ericcames/sales.demos/issues/622)) |
 | AO is unreachable (503 / no Route) | Re-run `AAP Ecosystem - Deploy Automation Orchestrator` — it converges |
 | Database gone | `oc delete namespace automation-orchestrator` and re-deploy from scratch |
 
