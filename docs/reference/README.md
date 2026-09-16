@@ -17,6 +17,7 @@ is the front door; these pages are the detail behind it.
 | [New environment](new-environment.md) | Your RHDP cluster expired and you need to point at a fresh one |
 | [Running playbooks](running-playbooks.md) | You are running a phase from a laptop, or about to merge a playbook change |
 | [Running from AAP](running-from-aap.md) | You want the workflows and job templates AAP actually has |
+| [Facts and drift](facts-and-drift.md) | You want to show what AAP knows about a guest, or what changed since last time |
 | [Execution environment](execution-environment.md) | A job template fails in a way a laptop run does not reproduce |
 | [Reusing this repo](reusing-this-repo.md) | You cloned or forked it and want it pointed at your own cluster |
 | [Repo layout](repo-layout.md) | You are looking for a file, or wondering why `secrets.yml` or `local.yml` is not where you would guess |

@@ -113,6 +113,7 @@ nav:
       - New Environment: reference/new-environment.md
       - Running Playbooks: reference/running-playbooks.md
       - Running from AAP: reference/running-from-aap.md
+      - Facts and Drift: reference/facts-and-drift.md
       - Execution Environment: reference/execution-environment.md
       - Reusing This Repo: reference/reusing-this-repo.md
       - Repo Layout: reference/repo-layout.md

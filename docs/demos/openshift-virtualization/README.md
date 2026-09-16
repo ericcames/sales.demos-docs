@@ -42,8 +42,13 @@ a workflow in Ansible Automation Platform does the rest:
    repositories at all.
 3. **Configure** — web server, firewall, Cockpit, the demo page, security
    patches. The URL turns 200.
-4. **Check** — logs in, gathers facts, caches them in AAP, so the workflow ends
-   by proving the machine is genuinely reachable rather than that the tasks ran.
+4. **Compliance Scan** — scans the guest against the CIS benchmark and
+   publishes the report beside the demo page.
+5. **Check and Gather Facts** — logs in, curates the guest's facts into AAP's
+   database and publishes them to the guest, so the workflow ends by proving the
+   machine is genuinely reachable rather than that the tasks ran. What lands on
+   the Facts tab is in
+   [Facts and drift](../../reference/facts-and-drift.md).
 
 That night, a scheduled teardown destroys the VM and deregisters it — while
 deliberately preserving the expensive things.

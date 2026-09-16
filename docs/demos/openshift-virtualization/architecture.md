@@ -11,7 +11,7 @@ research, the constraints, the decisions and the ones that were reversed — rea
 
 ## The one-button workflow
 
-`Linux Day 1 - 0 Workflow`. Four job templates chained on success, one survey
+`Linux Day 1 - 0 Workflow`. Five job templates chained on success, one survey
 that feeds all of them.
 
 ```mermaid
@@ -21,11 +21,13 @@ flowchart TD
     P["<b>Provision VM</b><br/>playbooks/provision_vm.yml<br/><i>terraform apply → register host in AAP</i>"]
     R["<b>Register Linux VMs</b><br/>playbooks/register_linux_vm.yml<br/><i>wait for ssh → attach to the Red Hat CDN</i>"]
     C["<b>Configure Linux VMs</b><br/>playbooks/configure_linux_vm.yml<br/><i>httpd · firewalld · Cockpit · page · patches</i>"]
-    K["<b>Check Linux VMs</b><br/>playbooks/check_linux_vm.yml<br/><i>log in, gather facts, cache them in AAP</i>"]
+    A["<b>Compliance Scan</b><br/>playbooks/linux_compliance_scan.yml<br/><i>OpenSCAP scan → compliance/report.html</i>"]
+    K["<b>Check and Gather Facts</b><br/>playbooks/check_linux_vm.yml<br/><i>log in, curate and cache the facts, publish facts.html</i>"]
 
     P -->|success| R
     R -->|success| C
-    C -->|success| K
+    C -->|success| A
+    A -->|success| K
 
     P -.->|"Route exists, returns 503"| W(["web_url"])
     C -.->|"httpd running, returns 200"| W
@@ -176,17 +178,19 @@ All of it is configuration-as-code under `inventory/group_vars/`, applied by
 | Organization | `IT Service Automation` |
 | Project | `Sales Demos` |
 | Execution environment | `Sales Demos - OCP Virt EE` |
-| Credentials | `Sales Demos - Vault` · `Sales Demos - Env Secrets` · `Sales Demos - Linux Machine` · `Sales Demos - Windows Machine` · `Sales Demos - PAH Registry` |
+| Credentials | `Sales Demos - Vault` · `Sales Demos - Env Secrets` · `Sales Demos - Linux Machine` · `Sales Demos - Windows Machine` · `Sales Demos - PAH Registry` · `Sales Demos - Controller` |
 | Inventory | `Sales Demo VMs` · `Sales Demo VMs - Control` |
-| Job templates | `Linux Day 1 - 1 Provision` · `2 Register` · `3 Configure` · `4 Compliance Scan` · `5 Check` · `Repair` · `Teardown` |
-| | `AAP Ecosystem - Install Automation Orchestrator` · `Configure Automation Orchestrator` · `Install MCP Server` · `Install Self-Service Portal` |
-| | `AAP Observability - 1 Deploy Alloy` · `2 Deploy Dashboards` |
+| Job templates | `Linux Day 1 - 1 Provision` · `2 Register` · `3 Configure` · `4 Compliance Scan` · `5 Check and Gather Facts` · `Repair` · `Teardown` |
+| | `Linux Day 2 - Gather Facts` |
+| | `AAP Ecosystem - Install Automation Orchestrator` · `Configure Automation Orchestrator` · `Load Automation Orchestrator Workflows` · `Rehearse Automation Orchestrator Demo` · `Install Self-Service Portal` · `Install MCP Server` |
+| | `AAP Observability - 1 Deploy Alloy` · `2 Deploy Dashboards` · `3 Deploy Alerts` |
 | | `Cluster Day 0 - 1 Install OpenShift Virtualization` · `2 Verify Environment` · `Probe Capacity` |
 | | `Golden Image - Link RHEL 9 CIS L1` · `Link Windows 2022 CIS L1` |
 | | `Self-Service - Request Linux Server` · `Request Windows Server` |
-| | `Windows Day 1 - 1 Provision` · `2 Patch` · `3 Configure` · `4 Compliance Scan` · `5 Check` · `Repair` · `Teardown` |
-| Workflows | `AAP Ecosystem - Deploy Automation Orchestrator` · `Cluster Day 0` · `Linux Day 1 - 0 Workflow` · `Windows Day 1 - 0 Workflow` |
-| Labels | `linux` · `windows` · `cluster` · `aap-ecosystem` · `observability` · `golden-image` · `day-0` · `day-1` · `install` · `ocpvirt` · `read-only` · `self-service` |
+| | `Windows Day 1 - 1 Provision` · `2 Patch` · `3 Configure` · `4 Compliance Scan` · `5 Check and Gather Facts` · `Repair` · `Teardown` |
+| | `Windows Day 2 - Break Compliance` · `Fix Compliance` · `Compliance Scan` · `Patch` · `Check SMB` · `.NET Patch Report` · `Gather Facts` |
+| Workflows | `AAP Ecosystem - Deploy Automation Orchestrator` · `Cluster Day 0` · `Linux Day 1 - 0 Workflow` · `Windows Day 1 - 0 Workflow` · `Windows Day 2 - 0 Break Fix` |
+| Labels | `linux` · `windows` · `cluster` · `aap-ecosystem` · `observability` · `golden-image` · `day-0` · `day-1` · `day-2` · `install` · `ocpvirt` · `read-only` · `self-service` |
 | Schedules | `Linux Day 1 - Nightly teardown (6 PM)` · `Windows Day 1 - Nightly teardown (6 PM)` (+ 10 PM safety nets in sandbox) |
 
 **Almost everything runs from AAP now, and the exceptions are deliberate.**
@@ -259,8 +263,11 @@ and then pulling packages and patches over it. The machine itself exists in
 under 40 seconds. That is the honest shape of the demo, and it is why "the VM
 built in 45 seconds" and "the demo takes nine minutes" are both true.
 
-Use `Check Linux VMs` at 5 seconds when someone asks whether the verification step is
-real: it logs in, gathers facts and caches them, and that is all it needs to do.
+Use `Check and Gather Facts` at 5 seconds when someone asks whether the
+verification step is real: it logs in, curates the facts into AAP's database and
+publishes them to the guest, and that is all it needs to do. What it puts on the
+Facts tab, and what it will not tell you, is in
+[Facts and drift](../../reference/facts-and-drift.md).
 
 ### Everything else
 

@@ -6,7 +6,7 @@ config-as-code in
 [`inventory/group_vars/aap/`](https://github.com/ericcames/sales.demos/tree/main/inventory/group_vars/aap),
 applied by `playbooks/config.yml` like everything else.
 
-Measured against `main` on 2026-09-11: **33 job templates and 5 workflows.**
+Measured against `main` on 2026-09-16: **38 job templates and 5 workflows.**
 The counts here come from `controller_templates.yml` and
 `controller_workflows.yml`, ignoring entries carrying `state: absent` — those
 are tombstones that *delete* superseded objects, not things AAP runs.
@@ -35,7 +35,7 @@ Linux Day 1 - 1 Provision
   └─> Linux Day 1 - 2 Register
         └─> Linux Day 1 - 3 Configure
               └─> Linux Day 1 - 4 Compliance Scan
-                    └─> Linux Day 1 - 5 Check
+                    └─> Linux Day 1 - 5 Check and Gather Facts
 ```
 
 ### `Windows Day 1 - 0 Workflow`
@@ -47,7 +47,7 @@ Windows Day 1 - 1 Provision
   └─> Windows Day 1 - 2 Patch
         └─> Windows Day 1 - 3 Configure
               └─> Windows Day 1 - 4 Compliance Scan
-                    └─> Windows Day 1 - 5 Check
+                    └─> Windows Day 1 - 5 Check and Gather Facts
 ```
 
 ### `AAP Ecosystem - Deploy Automation Orchestrator`
@@ -79,17 +79,60 @@ Windows Day 2 - Break Compliance
 |---|---|---|
 | `Cluster Day 0` | 3 | Install CNV, verify the environment, probe capacity |
 | `Golden Image` | 2 | Link the RHEL 9 and Windows 2022 CIS L1 images |
-| `Linux Day 1` | 7 | Provision, register, configure, scan, check, repair, teardown |
-| `Windows Day 1` | 7 | Provision, patch, configure, scan, check, repair, teardown |
-| `Windows Day 2` | 6 | Break/fix compliance, scan, patch, check SMB, .NET patch report |
-| `AAP Ecosystem` | 4 | Install AO, configure AO, self-service portal, MCP server |
-| `AAP Observability` | 2 | Deploy Alloy, deploy dashboards |
+| `Linux Day 1` | 7 | Provision, register, configure, scan, check and gather facts, repair, teardown |
+| `Linux Day 2` | 1 | Gather facts |
+| `Windows Day 1` | 7 | Provision, patch, configure, scan, check and gather facts, repair, teardown |
+| `Windows Day 2` | 7 | Break/fix compliance, scan, patch, check SMB, .NET patch report, gather facts |
+| `AAP Ecosystem` | 6 | Install AO, configure AO, load AO workflows, rehearse the AO demo, self-service portal, MCP server |
+| `AAP Observability` | 3 | Deploy Alloy, deploy dashboards, deploy alerts |
 | `Self-Service` | 2 | Request a Linux or Windows server via the portal |
 
 Every template maps to one playbook. A few playbooks back more than one
 template — `provision_vm.yml` serves both the Linux and Windows provision
 steps, `teardown.yml` both teardowns, and `windows_compliance_scan.yml` is
 reused at three points in the Windows story.
+
+---
+
+## Why the templates are named the way they are
+
+The names are not decorative. Read one and you know where it runs and whether
+anything else depends on it.
+
+**A number is a chain position.** `Linux Day 1 - 5 Check and Gather Facts` is
+the fifth node of `Linux Day 1 - 0 Workflow`. The digits are why the workflow
+reads in order in the visualizer, and why a renumbering is a change to the
+chain rather than a rename.
+
+**Unnumbered means off-chain.** `Repair` and `Teardown` carry no digit because
+no workflow node points at them — you launch them when you decide to, not as
+part of a build.
+
+**A `Day 2 -` entry is an alias, not a fork.** It is the *same playbook* as its
+Day 1 counterpart, launched with different survey defaults. Day 1 versus Day 2
+is not a property of the work; it is a property of when you press the button.
+
+The fact-gathering pair is the clearest example, and the newest. Both run
+`check_linux_vm.yml`:
+
+| | `Linux Day 1 - 5 Check and Gather Facts` | `Linux Day 2 - Gather Facts` |
+|---|---|---|
+| Playbook | `check_linux_vm.yml` | `check_linux_vm.yml` |
+| On the Day 1 chain | yes, node 5 | no |
+| `demo_facts_compare` | `false` | `true` |
+| Labels | `linux` · `day-1` | `linux` · `day-2` · `read-only` |
+
+The default difference is what earns the second object: a VM the chain has just
+built has no previous facts to compare against, so drift is off there and on
+here. `Windows Day 1 - 2 Patch` and `Windows Day 2 - Patch` had already made
+this call — the rule was written down in
+[sales.demos#647](https://github.com/ericcames/sales.demos/issues/647) rather
+than invented by it.
+
+The Windows Day 2 entry adds one `extra_vars` override,
+`check_vm_assert_serving: false`, so a guest whose Route is returning 503 still
+gives you its facts instead of failing the job. See
+[Facts and drift](facts-and-drift.md).
 
 ---
 
