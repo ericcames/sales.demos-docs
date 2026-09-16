@@ -9,6 +9,13 @@ what a "build" even means; a survey that said one question now asks four; the
 sandbox itself was rebuilt. A timing with no date and no environment beside it is
 a claim, not evidence — so each table below carries both.
 
+**Steps are named as they were when the run was measured.** Step 5 appears below
+as `5 Check`, which is what the template was called at the time; it is now
+`5 Check and Gather Facts` and does more, so those figures are not a current
+measurement of it. Renaming the rows would make each table claim a template that
+did not exist when the stopwatch ran. See
+[Facts and drift](../../reference/facts-and-drift.md) for what the step does now.
+
 ---
 
 ## The headline

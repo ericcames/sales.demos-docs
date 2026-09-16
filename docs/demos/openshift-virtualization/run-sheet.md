@@ -177,7 +177,7 @@ than the rest of the demo combined.
 **Then `aap-workflow-running.png`.** Five nodes, chained on success:
 
 ```
-1 Provision → 2 Register → 3 Configure → 4 Compliance Scan → 5 Check
+1 Provision → 2 Register → 3 Configure → 4 Compliance Scan → 5 Check and Gather Facts
 ```
 
 > **Screenshot is stale** — it was captured before the compliance node (#202)
@@ -340,7 +340,7 @@ the Windows OOBE screen. Three stacked bugs, all fixed and verified.
 There is a **second, complete chain**, same shape as the Linux one:
 
 ```
-1 Provision → 2 Patch → 3 Configure → 4 Compliance Scan → 5 Check
+1 Provision → 2 Patch → 3 Configure → 4 Compliance Scan → 5 Check and Gather Facts
 ```
 
 #### It takes 12 to 28 minutes, and you must launch it before you start talking
