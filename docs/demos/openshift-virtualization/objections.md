@@ -73,10 +73,16 @@ is done (#340), so do not hedge *that*. Claiming a gap that has closed costs you
 as much credibility as claiming a capability you do not have.
 
 > **"CIS Level 1 hardened" is a supportable claim again.** It was struck while
-> #358 was open and a clone scored 33%. Measured 2026-09-08: a clone scores
-> **26 of 27 (96%)**, and the image itself reads 10 of 10 offline on controls
-> that cannot exist on a clean install. Say it — and still say what the
-> percentage covers, per the note below.
+> #358 was open and a clone scored 33%. A clone scores **27 of 27 (100%)**, and
+> the image itself reads 10 of 10 offline on controls that cannot exist on a
+> clean install. Say it — and still say what the percentage covers, per the note
+> below.
+>
+> **If you have seen 26 of 27 (96%) quoted, that was the report being wrong, not
+> the guest** ([#382](https://github.com/ericcames/sales.demos/issues/382)). The
+> single "not configured" line came from checking rule `18.9.20.1.1` at a
+> registry path missing both `NT` and `\Printers`, so the value could not be
+> found on *any* machine.
 
 **The one difference, if they are technical:** step 2 registers the Linux guest
 to the Red Hat CDN, because the RHEL boot source ships with no repositories at
@@ -95,7 +101,7 @@ If they ask what the build involves: unattended install from an answer file,
 virtio drivers and guest agent, a CIS Level 1 hardening pass via the Ansible
 Lockdown role, WinRM over HTTPS, sysprep, then publish as a containerdisk.
 (You can now describe the guest as well as the build: the hardening survives to
-the clone, measured at 26 of 27.) About
+the clone, measured at 27 of 27.) About
 forty-five minutes, once, in a separate repo — `ericcames/image.builder.pipeline`
 is the factory, this repo is the consumer.
 

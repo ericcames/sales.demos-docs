@@ -904,7 +904,7 @@ the unattend's `oobeSystem` pass overrides it; the guest has `AutoAdminLogon = 1
 | Current image | `quay.io/zigfreed/win2k22-cis-l1-golden:20260908-1853` (private, 10.4 GB) |
 | Verified before the label was applied | **10 of 10** non-default controls, read off the qcow2 by the producer's publish gate |
 | Verified on the booted, sysprepped guest's disk | **10 of 10** |
-| Compliance scan on the running clone | **26 of 27 compliant (96%)** — 0 non-compliant, 1 not configured |
+| Compliance scan on the running clone | **27 of 27 compliant (100%)** — 0 non-compliant, 0 not configured. An earlier 26 of 27 was the report checking rule `18.9.20.1.1` at a registry path missing `NT` and `\Printers`, so it read "not configured" on every machine ([#382](https://github.com/ericcames/sales.demos/issues/382)) |
 | Full `Windows Day 1 - 0 Workflow` | five nodes green, 19.7 min |
 
 **`sysprep /generalize` strips nothing.** That was the leading suspicion for two
