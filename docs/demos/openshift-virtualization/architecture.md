@@ -318,7 +318,10 @@ a 30 GiB Linux one does.
 
 The published image is **built to be CIS L1 hardened, and generalized** — the
 build in `image.builder.pipeline` applies the `ansible-lockdown/Windows-2022-CIS`
-role, then runs `sysprep /generalize /oobe /shutdown`.
+role, then runs `sysprep /generalize /oobe /shutdown`. How that build works, the
+four CIS controls it has to disable to survive its own run, and the gate that
+decides whether the image may claim a compliance level, are all in
+[Image Factory → Windows](../../image-factory/windows.md).
 
 > **The hardening half of that sentence is demonstrable again, and this page
 > once stated the opposite.** It read that a clone scored 9 of 27 (33%) and that
