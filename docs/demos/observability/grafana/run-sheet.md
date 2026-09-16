@@ -179,18 +179,10 @@ debug in front of them — cut to the tab and carry on.
 
 ---
 
-## Screenshots still worth capturing
+## Screenshots
 
-Capture from **sandbox**. Alloy has been sending since 2026-09-15 17:35 UTC, so
-there is a full day of data from 2026-09-16 evening onwards. The trial ends
-**2026-09-20 15:32 UTC**, so everything must be captured by 2026-09-19.
-
-- [ ] `grafana-dashboard-full.png` — full dashboard, Cluster = sandbox, Last 24 hours
-- [ ] `grafana-overview-row.png`, `grafana-nodes-row.png`, `grafana-vm-row.png`, `grafana-aap-row.png`, `grafana-logs-panel.png`
-- [ ] `grafana-vm-status-panel.png` — rendered by the MCP server
-- [ ] `grafana-home-menu.png`, `grafana-dashboards-list.png`, `grafana-dashboard-controls.png`
-- [ ] `grafana-explore-metrics.png`, `grafana-explore-logs.png`
-- [ ] `grafana-alert-firing.png` — repeat the VM stop
-- [ ] `grafana-service-accounts.png`, `grafana-access-policy.png` — tokens masked
-- [ ] `grafana-usage-dashboard.png` — account IDs cropped
-- [ ] `grafana-aap-templates.png` — the three templates in AAP
+All captured from **sandbox** on 2026-09-15 and committed to
+`docs/images/grafana-*.png`: the whole dashboard and each row, the AAP job
+templates, Explore and the metric catalogue, the service accounts, the usage
+page, and the alert both firing and with its instance. The stack name is
+blurred out of every image that showed it.

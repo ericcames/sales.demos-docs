@@ -11,7 +11,7 @@ twenty minutes.
 | **Audience** | Platform engineers, SREs and automation leads who already run monitoring and want to see it managed as code and read by an assistant |
 | **Reader** | The Ansible pre-sales engineer presenting it |
 | **Needs a live environment?** | **No, but there is one.** Every beat is captured in screenshots here. The Grafana Cloud stack keeps running: on 2026-09-20 the trial ends and the account moves to the **Free plan**, which this demo fits inside |
-| **Status** | **Draft** — built and rehearsed on sandbox 2026-09-15; a few screenshots outstanding |
+| **Status** | **Ready** — built, rehearsed and captured on sandbox, 2026-09-15 |
 
 **New to Grafana?** Read [`grafana-101.md`](grafana-101.md) first. It assumes
 nothing.
