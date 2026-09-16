@@ -521,10 +521,12 @@ from your delivery rather than softening it.**
 
 > ### ⛔ Do not substitute the compliance percentage here
 >
-> The Windows compliance number is available as a third item again: measured
-> 2026-09-08, a clone scores **26 of 27 (96%)**, which really is a demonstration
-> that the hardening took and is still in place after `sysprep /generalize`.
-> It was withdrawn while #358 was open and the guest scored 33%; that is fixed.
+> The Windows compliance number is available as a third item again: a clone
+> scores **27 of 27 (100%)**, which really is a demonstration that the hardening
+> took and is still in place after `sysprep /generalize`. It was withdrawn while
+> #358 was open and the guest scored 33%; that is fixed. (An earlier **26 of 27
+> (96%)** was the report checking one rule at the wrong registry path, not a gap
+> in the guest — [#382](https://github.com/ericcames/sales.demos/issues/382).)
 
 That is a better third item anyway: a limitation you are choosing to disclose
 about something that *works* lands harder than one about something that does

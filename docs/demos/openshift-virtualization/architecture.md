@@ -142,7 +142,7 @@ provider driving `kubernetes_manifest`. No community KubeVirt provider.
 | `kubernetes_namespace.demo` | The VM namespace, `sales-demos-<env>` |
 | `VirtualMachineClusterInstancetype` ×3 | The `sd1.small` / `.medium` / `.large` types |
 | `kubernetes_manifest.linux_vm` | RHEL 9 guest, cloned from the `rhel9` DataSource |
-| `kubernetes_manifest.windows_vm` | Windows Server 2022, CIS L1 hardened (**verified on the clone: 26 of 27, 96%**), cloned from `win2k22` |
+| `kubernetes_manifest.windows_vm` | Windows Server 2022, CIS L1 hardened (**verified on the clone: 27 of 27, 100%**), cloned from `win2k22` |
 | `kubernetes_service.linux` | **Headless.** Stable in-cluster DNS for the AAP inventory |
 | `kubernetes_service.linux_web` | ClusterIP on :80, existing solely to back the Route |
 | `kubernetes_manifest.linux_web_route` | The public URL, edge TLS |
@@ -325,12 +325,17 @@ decides whether the image may claim a compliance level, are all in
 
 > **The hardening half of that sentence is demonstrable again, and this page
 > once stated the opposite.** It read that a clone scored 9 of 27 (33%) and that
-> whether the hardening reached a clone was open. Measured 2026-09-08, a clone of
-> `win2k22-cis-l1-golden:20260908-1853` scores **26 of 27 (96%)**, and the
+> whether the hardening reached a clone was open. A clone of
+> `win2k22-cis-l1-golden:20260908-1853` scores **27 of 27 (100%)**, and the
 > hardening was read directly off the guest's own disk at **10 of 10** on
 > controls impossible to set on a clean install. **`sysprep /generalize` strips
 > nothing** — that was the leading suspicion for two days and it is now measured
-> and wrong. The 33% readings came from guests cloned from unhardened media.
+> and wrong. The 33% readings came from guests cloned from unhardened media, and
+> an intermediate **26 of 27 (96%)** was the report checking rule `18.9.20.1.1`
+> at a registry path missing both `NT` and `\Printers` — it read "not
+> configured" on every machine
+> ([#382](https://github.com/ericcames/sales.demos/issues/382)). **The report was
+> wrong, not the guest.**
 
 A clone boots into the OOBE specialize pass and the built-in Administrator holds
 a random password the build discarded. `terraform/ocpvirt` answers that with a `sysprep` volume: a Secret

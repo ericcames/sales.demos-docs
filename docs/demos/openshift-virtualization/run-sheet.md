@@ -384,15 +384,20 @@ Windows admin in the room will notice it:
 
 > ### The Windows compliance report is now safe to show
 >
-> Measured 2026-09-08: a clone of
-> `win2k22-cis-l1-golden:20260908-1853` scores **26 of 27 controls compliant
-> (96%)** — 0 non-compliant, 1 not configured. The hardening is real, it
-> survives `sysprep /generalize`, and the guest carries it.
+> A clone of `win2k22-cis-l1-golden:20260908-1853` scores **27 of 27 controls
+> compliant (100%)** — 0 non-compliant, 0 not configured. The hardening is real,
+> it survives `sysprep /generalize`, and the guest carries it.
 >
-> Getting here took fixing three defects of one shape — a status trusted instead
-> of the artifact measured (#364, image.builder.pipeline#92, #377). **The node
-> that surfaced all of it is this one**, which is worth saying out loud if
+> Getting here took fixing four defects of one shape — a status trusted instead
+> of the artifact measured (#364, image.builder.pipeline#92, #377, #382). **The
+> node that surfaced all of it is this one**, which is worth saying out loud if
 > anyone asks why the number moved.
+>
+> The last of them is the reason you may have seen **26 of 27 (96%)**: the
+> report checked rule `18.9.20.1.1` at a registry path missing both `NT` and
+> `\Printers`, so it read "not configured" on every machine. The guest was
+> always 27 of 27 — **the report was wrong, not the image**. That same wrong
+> path had shipped in three separate readers and survived two fixes.
 
 **The compliance node is where the Windows story gets better than the Linux
 one.** There is no OpenSCAP for Windows, so it does not pretend to scan: it
