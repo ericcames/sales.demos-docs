@@ -27,6 +27,10 @@ no cloud dependency.
 Build from the run sheet. Present the OCP Virt demo from its own
 [run sheet](../openshift-virtualization/run-sheet.md) once the environment is up.
 
+For how the installer ISO itself is produced — the Day 0 manifests, the CIS
+posture of stock RHCOS, and why the kit is not published to a registry — see
+[Image Factory → SNO Installer](../../image-factory/sno-kit.md).
+
 ---
 
 ## The 60-second version

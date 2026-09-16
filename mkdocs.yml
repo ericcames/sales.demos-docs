@@ -106,6 +106,15 @@ nav:
               - Usage and Cost: demos/observability/grafana/usage-and-cost.md
               - Rebuild from Zero: demos/observability/grafana/rebuild.md
               - Objections: demos/observability/grafana/objections.md
+  - Image Factory:
+      - Overview: image-factory/README.md
+      - Architecture: image-factory/architecture.md
+      - RHEL 9 CIS L1: image-factory/rhel9.md
+      - Windows Server 2022 CIS L1: image-factory/windows.md
+      - SNO Installer: image-factory/sno-kit.md
+      - Compliance Evidence: image-factory/compliance-evidence.md
+      - Extending It: image-factory/extending.md
+      - Operations: image-factory/operations.md
   - Reference:
       - Overview: reference/README.md
       - First-Time Setup: reference/first-time-setup.md

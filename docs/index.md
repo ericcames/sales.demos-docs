@@ -22,10 +22,15 @@ then [First-time setup](reference/first-time-setup.md).
 The **Design Plans** tab has the engineering plans behind each use case — the
 research, the decisions, and the phase plan.
 
+The **Image Factory** tab covers where the hardened RHEL and Windows images
+come from, the compliance evidence behind them, and
+[how the pipeline extends to another OS, benchmark or hypervisor](image-factory/extending.md).
+
 ## Links
 
 | Resource | Description |
 |---|---|
 | [sales.demos](https://github.com/ericcames/sales.demos) | The automation code — playbooks, inventory, skills |
 | [sales.demos-docs](https://github.com/ericcames/sales.demos-docs) | This repo — the markdown source for this site |
+| [image.builder.pipeline](https://github.com/ericcames/image.builder.pipeline) | The [image factory](image-factory/) — CIS-hardened RHEL and Windows images, plus the evidence |
 | [Sales Demos (Google Drive)](https://drive.google.com/drive/folders/1Me_blEFV-xHUyZeL48F0GjCyWl3_KSxG) | Marketing content — key messages, Gemini prompts, Red Hat product links |
