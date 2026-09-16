@@ -283,5 +283,31 @@ No new collection dependencies — `ansible.builtin.uri` is core Ansible.
 ### What's next
 
 - More dashboards (VM provisioning timing, AAP job duration histograms)
-- Alerting rules (Phase 4, not yet planned)
 - Dynatrace pairing (#99) for application-level observability
+
+## Phase 4 — Alert rules as code (#629)
+
+Shipped 2026-09-15. `playbooks/deploy_alerts.yml` pushes one rule group,
+`sales-demos-health`, from `playbooks/files/grafana/alert-rules.json` into the
+same folder as the dashboard, with the same Editor token and no new vault keys.
+AAP path: `AAP Observability - 3 Deploy Alerts`.
+
+Decisions worth keeping:
+
+- **The whole group is replaced**, then read back and asserted, so git is the
+  source of truth in both directions.
+- **"VM count dropped", not "VM stopped".** A stopped VM has no VMI, so its
+  series disappears rather than changing. The rule compares with ten minutes
+  earlier. Measured: stopped 18:01:50, firing 18:08:30 — the gap is Prometheus'
+  five-minute staleness window.
+- **No contact point.** A receiver would put an address in a public repo.
+
+## Status — the trial ends 2026-09-20, the stack stays
+
+The trial behind this plan ends on 2026-09-20, when the account switches to the
+**Free plan** automatically rather than being deleted — measured usage sits at
+about 23% of the free series allowance and 10% of the log allowance, so the demo
+keeps working. The automation, dashboard, alerts, MCP answers and screenshots are in
+[`demos/observability/grafana/`](../demos/observability/grafana/README.md),
+which also has the step-by-step
+[rebuild on a new account](../demos/observability/grafana/rebuild.md).

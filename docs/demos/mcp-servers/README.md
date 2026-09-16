@@ -108,6 +108,9 @@ New to this repo? Run [`/sales-demos-first-time`](https://github.com/ericcames/s
 - [`../../plan/platform-addons-plan.md`](../../plan/platform-addons-plan.md) —
   why the MCP servers are built this way: the transport decision, the local-first
   rationale, the in-cluster AAP deployment
+- [`../observability/grafana/mcp-server.md`](../observability/grafana/mcp-server.md) —
+  the Grafana server in depth: all 81 tools, captured answers, and the 403 that
+  proves it cannot write
 - [`../../plan/network-mcp-plan.md`](../../plan/network-mcp-plan.md) — the
   next use case: network vendor MCP servers
 - [`ROADMAP.md`](https://github.com/ericcames/sales.demos/blob/main/ROADMAP.md) — what is done and what is not

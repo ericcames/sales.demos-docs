@@ -93,6 +93,19 @@ nav:
           - Talk Track: demos/edge-sno/talk-track.md
           - Architecture: demos/edge-sno/architecture.md
           - Objections: demos/edge-sno/objections.md
+      - Observability:
+          - Overview: demos/observability/README.md
+          - Grafana Cloud:
+              - Overview: demos/observability/grafana/README.md
+              - Grafana 101: demos/observability/grafana/grafana-101.md
+              - Run Sheet: demos/observability/grafana/run-sheet.md
+              - Talk Track: demos/observability/grafana/talk-track.md
+              - Playbooks: demos/observability/grafana/playbooks.md
+              - MCP Server: demos/observability/grafana/mcp-server.md
+              - Architecture: demos/observability/grafana/architecture.md
+              - Usage and Cost: demos/observability/grafana/usage-and-cost.md
+              - Rebuild from Zero: demos/observability/grafana/rebuild.md
+              - Objections: demos/observability/grafana/objections.md
   - Reference:
       - Overview: reference/README.md
       - First-Time Setup: reference/first-time-setup.md
