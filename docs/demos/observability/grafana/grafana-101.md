@@ -200,13 +200,18 @@ lines containing that text.
 
 ## Alerts
 
-![Alert rules list, one rule firing](../../../images/grafana-alert-firing.png)
+![The Running VM count dropped rule, firing, with its instance for cluster sandbox](../../../images/grafana-alert-firing.png)
+
+The **Instances** tab shows what actually fired — one instance, labelled
+`cluster=sandbox`. Note **Destination: empty**: no contact point is configured,
+so the alert is visible in Grafana and nothing is emailed or posted. That is
+deliberate — a receiver would put an address into a public repository.
+
+![The firing instance, labelled cluster sandbox, with an empty notification destination](../../../images/grafana-alert-instance.png)
 
 Opening a rule shows exactly what it does — the query, the threshold, the
-labels and when it last evaluated. This one came from git, and the "Last
-updated by" line names the Editor service account the playbook uses:
-
-![The Running VM count dropped rule, with its query and threshold](../../../images/grafana-alert-rule.png)
+labels and when it last evaluated. Note **Last updated by: sales-demos-editor**:
+the rule came from git, applied by the playbook's Editor service account.
 
 **Alerting › Alert rules**, folder *Sales Demos*. Five rules, each shown with a
 state:

@@ -111,7 +111,7 @@ three is for when you aren't."*
 Show [`alert-rules.json`](https://github.com/ericcames/sales.demos/blob/main/playbooks/files/grafana/alert-rules.json)
 briefly, then:
 
-![A rule firing](../../../images/grafana-alert-firing.png)
+![The Running VM count dropped rule, firing on sandbox](../../../images/grafana-alert-firing.png)
 
 > **"Five rules. The playbook replaces the whole group, so if you delete a rule
 > from git it's deleted from Grafana. Then it reads the group back and fails
