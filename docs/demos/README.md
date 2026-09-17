@@ -24,7 +24,8 @@ building the automation. For *why* something is built the way it is, read
 
 ## What a use-case directory contains
 
-Copy [`_template/`](_template/) and fill it in. Five files, each with one job:
+Copy [`_template/`](https://github.com/ericcames/sales.demos-docs/tree/main/docs/demos/_template)
+and fill it in. Five files, each with one job:
 
 | File | Layer | Job |
 |---|---|---|
