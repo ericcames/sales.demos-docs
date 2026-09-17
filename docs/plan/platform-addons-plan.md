@@ -102,14 +102,36 @@ which is development speed.
 
 ## What is running
 
-`.mcp.json` is **committed**, and defines two servers:
+`.mcp.json` is **committed**, and defines **seven** servers — three for the
+clusters, two for AAP, two for the self-service portal.
+
+The three cluster servers authenticate from a gitignored kubeconfig:
 
 | Server | Kubeconfig | Access | Tools |
 |---|---|---|---|
 | `openshift-sandbox` | `.kube/sandbox.kubeconfig` | full | 25 |
 | `openshift-demo` | `.kube/demo.kubeconfig` | `--read-only` | 16 |
+| `openshift-edge` | `.kube/edge.kubeconfig` | full | 25 |
 
-Upstream is [`containers/kubernetes-mcp-server`](https://github.com/containers/kubernetes-mcp-server),
+`openshift-edge` is the bare-metal single-node cluster, and it is read-write for
+the same reason `sandbox` is: it is a machine you own, not an environment a
+customer is watching.
+
+The other four are a different shape, so they are not rows in the table above —
+they have no kubeconfig. Each is a stdio wrapper that bridges to a remote
+Streamable HTTP endpoint with `npx supergateway`, authenticating from a
+gitignored token file:
+
+| Server | Credential | Access |
+|---|---|---|
+| `aap-sandbox`, `aap-demo` | bearer token in `.aap/`, from `utilities/make-aap-mcp.sh` | set server-side by `aap_mcp_allow_write_operations` |
+| `portal-sandbox`, `portal-demo` | static token in `.portal/`, from `utilities/make-portal-mcp.sh` | read-only by what the tools can do — software catalog and TechDocs |
+
+**Two more exist and are deliberately not in the committed file**: `ao-sandbox`
+and `grafana` are registered at local scope by the `sales-demos-mcp` skill. A
+reader cloning the repo gets seven, not nine.
+
+Upstream for the three cluster servers is [`containers/kubernetes-mcp-server`](https://github.com/containers/kubernetes-mcp-server),
 Apache-2.0, pinned at **v0.0.66**. It is a Go binary distributed through npm, so
 `npx` is a launcher rather than a real Node dependency; standalone binaries exist
 for seven platforms if you would rather not install Node.
