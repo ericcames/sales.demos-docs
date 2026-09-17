@@ -12,6 +12,7 @@ these documents follow and why there are two layers rather than one.
 |------|------|---------|
 | Automation | [sales.demos](https://github.com/ericcames/sales.demos) | Playbooks, inventory, skills, terraform |
 | Demo docs | **This repo** | Talk tracks, run sheets, architecture, objections |
+| Image factory docs | **This repo**, `docs/image-factory/` | Where the hardened images come from, and the evidence behind them |
 | Marketing | [Google Drive](https://drive.google.com/drive/folders/1Me_blEFV-xHUyZeL48F0GjCyWl3_KSxG) | Key messages, Gemini prompts, product links |
 
 New documentation goes here or to Google Drive, **not** to `sales.demos`.
@@ -29,12 +30,10 @@ into placeholders. See [`.github/SECURITY.md`](.github/SECURITY.md).
 
 ## Preview before you push
 
-```bash
-pip install mkdocs-material
-mkdocs serve
-```
-
-Serves at <http://127.0.0.1:8000/sales.demos-docs/> and reloads on save.
+`mkdocs serve`, then click the URL it prints. See
+[Getting started](README.md#-getting-started) in the README for the one-time
+install and why the address only answers while the server is running — that is
+the single copy of these instructions.
 
 ## Adding a demo
 
@@ -65,7 +64,10 @@ earned it so far.
    would you revert these together? Then ship them together.
 4. Run `mkdocs build` — it must be clean.
 5. **Check every link you added.** CI does not. Relative paths must resolve in
-   the tree; external URLs must return 200. This has bitten before.
+   the tree; external URLs must return 200. This has bitten before. Run
+   [`/docs-check`](.claude/skills/docs-check/SKILL.md) rather than doing it by
+   hand — it checks both, plus the strict build and the `- #N` heading trap, in
+   about 30 seconds.
 6. Open a PR with `Closes #N` in the body, so the issue closes on merge.
 
 **There is no changelog to update.** The per-PR obligation was retired on

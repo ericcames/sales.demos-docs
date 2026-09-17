@@ -81,9 +81,7 @@ The site deploys to GitHub Pages on push to `main`
 
 ## Running locally
 
-```bash
-pip install mkdocs-material
-mkdocs serve
-```
-
-Opens at `http://127.0.0.1:8000/sales.demos-docs/`.
+`mkdocs serve`, then click the URL it prints. `README.md` holds the single copy
+of these instructions, including why that address only answers while the server
+is running and why the `/sales.demos-docs/` path cannot be shortened. Do not
+restate them here — this block used to be a third copy, and the three drifted.
