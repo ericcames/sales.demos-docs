@@ -52,6 +52,14 @@ markdown_extensions:
   - attr_list
   - md_in_html
 
+# The demo scaffolding template stays in the tree — CONTRIBUTING and the README
+# both start a new demo with `cp -r docs/demos/_template docs/demos/<slug>` — but
+# it must not be built. It has no nav entry, and "not in nav" does not mean "not
+# built": all five placeholder pages were rendering to the public site, reachable
+# by URL and indexable.
+exclude_docs: |
+  demos/_template/
+
 nav:
   - Home: index.md
   - Demos:
