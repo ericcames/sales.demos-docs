@@ -193,8 +193,9 @@ nothing for Aruba, which has no official equivalent to substitute.
 specifications and validated content as MCP tools.
 *For:* fixes the failure that actually costs time — hallucinated module names and
 invented parameters; **needs no device**, so it is unblocked today; no
-third-party code; the grounding corpus is the Private Automation Hub built in
-#68/#69/#70, which is a differentiated Red Hat story rather than a generic one.
+third-party code; the grounding corpus is the Private Automation Hub built
+in #68/#69/#70, which is a differentiated Red Hat story rather than a
+generic one.
 *Against:* **no vendor-supplied implementation exists for this either**, so it
 means writing a server; it is one server covering every vendor, which collapses
 the per-vendor issue structure; and it shows no live network state, so it is

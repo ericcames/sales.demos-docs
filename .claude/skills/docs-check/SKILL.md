@@ -20,11 +20,20 @@ Takes about **30 seconds** for a full run.
    file and reports ones that point to files that do not exist.
 3. **Dead external URLs** — HEAD-checks every `https://` URL in the docs and
    reports ones that return non-200.
-4. **The `- #N` heading trap** — Python-Markdown's `lenient` ATX heading
-   parser (which mkdocs-material enables by default) treats `- #357` as a
-   heading, not a list item with a GitHub issue reference. This once truncated
-   a page TOC from 263 entries to 42. Grep for `^\s*- #[0-9]` and flag every
-   match.
+4. **The heading trap** — Python-Markdown's `lenient` ATX heading parser
+   (which mkdocs-material enables by default) turns a line beginning with `#`
+   plus a digit into an `<h1>`, so a wrapped sentence whose line happens to
+   start `#357` becomes a top-level heading and enters the page TOC. This once
+   truncated a page TOC from 263 entries to 42.
+
+   **Checked against the built HTML, not with a grep**, because a grep is
+   wrong in both directions. The previous `^\s*- #[0-9]` pattern matched only
+   the list-item form and found **zero** of the 8 live defects #85 fixed —
+   those were paragraph continuations and blockquotes (`> #358 ...`). A
+   broader pattern then false-positives on lines indented inside a list item,
+   which are lazy continuations and never headings. The rendered page is the
+   only thing that knows. Any page with more than one `<h1>` in its `<article>`
+   has one it did not ask for.
 
 ## Run
 
@@ -98,23 +107,32 @@ else:
 PY
 
 echo ""
-echo "=== 4. Heading trap (- #N) ==="
+echo "=== 4. Heading trap (spurious <h1> in the built site) ==="
 python3 - <<'PY'
-import pathlib
+import pathlib, re
 
-docs = pathlib.Path("docs")
+# Reads site/ from the strict build in check 1. A page has exactly one <h1>,
+# its title; any extra is a sentence Python-Markdown promoted to a heading.
+site = pathlib.Path("site")
+if not site.is_dir():
+    raise SystemExit("  site/ not found — run check 1 (mkdocs build) first")
 bad = 0
-for md in sorted(docs.rglob("*.md")):
-    for i, line in enumerate(md.read_text(errors="replace").splitlines(), 1):
-        stripped = line.lstrip()
-        if stripped.startswith("- #") and len(stripped) > 3 and stripped[3].isdigit():
-            print(f"  {md}:{i}: {line.strip()}")
-            bad += 1
+for html in sorted(site.rglob("index.html")):
+    art = re.search(r'<article[^>]*>(.*?)</article>',
+                    html.read_text(errors="replace"), re.S)
+    if not art:
+        continue
+    h1s = re.findall(r'<h1\b[^>]*>(.*?)</h1>', art.group(1), re.S)
+    for extra in h1s[1:]:
+        txt = re.sub(r'<[^>]+>', '', extra).strip().replace("\n", " ")
+        print(f"  {html.relative_to(site).parent}: {txt[:64]}")
+        bad += 1
 if bad:
-    print(f"\n{bad} line(s) where '- #N' will render as a heading, not a list item")
-    print("Fix: escape the hash (- \\#N) or rephrase (- issue #N)")
+    print(f"\n{bad} spurious <h1> — a wrapped line starts with '#' plus a digit")
+    print("Fix: re-wrap so the reference is not first on the line, or write it")
+    print("as sales.demos#357. Search the source for the words printed above.")
 else:
-    print("No heading-trap lines found.")
+    print("No spurious headings.")
 PY
 ```
 
@@ -127,9 +145,12 @@ PY
   does not exist on disk. Usually a renamed or deleted file.
 - **Check 3 (external URLs)**: `FAIL` means the URL is unreachable or timed
   out. Some sites block HEAD requests — verify manually before removing a link.
-- **Check 4 (heading trap)**: every match is a line that Python-Markdown will
-  turn into a heading instead of a list item. The fix is to escape the hash
-  (`\#N`) or rephrase (`issue #N`).
+- **Check 4 (heading trap)**: every match is a real heading on the published
+  page that nobody wrote, sitting in the right-hand table of contents. The
+  printed text is the start of the promoted line — grep the source for it. Fix
+  by re-wrapping so the `#` reference is not the first character on its line,
+  or by writing it as `sales.demos#357`. `mkdocs build` never warns about
+  this, `--strict` included, which is why CI cannot catch it.
 
 ## When it finishes
 

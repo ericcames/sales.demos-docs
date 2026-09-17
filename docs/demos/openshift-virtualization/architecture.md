@@ -69,8 +69,9 @@ run-it-by-hand path.
 | VM size tier | `vm_size_tier` | `small` · `medium` · `large` | `small` |
 
 **There is deliberately no question for the operating system, and there used to
-be.** This table showed `os_type` with a `linux · windows · both` dropdown until
-#300 removed it and #301 removed the possibility behind it. With one Terraform
+be.** This table showed `os_type` with a `linux · windows · both` dropdown
+until #300 removed it and #301 removed the possibility behind it. With one
+Terraform
 state per environment, picking `windows` in that dropdown set `create_linux=false`
 and planned the *running* Linux VM for destruction — a way to delete the demo
 mid-demo. `os_type` is now pinned per template: `Linux Day 1 - 1 Provision`
