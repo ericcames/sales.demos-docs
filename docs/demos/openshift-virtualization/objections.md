@@ -72,8 +72,9 @@ deployment.
 is done (#340), so do not hedge *that*. Claiming a gap that has closed costs you
 as much credibility as claiming a capability you do not have.
 
-> **"CIS Level 1 hardened" is a supportable claim again.** It was struck while
-> #358 was open and a clone scored 33%. A clone scores **27 of 27 (100%)**, and
+> **"CIS Level 1 hardened" is a supportable claim again.** It was struck
+> while #358 was open and a clone scored 33%. A clone scores **27 of 27
+> (100%)**, and
 > the image itself reads 10 of 10 offline on controls that cannot exist on a
 > clean install. Say it — and still say what the percentage covers, per the note
 > below.

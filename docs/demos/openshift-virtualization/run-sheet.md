@@ -122,8 +122,8 @@ workflow, and a survey-enabled workflow rejects anything that is not one of its
 own questions. The dropdown with one entry is the seam the other providers land
 in, and it is honest about where the platform is today.
 
-**`How many VMs` stops at 2, and that number is not arbitrary.** It was 10 until
-#397. A `large` guest is 16 GiB against a 63 GiB budget, so three already
+**`How many VMs` stops at 2, and that number is not arbitrary.** It was 10
+until #397. A `large` guest is 16 GiB against a 63 GiB budget, so three already
 exceed it — eight of the ten values on offer had no outcome but being refused.
 If someone asks whether they could have twenty, the answer is that the ceiling is
 set where the hardware is, in six places that move together.

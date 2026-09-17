@@ -252,8 +252,8 @@ to decide whether an agent can POST, PATCH and DELETE:
 
 Measured on a working sandbox: **140 tools**, including
 `job_templates_launch_create`, `workflow_job_templates_launch_create` and
-`jobs_stdout_retrieve` — precisely steps 4 and 5 of the demo stories in #93 and
-#99.
+`jobs_stdout_retrieve` — precisely steps 4 and 5 of the demo stories in #93
+and #99.
 
 **This is not an ungoverned agent, and the distinction is worth stating.** #93's
 thesis is *"the MCP server reads; every write goes through an Ansible job
@@ -304,5 +304,5 @@ Automation Orchestrator has its own plan document:
 It covers the full arc — the #108 experiment that proved entitlement and found
 the PostgreSQL blocker, the #141 build phase that solved it with CloudNativePG
 (three databases, not the two the CRD documents), the #457 configuration phase
-that wired OIDC SSO and the AAP integration, the #468 deploy workflow, and the
-#464 MCP server. The footprint is 1.91 vCPU / 2.47 GiB.
+that wired OIDC SSO and the AAP integration, the #468 deploy workflow, and
+the #464 MCP server. The footprint is 1.91 vCPU / 2.47 GiB.
