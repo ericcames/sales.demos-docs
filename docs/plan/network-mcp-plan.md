@@ -300,7 +300,7 @@ guarantee rewriting them.
 
 **Foundation.** Depends on #92. The Decision C mechanism; the stdio→streamable
 HTTP + Route + auth pattern; the vault→Secret→pod credential path;
-`playbooks/mcp_server.yml`; a `sales-demos-mcp-deploy` skill; registering the
+`playbooks/mcp_server.yml`; a skill wrapping it; registering the
 endpoint in the laptop's Claude Code MCP configuration; and the read-only +
 AAP-write-path governance statement. If A4 or A5 wins, the collection-knowledge
 server lands here rather than in a vendor issue.

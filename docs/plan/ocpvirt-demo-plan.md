@@ -181,15 +181,15 @@ marketplace, no `plugin.json`. Tradeoff: project skills load only when you're wo
 support one repo, that is the correct scope. Leave `aap-skills` installed and untouched for
 your other demos.
 
-**Skills to build** (one per phase):
+**One skill per phase, each wrapping one playbook** — the skill does preflight checks and
+collects inputs, the playbook does the work, and neither duplicates the other.
 
-| Skill | Playbook | Does |
-|---|---|---|
-| `ocpvirt-setup` | `playbooks/setup.yml` | Phase 0 — bootstrap AAP *and* install CNV, self-contained |
-| `ocpvirt-provision` | `playbooks/provision_vm.yml` | Phase 1/3 — run Terraform, register hosts in AAP |
-| `ocpvirt-windows-image` | `playbooks/link_windows_image.yml` | Phase 2 — point CNV at the published golden image |
-| `ocpvirt-demo` | `playbooks/repair_linux_vm.yml` | Phase 4 — re-run the daily demo content on existing VMs |
-| `ocpvirt-teardown` | `playbooks/teardown.yml` | `terraform destroy`, leave CNV and golden image intact |
+*This used to enumerate the five skills by name, and the `ocpvirt-*` → `sales-demos-*`
+rename never reached it, so it named five that did not exist.* A plan doc cannot hold an
+accurate inventory of a directory in another repo that changes whenever a skill is added or
+renamed. The skills are listed where they change: [`.claude/skills/`](https://github.com/ericcames/sales.demos/tree/main/.claude/skills)
+and the skill table in the [`sales.demos` README](https://github.com/ericcames/sales.demos#-skills),
+which CI keeps in step with that directory.
 
 Follow the existing `aap-skills` SKILL.md shape: frontmatter `name` + `description` with
 explicit **TRIGGER** and **SKIP** clauses, then a Preflight Check section of shell one-liners
