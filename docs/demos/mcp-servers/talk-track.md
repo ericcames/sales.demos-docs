@@ -57,7 +57,7 @@ live.
 
 ---
 
-## Beat 2 · The six servers (3–6)
+## Beat 2 · The nine servers (3–6)
 
 Switch to the status table. Show it on screen or recite from
 [`server-inventory.md`](server-inventory.md):
@@ -69,12 +69,16 @@ Switch to the status table. Show it on screen or recite from
 | `openshift-edge` | OpenShift | stdio | read-write | 25 |
 | `aap-sandbox` | AAP | HTTP | read-write | ~140 |
 | `aap-demo` | AAP | HTTP | read-only | ~95 |
+| `portal-sandbox` | RHDH portal | HTTP | read-only | 4 |
+| `portal-demo` | RHDH portal | HTTP | read-only | 4 |
+| `ao-sandbox` | Automation Orchestrator | stdio | read-only | 32 |
 | `grafana` | Grafana Cloud | stdio | read-only (Viewer) | 81 |
 
-> **"Six servers. Three platforms — OpenShift, Ansible Automation Platform,
-> and Grafana Cloud. Three environments — sandbox, where I break things;
-> demo, where a customer watches; and edge, a single-node cluster on bare
-> metal. Demo is read-only on both platforms. Grafana Cloud is read-only
+> **"Nine servers. Five platforms — OpenShift, Ansible Automation Platform,
+> the self-service portal, Automation Orchestrator, and Grafana Cloud. Three
+> environments — sandbox, where I break things; demo, where a customer
+> watches; and edge, a single-node cluster on bare metal. Demo is read-only on
+> both platforms that have a demo instance. Grafana Cloud is read-only
 > everywhere — the service account is Viewer. That's not a setting I toggled —
 > on OpenShift it removes the tools. The server physically cannot accept a
 > delete request."**
@@ -239,7 +243,7 @@ gets no answer to any of them.
 
 ## If you only get ten minutes
 
-Keep Beats 1, 2, 4 and 6 — the live query, the six servers with the access
+Keep Beats 1, 2, 4 and 6 — the live query, the nine servers with the access
 posture, the governed write path, and the honest bits. Drop the rest.
 
 That is still a complete argument: reads everything, changes nothing except
@@ -253,7 +257,7 @@ Every claim in this track is checkable in the repo:
 
 | Claim | Source |
 |---|---|
-| Six servers, three platforms, three environments | `.mcp.json`, `SKILL.md`, `docs/plan/grafana-plan.md` |
+| Nine servers, five platforms, three environments | `.mcp.json` (seven) plus `ao-sandbox` and `grafana` at local scope; `SKILL.md`; `docs/plan/grafana-plan.md` |
 | Demo is read-only, sandbox is read-write | `.mcp.json` line 21 (`--read-only`), `inventory/group_vars/demo/mcp.yml` |
 | Nine mutating tools removed by `--read-only` | [`server-inventory.md`](server-inventory.md#the-nine-tools-read-only-removes) |
 | 25 tools on sandbox and edge, 16 on demo | Measured 2026-09-03 and 2026-09-09, [`server-inventory.md`](server-inventory.md) |

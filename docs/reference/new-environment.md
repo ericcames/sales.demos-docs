@@ -227,6 +227,8 @@ reads the credential files from Phase C and connects all servers:
 | `openshift-edge` | `.kube/edge.kubeconfig` |
 | `aap-sandbox` | `.aap/sandbox.token` + `.aap/sandbox.url` |
 | `aap-demo` | `.aap/demo.token` + `.aap/demo.url` |
+| `portal-sandbox` | `.portal/sandbox.token` + `.portal/sandbox.url` |
+| `portal-demo` | `.portal/demo.token` + `.portal/demo.url` |
 
 **Credential files must exist before Claude Code starts.** Claude Code does
 startup discovery for all `.mcp.json` servers; a server that fails at startup
@@ -238,6 +240,7 @@ Verify by calling a tool on the server you just repointed:
 ```
 mcp__openshift-<env>__namespaces_list   (fieldSelector=metadata.name=default)
 mcp__aap-<env>__me_list
+mcp__portal-<env>__fetch-catalog-entities   (limit=1)
 ```
 
 !!! warning "\"Connected\" does not mean \"Live\""
