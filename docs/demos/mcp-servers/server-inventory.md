@@ -6,12 +6,17 @@ audience sees the same view the assistant works from.
 
 ---
 
-## The seven servers at a glance
+## The nine servers at a glance
 
 Measured 2026-09-03 (OpenShift sandbox/demo, AAP), 2026-09-06 (Grafana),
-2026-09-09 (`openshift-edge`) and 2026-09-11 (`ao-sandbox`) against
-`kubernetes-mcp-server@0.0.66`, AAP 2.7 (controller 4.8.6), `mcp-grafana` via
-`uvx`, and `ao-mcp-server.py` (custom).
+2026-09-09 (`openshift-edge`), 2026-09-11 (`ao-sandbox`) and 2026-09-17
+(`portal-sandbox`) against `kubernetes-mcp-server@0.0.66`, AAP 2.7
+(controller 4.8.6), `mcp-grafana` via `uvx`, `ao-mcp-server.py` (custom), and
+RHDH's `software-catalog-mcp-tool` / `techdocs-mcp-tool` plugins.
+
+`portal-demo` and `ao-demo` could not be measured — the `demo` environment has
+been down since 2026-09-14. `portal-demo` runs the same two RHDH plugins as
+`portal-sandbox`, so its row is stated from `.mcp.json` rather than counted.
 
 | Server | Platform | Transport | Access | Tools | Auth | Source |
 |---|---|---|---|---|---|---|
@@ -20,6 +25,8 @@ Measured 2026-09-03 (OpenShift sandbox/demo, AAP), 2026-09-06 (Grafana),
 | `openshift-edge` | OpenShift | stdio (local) | read-write | 25 | kubeconfig | `.mcp.json` (committed) |
 | `aap-sandbox` | AAP | stdio → streamable HTTP (supergateway) | read-write | ~140 | bearer token | `.mcp.json` (committed) |
 | `aap-demo` | AAP | stdio → streamable HTTP (supergateway) | read-only | ~95 | bearer token | `.mcp.json` (committed) |
+| `portal-sandbox` | RHDH portal | stdio → streamable HTTP (supergateway) | read-only | 4 | static token | `.mcp.json` (committed) |
+| `portal-demo` | RHDH portal | stdio → streamable HTTP (supergateway) | read-only | 4 | static token | `.mcp.json` (committed) |
 | `ao-sandbox` | Automation Orchestrator | stdio (local) | read-only | 32 | admin password | `claude mcp add --scope local` |
 | `grafana` | Grafana Cloud | stdio (local) | read-only (Viewer) | 81 | SA token | `claude mcp add --scope local` |
 
@@ -41,14 +48,14 @@ velocity. Grafana is read-only by a different mechanism — the service account
 has the Viewer role, so write tools are exposed but the token lacks permission
 to execute them.
 
-**Seven is the whole list.** There is no ServiceNow, Dynatrace or network vendor
+**Nine is the whole list.** There is no ServiceNow, Dynatrace or network vendor
 server here, and the tables below are complete rather than abridged.
 
 **There is no `aap-edge` server.** `edge` runs AAP, but the MCP server for it
 has not been built: `utilities/make-aap-mcp.sh` takes only `sandbox` and
 `demo`, and it defaults anything that is not `demo` to **write** scope, so
 adding `edge` is a posture decision rather than a one-line change. If asked,
-say that plainly — three OpenShift servers, two AAP, one AO. For why
+say that plainly — three OpenShift servers, two AAP, two portal, one AO. For why
 ServiceNow is absent rather than pending, see [`servicenow.md`](servicenow.md);
 for what building one would take, [`building-a-server.md`](building-a-server.md).
 
@@ -188,6 +195,37 @@ surface.
 
 ---
 
+## Self-service portal MCP servers — 4 tools
+
+`portal-sandbox` and `portal-demo` expose the same four read-only tools. RHDH
+serves them natively from the `software-catalog-mcp-tool` and
+`techdocs-mcp-tool` plugins, which `playbooks/portal.yml` enables — nothing in
+this repo implements them.
+
+| Tool | Description |
+|---|---|
+| `fetch-catalog-entities` | List catalog entities — the Templates, Groups, Users and Locations the portal knows about |
+| `fetch-techdocs` | List the TechDocs a catalog entity publishes |
+| `retrieve-techdocs-content` | Read the content of a TechDocs page |
+| `analyze-techdocs-coverage` | Report which catalog entities have TechDocs and which do not |
+
+**Read-only by what the tools can do**, not by a flag. There is no write tool to
+remove — the plugins expose the software catalog and TechDocs, and neither can
+create, change or launch anything. That is a different mechanism from
+`openshift-demo`, where `--read-only` removes nine tools that otherwise exist,
+and from `grafana`, where the tools exist but the Viewer token cannot execute
+them. Worth keeping the three straight when asked.
+
+Measured against `portal-sandbox` on 2026-09-17: `fetch-catalog-entities`
+returned 53 entities, including the `Template` kinds the portal exists to
+surface. `portal-demo` is unmeasured — the `demo` environment has been down
+since 2026-09-14 — and runs the same two plugins.
+
+**There is no `portal-edge`.** The portal is deployed by `playbooks/portal.yml`
+into an RHDP environment; `edge` does not run it.
+
+---
+
 ## Automation Orchestrator MCP server — 32 tools
 
 Measured 2026-09-11. A custom Python server (`utilities/ao-mcp-server.py`)
@@ -282,6 +320,19 @@ curl -sk -H "Authorization: Bearer <token>" \
 curl -sk -X DELETE -H "Authorization: Bearer <token>" \
   https://<aap_hostname>/api/gateway/v1/tokens/<id>/
 ```
+
+### Self-service portal — static token
+
+`playbooks/portal.yml` generates a static bearer token when it deploys RHDH and
+stores it in the `portal-mcp-token` Secret in the cluster.
+`utilities/make-portal-mcp.sh <env>` reads it out and writes two gitignored
+files, `.portal/<env>.token` and `.portal/<env>.url`.
+`utilities/portal-mcp-stdio.sh <env>` reads those at launch and bridges stdio to
+the remote endpoint with `npx supergateway` — the same shape as the AAP servers
+since [sales.demos#515](https://github.com/ericcames/sales.demos/issues/515).
+
+`.mcp.json` names the paths, never the token. Cleanup is `rm -rf .portal/`; the
+token is regenerated by re-running the playbook, not recovered.
 
 ### Grafana Cloud — service account token
 
@@ -388,7 +439,7 @@ error is a pass.
 ### Confirm the client sees all servers
 
 ```bash
-claude mcp list   # all six servers should appear
+claude mcp list   # all nine servers should appear
 ```
 
 ---
