@@ -48,7 +48,7 @@ Leave it running, and it reloads on save. Ctrl-C stops it.
 > that path rather than failing, so either address works in a browser; any
 > other path 404s.
 
-One-time, if you do not already have it: `pip install --user mkdocs-material`.
+One-time, if you do not already have it: `pip install --user -r requirements.txt`.
 
 CI runs two required checks on every PR — `mkdocs-build` and `secret-guard` —
 and both must be clean before a PR merges. Neither one reads prose.

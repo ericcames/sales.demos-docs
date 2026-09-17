@@ -1,0 +1,15 @@
+# Pinned so the site builds the same way in CI, on Pages, and on a laptop.
+#
+# Unpinned, every build resolved mkdocs-material at whatever was latest. The
+# upstream project is warning that MkDocs 2.0 removes the plugin system and
+# breaks all theme overrides with no migration path — so an unpinned build
+# would have broken CI and the Pages deploy on a commit that changed nothing,
+# and the failure would have looked like it belonged to whatever PR was open.
+#
+# These are the versions the site is verified against: `mkdocs build --strict`
+# exits 0 with no warnings. Bump deliberately, in its own PR, and re-run the
+# strict build.
+mkdocs==1.6.1
+mkdocs-material==9.7.7
+mkdocs-material-extensions==1.3.1
+pymdown-extensions==11.0.2

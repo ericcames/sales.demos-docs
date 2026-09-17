@@ -32,7 +32,7 @@ Run from the repo root:
 
 ```bash
 echo "=== 1. Strict build ==="
-pip install mkdocs-material -q
+pip install -r requirements.txt -q
 mkdocs build --strict 2>&1
 
 echo ""
