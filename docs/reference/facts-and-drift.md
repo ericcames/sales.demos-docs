@@ -280,6 +280,50 @@ The job log and the report both count that list at runtime and tell you how many
 fields were compared, so read the number off a real run rather than from a
 document that can go stale.
 
+### Which changes matter
+
+Each compared field also carries a **severity**, set in the same file, with a
+one-line reason next to every entry:
+
+| Severity | Meaning | Examples |
+|---|---|---|
+| `investigate` | Nothing this repo runs should change it. Find out who did. | resources, addresses and DNS, SELinux, virtualization, hostname, CIS level |
+| `notable` | A deliberate act changes it. Worth seeing, not alarming. | provisioning tier and environment, golden image source, firmware strings |
+| `expected` | Routine Day 2 work changes it. | OS version, kernel, last boot |
+
+The job log lists changed rows most urgent first, labels each one, and gives the
+count at each level. This came from a real run on sandbox, after a reboot booted
+a kernel that Day 1 had installed:
+
+```
+3 field(s) changed since the last gather (1 investigate, 2 expected):
+[INVESTIGATE] resources.memory_mb: 15706 -> 15708
+[EXPECTED] os.kernel: 5.14.0-687.44.1.el9_8.x86_64 -> 5.14.0-687.49.1.el9_8.x86_64
+[EXPECTED] uptime.last_boot: 2026-09-18T20:28:00Z -> 2026-09-18T20:37:00Z
+```
+
+!!! warning "The memory row is a false alarm"
+
+    The VM's RAM did not change. The new kernel reserves a slightly different
+    amount of memory, so the memory the guest reports moved by 2 MB. Until
+    [sales.demos#663](https://github.com/ericcames/sales.demos/issues/663) is
+    fixed, a small `memory_mb` change right after a kernel update is expected.
+    A change of gigabytes is still worth investigating.
+
+`facts.html` shows the same label in a Severity column.
+
+**The severity is decided by Ansible, not by a model.** In
+[sales.demos#657](https://github.com/ericcames/sales.demos/issues/657), two
+Granite models were given the same drift and the same explicit labelling rules.
+The 3B model silently dropped a row. The 8B model labelled an unrequested
+doubling of RAM `expected` and made up a reason for it. Any AI narration added
+later will explain these labels, not set them.
+
+If you override the list, a plain field name with no severity is still accepted
+and counts as `notable`. A severity that is not one of the three fails the job
+and names the entry. Guessing would put a field in the wrong group without
+telling anyone.
+
 ---
 
 ## Checking it worked
@@ -330,3 +374,6 @@ above, not a bug.
 | `check_vm_assert_serving` never exercised | [sales.demos#649](https://github.com/ericcames/sales.demos/pull/649) — stated in the test report |
 | The four templates and the credential | [`controller_templates.yml`](https://github.com/ericcames/sales.demos/blob/main/inventory/group_vars/aap/controller_templates.yml), [`controller_credentials.yml`](https://github.com/ericcames/sales.demos/blob/main/inventory/group_vars/aap/controller_credentials.yml) |
 | The naming rule | [sales.demos#647](https://github.com/ericcames/sales.demos/issues/647) |
+| Severity levels, per-field reasons, bare-string fallback, fail on unknown | [`demo_facts/defaults/main.yml`](https://github.com/ericcames/sales.demos/blob/main/playbooks/roles/demo_facts/defaults/main.yml), [`demo_facts/tasks/compare.yml`](https://github.com/ericcames/sales.demos/blob/main/playbooks/roles/demo_facts/tasks/compare.yml); [sales.demos#662](https://github.com/ericcames/sales.demos/pull/662) |
+| The sample job log and the memory false alarm | sales.demos AAP sandbox job 311, 2026-09-18; [sales.demos#663](https://github.com/ericcames/sales.demos/issues/663) |
+| Neither Granite size followed the labelling rules | [sales.demos#657](https://github.com/ericcames/sales.demos/issues/657); [sales.demos#658](https://github.com/ericcames/sales.demos/issues/658) |
