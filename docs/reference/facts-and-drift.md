@@ -302,13 +302,14 @@ a kernel that Day 1 had installed:
 [EXPECTED] uptime.last_boot: 2026-09-18T20:28:00Z -> 2026-09-18T20:37:00Z
 ```
 
-!!! warning "The memory row is a false alarm"
-
-    The VM's RAM did not change. The new kernel reserves a slightly different
-    amount of memory, so the memory the guest reports moved by 2 MB. Until
-    [sales.demos#663](https://github.com/ericcames/sales.demos/issues/663) is
-    fixed, a small `memory_mb` change right after a kernel update is expected.
-    A change of gigabytes is still worth investigating.
+That memory row was a false alarm. The VM's RAM did not change. The new kernel
+reserves a slightly different amount of memory, so the memory the guest reports
+moved by 2 MB, and every patch cycle would have raised it.
+[sales.demos#664](https://github.com/ericcames/sales.demos/pull/664) fixed that
+with an optional **`tolerance_pct`** on a compared field: two numbers within that
+percentage do not count as a change. `memory_mb` uses 10%. The size tiers are 4,
+8 and 16 GiB, so any real resize is at least 50% away and is still reported as
+`investigate`. The report still shows the exact values.
 
 `facts.html` shows the same label in a Severity column.
 
@@ -376,4 +377,5 @@ above, not a bug.
 | The naming rule | [sales.demos#647](https://github.com/ericcames/sales.demos/issues/647) |
 | Severity levels, per-field reasons, bare-string fallback, fail on unknown | [`demo_facts/defaults/main.yml`](https://github.com/ericcames/sales.demos/blob/main/playbooks/roles/demo_facts/defaults/main.yml), [`demo_facts/tasks/compare.yml`](https://github.com/ericcames/sales.demos/blob/main/playbooks/roles/demo_facts/tasks/compare.yml); [sales.demos#662](https://github.com/ericcames/sales.demos/pull/662) |
 | The sample job log and the memory false alarm | sales.demos AAP sandbox job 311, 2026-09-18; [sales.demos#663](https://github.com/ericcames/sales.demos/issues/663) |
+| `tolerance_pct`, and 10% for `memory_mb` | [`demo_facts/defaults/main.yml`](https://github.com/ericcames/sales.demos/blob/main/playbooks/roles/demo_facts/defaults/main.yml); [sales.demos#664](https://github.com/ericcames/sales.demos/pull/664) |
 | Neither Granite size followed the labelling rules | [sales.demos#657](https://github.com/ericcames/sales.demos/issues/657); [sales.demos#658](https://github.com/ericcames/sales.demos/issues/658) |
