@@ -21,6 +21,7 @@ is the front door; these pages are the detail behind it.
 | [Execution environment](execution-environment.md) | A job template fails in a way a laptop run does not reproduce |
 | [Reusing this repo](reusing-this-repo.md) | You cloned or forked it and want it pointed at your own cluster |
 | [Repo layout](repo-layout.md) | You are looking for a file, or wondering why `secrets.yml` or `local.yml` is not where you would guess |
+| [Conventions rationale](conventions-rationale.md) | A `CLAUDE.md` rule cites a history you want to read, or you want to argue a convention should change |
 | [Project history](history/README.md) | You followed a reference to a `CHANGELOG.md` that no longer exists, or want the reasoning behind a past decision |
 
 ---

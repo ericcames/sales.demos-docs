@@ -134,6 +134,7 @@ nav:
       - Execution Environment: reference/execution-environment.md
       - Reusing This Repo: reference/reusing-this-repo.md
       - Repo Layout: reference/repo-layout.md
+      - Conventions Rationale: reference/conventions-rationale.md
       - Project History:
           - Overview: reference/history/README.md
           - sales.demos: reference/history/sales-demos.md
