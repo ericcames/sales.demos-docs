@@ -4,8 +4,9 @@ Talk tracks for the demos in this repo. One directory per use case, each with
 the same five documents.
 
 **These are written for the pre-sales engineer presenting**, not for the person
-building the automation. For *why* something is built the way it is, read
-[`docs/plan/`](../plan/). Different readers, different lifecycles.
+building the automation. For *why* something is built the way it is, read the design plans — start
+with [OpenShift Virtualization](../plan/ocpvirt-demo-plan.md). Different
+readers, different lifecycles.
 
 ---
 
@@ -13,12 +14,12 @@ building the automation. For *why* something is built the way it is, read
 
 | Use case | Audience | Length | Status |
 |---|---|---|---|
-| [OpenShift Virtualization](openshift-virtualization/) | Linux / platform sysadmins | 30 min | **Ready** |
-| [Private Automation Hub — ClickOps vs. configuration-as-code](private-automation-hub/) | Sysadmins and automation leads | 30 min | **Draft** ([#68](https://github.com/ericcames/sales.demos/issues/68)) |
-| [MCP Servers — Agentic Automation with Governance](mcp-servers/) | Platform engineers and automation leads | 20 min | **Draft** ([#153](https://github.com/ericcames/sales.demos/issues/153)) |
-| [Automation Orchestrator](automation-orchestrator/) | Platform engineers and automation leads | 20 min | **Ready** |
-| [Edge / Single Node OpenShift](edge-sno/) | Platform engineers and edge infrastructure architects | Setup ~90 min hands-on; the demo itself is the 30 min OCP Virt track | **Ready** |
-| [Observability — Grafana Cloud](observability/grafana/) | Platform engineers, SREs and automation leads | 20 min | **Ready** ([#82](https://github.com/ericcames/sales.demos-docs/issues/82)) |
+| [OpenShift Virtualization](openshift-virtualization/README.md) | Linux / platform sysadmins | 30 min | **Ready** |
+| [Private Automation Hub — ClickOps vs. configuration-as-code](private-automation-hub/README.md) | Sysadmins and automation leads | 30 min | **Draft** ([#68](https://github.com/ericcames/sales.demos/issues/68)) |
+| [MCP Servers — Agentic Automation with Governance](mcp-servers/README.md) | Platform engineers and automation leads | 20 min | **Draft** ([#153](https://github.com/ericcames/sales.demos/issues/153)) |
+| [Automation Orchestrator](automation-orchestrator/README.md) | Platform engineers and automation leads | 20 min | **Ready** |
+| [Edge / Single Node OpenShift](edge-sno/README.md) | Platform engineers and edge infrastructure architects | Setup ~90 min hands-on; the demo itself is the 30 min OCP Virt track | **Ready** |
+| [Observability — Grafana Cloud](observability/grafana/README.md) | Platform engineers, SREs and automation leads | 20 min | **Ready** ([#82](https://github.com/ericcames/sales.demos-docs/issues/82)) |
 
 ---
 

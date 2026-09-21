@@ -9,7 +9,7 @@ required. The narrative behind each beat, with the actual words, is in
 | **Length** | 30 minutes (25 + 5 for questions) |
 | **Audience** | Linux/platform sysadmins who want to run their estate with AAP |
 | **Needs an environment?** | **No.** Every artifact below is in this repo |
-| **Assets** | Eight images in [`docs/images/`](../../images/), the two banners and `facts.json` in [`talk-track.md`](talk-track.md), the Mermaid graph in [`architecture.md`](architecture.md) |
+| **Assets** | Eight images in `docs/images/`, the two banners and `facts.json` in [`talk-track.md`](talk-track.md), the Mermaid graph in [`architecture.md`](architecture.md) |
 
 ---
 

@@ -9,7 +9,7 @@ part takes.
 
 This describes the demo as it is *shown*. For **why** it is built this way — the
 research, the decisions, and the ones that were reversed — read
-[`docs/plan/`](../../plan/).
+[`docs/plan/`](../../plan/ocpvirt-demo-plan.md).
 
 ---
 
