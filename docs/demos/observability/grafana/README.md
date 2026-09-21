@@ -110,6 +110,6 @@ Two clusters answering and five rules at *Normal* means you are ready.
 
 ## Related
 
-- [`../../mcp-servers/`](../../mcp-servers/) — the wider MCP story this demo is one server of
+- [`../../mcp-servers/`](../../mcp-servers/README.md) — the wider MCP story this demo is one server of
 - [`../../../plan/grafana-plan.md`](../../../plan/grafana-plan.md) — why the automation is built this way
 - [`ROADMAP.md`](https://github.com/ericcames/sales.demos/blob/main/ROADMAP.md) — what is done and what is not

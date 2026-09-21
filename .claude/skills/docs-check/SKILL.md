@@ -1,6 +1,6 @@
 ---
 name: docs-check
-description: "Run site quality checks that CI does not — strict mkdocs build, broken relative links, dead external URLs, and the Python-Markdown heading trap. TRIGGER when: the user asks to check, lint, or validate the docs site, wants to find broken links, asks why a page TOC is wrong, or is about to push a docs change and wants a pre-merge check. SKIP: if the user wants to build and serve the site locally for reading — just run mkdocs serve."
+description: "Run site quality checks that CI does not — strict mkdocs build, links resolved against the published site, dead external URLs, and the Python-Markdown heading trap. TRIGGER when: the user asks to check, lint, or validate the docs site, wants to find broken links, asks why a page TOC is wrong, or is about to push a docs change and wants a pre-merge check. SKIP: if the user wants to build and serve the site locally for reading — just run mkdocs serve."
 ---
 
 # docs-check
@@ -16,10 +16,26 @@ Takes about **30 seconds** for a full run.
 1. **Strict build** — `mkdocs build --strict` turns warnings into errors.
    Catches undefined cross-references, missing nav entries, and invalid
    markdown extensions.
-2. **Broken relative links** — resolves every relative link in every markdown
-   file and reports ones that point to files that do not exist.
-3. **Dead external URLs** — HEAD-checks every `https://` URL in the docs and
-   reports ones that return non-200.
+2. **Broken links, resolved against the published site** — `utilities/check-links.py`.
+   It reads the built `site/` tree and resolves every in-content link against
+   the URL each page is *served at*, not against the source file's directory.
+
+   **That distinction is the whole check.** `use_directory_urls` puts every
+   page one level deeper than its source file. MkDocs rewrites `.md` links and
+   media `src` attributes to compensate, but passes a bare directory path
+   through untouched — so `[demo](../demos/edge-sno/)` written in
+   `docs/image-factory/sno-kit.md` is served from `/image-factory/sno-kit/`
+   and lands on `/image-factory/demos/edge-sno/`, which does not exist.
+
+   The version of this check that lived here until #108 did
+   `(md.parent / target).resolve().exists()` against `docs/`. Since
+   `docs/demos/edge-sno` exists on disk, it passed. Four links of exactly that
+   shape were live on the published site, and no number of runs would ever
+   have found them. Only the built tree knows.
+
+3. **Dead external URLs** — `utilities/check-links.py --external`. Uses GET,
+   not HEAD: several `redhat.com` pages reject HEAD with a 4xx and a
+   HEAD-only check reports them as dead.
 4. **The heading trap** — Python-Markdown's `lenient` ATX heading parser
    (which mkdocs-material enables by default) turns a line beginning with `#`
    plus a digit into an `<h1>`, so a wrapped sentence whose line happens to
@@ -43,68 +59,11 @@ Run from the repo root:
 echo "=== 1. Strict build ==="
 pip install -r requirements.txt -q
 mkdocs build --strict 2>&1
+# Checks 2 and 4 both read the site/ tree this produces.
 
 echo ""
-echo "=== 2. Broken relative links ==="
-python3 - <<'PY'
-import pathlib, re
-
-docs = pathlib.Path("docs")
-bad = 0
-for md in sorted(docs.rglob("*.md")):
-    content = md.read_text(errors="replace")
-    for m in re.finditer(r'\[([^\]]*)\]\(([^)]+)\)', content):
-        target = m.group(2)
-        if target.startswith(("http://", "https://", "mailto:", "#")):
-            continue
-        frag = ""
-        if "#" in target:
-            target, frag = target.rsplit("#", 1)
-        if not target:
-            continue
-        resolved = (md.parent / target).resolve()
-        if not resolved.exists():
-            print(f"  BROKEN: {md}  ->  {m.group(2)}")
-            bad += 1
-if bad:
-    print(f"\n{bad} broken relative link(s)")
-else:
-    print("All relative links resolve.")
-PY
-
-echo ""
-echo "=== 3. Dead external URLs ==="
-python3 - <<'PY'
-import pathlib, re, urllib.request, ssl, sys
-
-ctx = ssl.create_default_context()
-ctx.check_hostname = False
-ctx.verify_mode = ssl.CERT_NONE
-
-docs = pathlib.Path("docs")
-seen = set()
-dead = 0
-for md in sorted(docs.rglob("*.md")):
-    for url in re.findall(r'https?://[^\s)\]>"]+', md.read_text(errors="replace")):
-        url = url.rstrip(".,;:!?")
-        if url in seen:
-            continue
-        seen.add(url)
-        try:
-            req = urllib.request.Request(url, method="HEAD",
-                headers={"User-Agent": "docs-check/1.0"})
-            resp = urllib.request.urlopen(req, context=ctx, timeout=10)
-            if resp.status >= 400:
-                print(f"  {resp.status}: {url}")
-                dead += 1
-        except Exception as e:
-            print(f"  FAIL: {url}  ({e})")
-            dead += 1
-if dead:
-    print(f"\n{dead} dead or unreachable URL(s)")
-else:
-    print("All external URLs reachable.")
-PY
+echo "=== 2 + 3. Links (resolved against the published site) ==="
+python3 utilities/check-links.py --no-build --external
 
 echo ""
 echo "=== 4. Heading trap (spurious <h1> in the built site) ==="
@@ -141,10 +100,16 @@ PY
 - **Check 1 (strict build)**: any output line starting with `WARNING` or
   `ERROR` is a real problem. Common: undefined cross-references from a nav
   entry pointing at a page that was moved.
-- **Check 2 (relative links)**: every `BROKEN` line is a link whose target
-  does not exist on disk. Usually a renamed or deleted file.
-- **Check 3 (external URLs)**: `FAIL` means the URL is unreachable or timed
-  out. Some sites block HEAD requests — verify manually before removing a link.
+- **Check 2 (links)**: every `BROKEN` line prints the page, the link as
+  written, and the URL it actually resolves to. If the target looks like it
+  should exist, the link is almost always a bare directory path — point it at
+  the `.md` file instead (`../demos/edge-sno/README.md`), which is the form
+  mkdocs validates and rewrites. `mkdocs build` also prints
+  `unrecognized relative link ... Did you mean 'X/README.md'?` for the
+  forward-relative version of the same mistake; that log should stay empty.
+- **Check 3 (external URLs)**: a status code or `FAIL` means unreachable.
+  `docs.redhat.com` restructures its slugs between versions, so never write
+  one from memory — add it, then run this.
 - **Check 4 (heading trap)**: every match is a real heading on the published
   page that nobody wrote, sitting in the right-hand table of contents. The
   printed text is the start of the promoted line — grep the source for it. Fix

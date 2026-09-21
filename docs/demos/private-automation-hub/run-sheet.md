@@ -10,7 +10,7 @@ that, present from this. The full click-by-click for the ClickOps half is in
 | **Length** | 30 minutes (26 + 4 for questions) |
 | **Audience** | Systems administrators and automation leads. Assumes no Private Automation Hub experience |
 | **Needs an environment?** | **Yes** for the live version. A populated PAH plus the repo. The offline version is in [`architecture.md`](architecture.md) |
-| **Assets** | `hub/*-requirements.yml`, `inventory/group_vars/aap/hub_collection_*.yml`, `utilities/refresh-hub-requirements.py`, five images in [`docs/images/`](../../images/) |
+| **Assets** | `hub/*-requirements.yml`, `inventory/group_vars/aap/hub_collection_*.yml`, `utilities/refresh-hub-requirements.py`, five images in `docs/images/` |
 
 ---
 

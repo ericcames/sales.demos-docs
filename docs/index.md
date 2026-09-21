@@ -32,5 +32,5 @@ come from, the compliance evidence behind them, and
 |---|---|
 | [sales.demos](https://github.com/ericcames/sales.demos) | The automation code — playbooks, inventory, skills |
 | [sales.demos-docs](https://github.com/ericcames/sales.demos-docs) | This repo — the markdown source for this site |
-| [image.builder.pipeline](https://github.com/ericcames/image.builder.pipeline) | The [image factory](image-factory/) — CIS-hardened RHEL and Windows images, plus the evidence |
+| [image.builder.pipeline](https://github.com/ericcames/image.builder.pipeline) | The [image factory](image-factory/README.md) — CIS-hardened RHEL and Windows images, plus the evidence |
 | [Sales Demos (Google Drive)](https://drive.google.com/drive/folders/1Me_blEFV-xHUyZeL48F0GjCyWl3_KSxG) | Marketing content — key messages, Gemini prompts, Red Hat product links |

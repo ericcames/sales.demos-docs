@@ -122,7 +122,7 @@ hardware minimums, operator channels.
 
 This page covers **building** the installer. For running the demo on the cluster
 it produces — the run sheet, the talk track, the objections — see the
-[Edge / Single Node OpenShift demo](../demos/edge-sno/).
+[Edge / Single Node OpenShift demo](../demos/edge-sno/README.md).
 
 Producer here, consumer there, the same split as everything else in this
 factory.

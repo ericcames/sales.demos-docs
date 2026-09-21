@@ -5,7 +5,7 @@ platform, and an AI assistant that can read them.
 
 | Demo | What it shows | Status |
 |---|---|---|
-| [Grafana Cloud](grafana/) | Ansible instruments OpenShift, OpenShift Virtualization and AAP, pushes a dashboard and alert rules as code, and Claude reads the result through a read-only MCP server | **Ready** — captured on sandbox 2026-09-15 |
+| [Grafana Cloud](grafana/README.md) | Ansible instruments OpenShift, OpenShift Virtualization and AAP, pushes a dashboard and alert rules as code, and Claude reads the result through a read-only MCP server | **Ready** — captured on sandbox 2026-09-15 |
 
 Other observability platforms go beside `grafana/` here, one directory each. The
 Dynatrace idea is tracked in

@@ -81,6 +81,6 @@ workflow, three secrets, and the failure modes worth recognising.
 
 ## Related
 
-- [OpenShift Virtualization demo](../demos/openshift-virtualization/) — boots what this factory produces
-- [Edge / Single Node OpenShift demo](../demos/edge-sno/) — presenting the cluster the [SNO kit](sno-kit.md) installs
+- [OpenShift Virtualization demo](../demos/openshift-virtualization/README.md) — boots what this factory produces
+- [Edge / Single Node OpenShift demo](../demos/edge-sno/README.md) — presenting the cluster the [SNO kit](sno-kit.md) installs
 - [`docs/design.md`](https://github.com/ericcames/image.builder.pipeline/blob/main/docs/design.md) — the cross-repo contract, cited by section number from three repos
