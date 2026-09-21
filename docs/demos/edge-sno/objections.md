@@ -99,6 +99,49 @@ vault-encrypted `secrets.yml`, local only, never tracked. See
 
 ---
 
+## "Why single-node and not MicroShift, two-node, or a compact cluster?"
+
+**Expect this first from anyone who does edge for a living**, and know that
+"one node or three" is no longer the choice. Red Hat ships two topologies
+between them.
+
+| Topology | Minimum hardware | HA | Kubernetes |
+|---|---|---|---|
+| RHEL (Podman/KVM) | 1 core / 1.5 GB / 10 GB | No | No |
+| Red Hat Device Edge + MicroShift | 2 cores / 2 GB / 10 GB | No | Yes |
+| **Single-node OpenShift** | **2 cores (4 vCPU) / 16 GB / 120 GB** | No | Yes |
+| 2-node OpenShift with fencing | 2 server-class nodes with a BMC | Yes | Yes |
+| 2-node OpenShift with arbiter | 2 server-class + a NUC-class arbiter (1 core / 8 GB / 120 GB) | Yes | Yes |
+| 3-node compact cluster | 3 server-class nodes | Yes | Yes |
+
+Source: [Red Hat edge platforms: choosing the right one](https://developers.redhat.com/articles/2026/09/11/red-hat-edge-platforms-choosing-right-one-your-use-case)
+and [Matching edge topologies to your physical footprint](https://developers.redhat.com/articles/2026/09/18/matching-openshift-edge-topologies-your-physical-footprint),
+Daniel Froehlich, September 2026.
+
+> **"Single-node OpenShift is the smallest footprint that is still a full
+> OpenShift — the whole API, the operator ecosystem, Virtualization, the same
+> automation as your datacenter. If you need that on one box, this is the
+> answer. If you're running a handful of containers and don't need the API
+> surface, MicroShift on Red Hat Device Edge is a much smaller ask — two cores
+> and two gig. And if you need high availability, you don't have to jump
+> straight to three nodes any more: there's two-node with fencing, and two-node
+> with an arbiter that can be a NUC."**
+
+**The rule of thumb from the same article**, if they ask where the line is:
+a handful of containers means Podman; more than about ten microservices means
+Kubernetes.
+
+**What decides it is not size, it is whether they need the full platform.**
+This demo runs AAP and OpenShift Virtualization on the node. Neither runs on
+MicroShift. That is the honest reason single-node is the floor *here* — not
+that smaller is impossible.
+
+**Do not claim SNO is highly available.** It is one node. The row above says
+`No` and so should you. If HA is a requirement, the conversation moves to
+two-node or compact, and that is a better outcome than overselling this.
+
+---
+
 ## "Is this production-ready?"
 
 **Answer honestly.**
@@ -186,3 +229,9 @@ supported up to 100 connections and 100 GB; past that you move it out.
   scale.
 - **"The same as production."** It is the same automation. It is not the same
   infrastructure. Say which one you mean.
+- **"One node or three."** Not true since the two-node topologies shipped. The
+  ladder has six rungs and two of them sit between those numbers. Get it right
+  or do not reach for it.
+- **"It's highly available."** It is one node. Single-node OpenShift is `No`
+  in Red Hat's own HA column. If they need HA, that is a different topology and
+  a better conversation than a claim you cannot support.

@@ -27,9 +27,18 @@ that Kubernetes belongs at the edge.
 | Cloud-scale numbers | What happens when the network goes down |
 | Product roadmap slides | Whether the thing they are looking at is real |
 
-**Do not oversell the edge story.** SNO is a specific topology for a specific
-use case. It is not "OpenShift everywhere" — it is OpenShift where you need
-one node and cannot afford three. Say that.
+**Do not oversell the edge story.** Single-node OpenShift is a specific
+topology for a specific use case. It is not "OpenShift everywhere" — it is the
+smallest footprint that is still a *full* OpenShift. Say that.
+
+**"One node or three" is out of date, so do not say it.** Red Hat's ladder now
+runs Podman → MicroShift on Red Hat Device Edge → single-node → two-node with
+fencing → two-node with an arbiter → three-node compact. Anyone who has read
+[Matching edge topologies to your physical footprint](https://developers.redhat.com/articles/2026/09/18/matching-openshift-edge-topologies-your-physical-footprint)
+knows there are two high-availability options below a compact cluster, and
+claiming otherwise is the fastest way to lose an architect. The full table and
+the words to use are in
+[`objections.md`](objections.md#why-single-node-and-not-microshift-two-node-or-a-compact-cluster).
 
 ---
 
@@ -181,4 +190,7 @@ graph, the survey. The edge story stands on its own without a live VM build.
 | Its tested sizing: 32 GB, 16 CPUs, 128 GB, 3000 IOPS | Same page, table 1 |
 | Every AAP component is a separate container on the one node | Same page, table 2 — controller, hub, EDA, gateway, metrics, database and Redis pods |
 | Red Hat's single-node OpenShift minimum is 4 vCPU / 16 GB / 120 GB | [Matching edge topologies](https://developers.redhat.com/articles/2026/09/18/matching-openshift-edge-topologies-your-physical-footprint), Daniel Froehlich, 2026-09-18 |
+| Where single-node sits: Podman → MicroShift → single-node → 2-node fencing → 2-node arbiter → compact | [Choosing the right edge platform](https://developers.redhat.com/articles/2026/09/11/red-hat-edge-platforms-choosing-right-one-your-use-case), Daniel Froehlich, 2026-09-11 |
+| Single-node OpenShift is not highly available | Same article — the HA column reads `No` |
+| MicroShift's floor is 2 cores / 2 GB / 10 GB | Same article, comparison table |
 | RHACM and ZTP are the fleet answer | [ZTP](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/edge_computing/ztp-deploying-far-edge-clusters-at-scale), [RHACM](https://docs.redhat.com/en/documentation/red_hat_advanced_cluster_management_for_kubernetes/2.14) |
