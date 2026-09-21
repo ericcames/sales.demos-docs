@@ -50,6 +50,20 @@ If the hardware is not in the room (remote meeting), show the node detail
 in the OpenShift console instead. The CPU/memory/storage numbers are real
 either way.
 
+**The sentence that does the most work here**, if they look skeptical about a
+box that small:
+
+> **"And this isn't me shrinking a real deployment to fit a demo. Red Hat's
+> documented getting-started topology for Ansible Automation Platform on
+> OpenShift is tested on Single Node OpenShift. This is the shape they test."**
+
+**Why it lands.** It converts the NUC from a prop into evidence. Everything —
+controller, hub, EDA, the gateway, the database — is a separate container on
+that one node, which is what the topology describes. If they want the
+reference afterwards, it is the
+[Operator growth topology](https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.7/plan-ref_ocp_a_env_a)
+page.
+
 **Transition:** *"Let me show you what it's running."*
 
 ---
@@ -78,6 +92,10 @@ say the honest caveat:
 > and Zero Touch Provisioning rather than USB drives. What this shows is that
 > the platform itself deploys unattended, which is the prerequisite for any
 > of those tools."**
+
+([ZTP](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/edge_computing/ztp-deploying-far-edge-clusters-at-scale),
+[RHACM](https://docs.redhat.com/en/documentation/red_hat_advanced_cluster_management_for_kubernetes/2.14)
+— have both open in a tab.)
 
 **Transition:** *"Once the cluster is up, it gets the same automation as
 our cloud environments."*
@@ -159,3 +177,8 @@ graph, the survey. The edge story stands on its own without a live VM build.
 | "One YAML file" difference per environment | `inventory/group_vars/<env>/connection.yml` |
 | Partition layout and `growpart` behavior | `image.builder.pipeline/docs/design.md` section 11.6 |
 | DNS setup | `image.builder.pipeline/docs/design.md` section 11.9 |
+| AAP on SNO is a Red Hat tested topology | [Operator growth topology](https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.7/plan-ref_ocp_a_env_a) — *"Red Hat tests a Single Node OpenShift (SNO) cluster"* |
+| Its tested sizing: 32 GB, 16 CPUs, 128 GB, 3000 IOPS | Same page, table 1 |
+| Every AAP component is a separate container on the one node | Same page, table 2 — controller, hub, EDA, gateway, metrics, database and Redis pods |
+| Red Hat's single-node OpenShift minimum is 4 vCPU / 16 GB / 120 GB | [Matching edge topologies](https://developers.redhat.com/articles/2026/09/18/matching-openshift-edge-topologies-your-physical-footprint), Daniel Froehlich, 2026-09-18 |
+| RHACM and ZTP are the fleet answer | [ZTP](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/edge_computing/ztp-deploying-far-edge-clusters-at-scale), [RHACM](https://docs.redhat.com/en/documentation/red_hat_advanced_cluster_management_for_kubernetes/2.14) |

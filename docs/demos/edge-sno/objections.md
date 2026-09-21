@@ -121,13 +121,41 @@ vault-encrypted `secrets.yml`, local only, never tracked. See
 > demonstrates is that the platform deploys unattended, which is the prerequisite
 > for ZTP."**
 
+Send them to [Zero Touch Provisioning](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/edge_computing/ztp-deploying-far-edge-clusters-at-scale)
+and [Red Hat Advanced Cluster Management](https://docs.redhat.com/en/documentation/red_hat_advanced_cluster_management_for_kubernetes/2.14).
+
 ---
 
 ## "Can I have this?"
 
+**Two different people ask this. Hear which one it is.**
+
+*Another SE who wants the demo:*
+
 > **"Yes. Both repos are public. Clone them, follow the run sheet, and you'll
 > have your own environment. The run sheet is written for someone doing it for
 > the first time."**
+
+*A customer who wants AAP on OpenShift:* they do not want our automation, they
+want a supported path. Give them Red Hat's, not ours.
+
+> **"What you're looking at is Red Hat's Operator growth topology — the
+> documented getting-started deployment for AAP on OpenShift. Red Hat tests it
+> on Single Node OpenShift, 32 gig, 16 CPUs, 128 gig of disk. Start at the
+> planning guide, install the operator from OperatorHub, and you're on the same
+> path. Our repos just show you what it looks like fully automated."**
+
+| Send them to | For |
+|---|---|
+| [Operator growth topology](https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.7/plan-ref_ocp_a_env_a) | The topology and its sizing |
+| [Plan your installation on OpenShift](https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.7/install-assembly_operator_install_planning) | What to decide before starting |
+| [Choose an installation type](https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.7/install-con_choosing_installation_type) | Operator vs. containerized vs. RPM |
+| [Install through OperatorHub](https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.7/install-assembly_install_aap_operator) | The procedure itself |
+
+**If they ask whether all of it really fits on one node:** yes, and that is the
+documented shape. Controller, hub, EDA, gateway, metrics, PostgreSQL and Redis
+are separate containers on the same node. The operator-managed database is
+supported up to 100 connections and 100 GB; past that you move it out.
 
 ---
 

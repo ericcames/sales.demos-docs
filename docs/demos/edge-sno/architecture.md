@@ -110,6 +110,22 @@ Configurable: set `sno_root_partition_size_gb` to adjust the split. Set it to
 
 ## Manual AAP deployment
 
+Every field below is documented in
+[Customize your AAP Operator](https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.7/install-assembly_operator_customize_aap);
+the shape it produces is Red Hat's
+[Operator growth topology](https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.7/plan-ref_ocp_a_env_a).
+
+**Everything lands on the one node, as separate containers.** Controller web
+and task, hub web/API/content/worker, EDA API and workers, the platform
+gateway, metrics, PostgreSQL and Redis are each their own pod — that is the
+topology, not a compromise we made to fit a NUC. It is the answer to *"surely
+you need more than one box for all of that."*
+
+The operator-managed PostgreSQL has a default `max_connections` of 100 and a
+100 GB ceiling, and Red Hat's guidance is to move to an external database only
+past those limits. A demo environment is nowhere near either, so nothing here
+cuts a corner.
+
 Until `install_aap.yml` ships ([#395](https://github.com/ericcames/sales.demos/issues/395)),
 create the CR manually:
 
@@ -134,6 +150,9 @@ spec:
     disabled: true
 EOF
 ```
+
+`file_storage_storage_class: lvms-vg1` is the SNO-specific part — LVMS is the
+storage this cluster has.
 
 Wait for all components:
 
@@ -187,17 +206,29 @@ the DNS records and making the cluster unreachable. Static IP is the default.
 
 ## Hardware minimums
 
-From `sno_defaults.yml`:
+**There are three different numbers here and they are not interchangeable.**
+Quote the one you mean.
 
-| Resource | Minimum | Recommended |
-|---|---|---|
-| RAM | 32 GB | 64 GB (leaves room for demo VMs) |
-| Disk | 120 GB | 500 GB+ (200 GB root + LVMS for VM disks) |
-| CPUs | 8 | 12+ |
+| Whose number | RAM | CPUs | Disk | Source |
+|---|---|---|---|---|
+| Red Hat single-node OpenShift minimum | 16 GB | 4 vCPU | 120 GB | [Matching edge topologies](https://developers.redhat.com/articles/2026/09/18/matching-openshift-edge-topologies-your-physical-footprint), 2026-09-18 |
+| Red Hat **tested** AAP growth topology | 32 GB | **16** | 128 GB, 3000 IOPS | [Operator growth topology](https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.7/plan-ref_ocp_a_env_a) |
+| This kit | 32 GB | 8 | 120 GB | `sno_defaults.yml` |
+| This kit, recommended | 64 GB | 12+ | 500 GB+ (200 GB root + LVMS for VM disks) | `sno_defaults.yml` |
+| The NUC it was proven on | 64 GB | 12 | 953 GB SATA SSD | measured 2026-09-09 |
 
-**Tested on:** Intel NUC, 12 CPUs, 64 GB RAM, 953 GB SATA SSD. Any x86_64
-hardware meeting the minimums should work — the ISO generator parameterizes
-everything hardware-specific.
+The first row is what OpenShift itself needs. The second is what Red Hat tests
+**AAP on OpenShift** against, and it is the one a customer planning their own
+deployment should size to — the metrics service alone adds roughly 3.5 Gi of
+RAM request (7 Gi limit) before CNV and the demo VMs exist.
+
+**Be straight about the gap.** The NUC runs 12 CPUs and this kit's floor is 8,
+both under Red Hat's tested 16. The demo is reliable at 12 — it is not the
+tested configuration, and a customer who opens the growth topology page will
+work that out in about ten seconds. Say it first.
+
+Any x86_64 hardware meeting the minimums should work — the ISO generator
+parameterizes everything hardware-specific.
 
 ---
 
