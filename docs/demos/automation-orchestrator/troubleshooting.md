@@ -120,8 +120,17 @@ integration was Enabled, AO listed 36 templates — while three were broken.
 - **Where:** the condition step, after `scan` succeeded (execution `6df4f502`,
   after scan job 89).
 - **Cause:** AO has no boolean literals. `… .compliant} == false` is read as a
-  reference to a step named `false`.
-- **Fix:** compare a number: `${activity_<id>.artifacts.windows_compliance.fail} > 0`.
+  reference to a step named `false`. `ao-worker` strips each `${…}` and
+  evaluates what is left as a restricted Python expression. A bare word is a
+  name, looked up as a step. A **quoted** string is a value and compares
+  normally (read in `workflow_engine/unified_eval.py`, 2026-09-22).
+- **Fix:** compare a number,
+  `${activity_<id>.artifacts.windows_compliance.fail} > 0`, or a quoted
+  string, `${activity_decide.result.content.template} == "Linux Day 2 - Fix SELinux"`
+  ([sales.demos#802](https://github.com/ericcames/sales.demos/issues/802)).
+- **Saving does not catch it.** `POST /api/v1/workflows/validate` accepts
+  `== false` and `== none` as readily as `== "none"`. Only a run, or **Run
+  step**, shows the difference.
 - **To check a condition without a full run**, open it and click **Run step**.
   It re-runs the steps before it and shows `evaluated_result` (execution
   `47aa8132`, `mode: test`, AAP job 92).
@@ -132,6 +141,34 @@ integration was Enabled, AO listed 36 templates — while three were broken.
   unconnected.
 - **Fix:** run `Windows Day 2 - Break Compliance` (limit `windemo`, about 7 s),
   or let `/sales-demos-orchestrator-rehearse` do it.
+
+### The drift run ends at `drift_check` without asking for approval
+
+- **Cause:** the host is compliant. `decide` answered `template: "none"`, and
+  `drift_check` passes only when `decide` proposes `Linux Day 2 - Fix SELinux`,
+  the one template `remediate` runs. **False** is unconnected on purpose, so a
+  compliant host, a misspelling, or an invented template name all end the run
+  instead of asking to approve nothing
+  ([sales.demos#802](https://github.com/ericcames/sales.demos/issues/802)).
+- **Fix:** inject drift first. Run `setenforce 0` on the Linux guest, **once**.
+
+### One drift injection starts two or three runs
+
+- **Cause:** fixed in
+  [sales.demos#806](https://github.com/ericcames/sales.demos/pull/806). The
+  workflow's own `gather` and `verify` steps posted to the EDA webhook. `gather`
+  saw the drift the run was started for, and `verify` saw the fix. EDA's rule
+  audit showed the loop: one `setenforce 0` produced three firings, 15 s and
+  3 min apart ([sales.demos#803](https://github.com/ericcames/sales.demos/issues/803),
+  [#804](https://github.com/ericcames/sales.demos/issues/804)).
+- **If it comes back:** those steps must pass `demo_facts_notify_eda: "false"`.
+  Check the gather job's extra vars in AAP. The `host` in each EDA event shows
+  who sent it: the guest's `hostname -f` means the auditd reporter; the AAP
+  inventory hostname means a Gather Facts job.
+- **Still two runs?** Running `setenforce 0` twice, or launching
+  `Linux Day 2 - Trigger AO Remediation` by hand after injecting drift, starts a
+  second run. That template is EDA's launcher. To start a run without EDA, use
+  **Run** on the workflow in AO.
 
 ### An AAP step fails inside the workflow
 
@@ -157,6 +194,38 @@ integration was Enabled, AO listed 36 templates — while three were broken.
 - **Cause:** **Approve** (or **Reject**) only selects the decision.
 - **Fix:** click **Submit decision**. An unanswered approval waits a day by
   default.
+
+### Stale approvals crowd the queue before a demo
+
+- **Fix:** open **Approvals**, tick every **Pending** row, click **Reject**.
+  Do it before every rehearsal and presentation, so the queue holds only the
+  live run.
+- **Why not a playbook:** only a user named in the approval's approvers can
+  decide it, and there is no admin override. The playbooks log in as the local
+  `admin`, while the approver is the SSO identity (`admin-<hash>`), so
+  `PATCH /api/v1/approvals/<id>` is refused
+  ([sales.demos#805](https://github.com/ericcames/sales.demos/issues/805)).
+
+### A run stays `paused` after Reject, Cancel or expiry
+
+- **What each action does** (measured on sandbox, 2026-09-22):
+
+  | Action | Approval | Run |
+  |---|---|---|
+  | Reject in the UI | `rejected` | `completed`, if the run started after the last AO pod restart |
+  | `POST /api/v1/executions/<id>/cancel` | `cancelled` | stays `paused` |
+  | Expiry (a day, then the fallback decision) | `expired` | stays `paused` |
+
+- **Cause:** AO's database learns a run's final status from a monitor held in
+  memory by the pod that started the run. Every AO pod on sandbox restarted
+  5–8 times in two days. A run started before a restart loses its monitor, so
+  AO's engine (Temporal) finishes it but the database never hears. Cancelling
+  it afterwards logs `Workflow already completed, cancel is a no-op`.
+- **Fix:** none. AO has no API to delete a run, and removing the workflow
+  would delete its whole history (below). The stuck rows show only in the
+  executions list, not in the approvals queue.
+- **Before a demo:** check the AO pods' restart counts. A restart in the middle
+  of the live run leaves it looking stuck.
 
 ### A run's history and approval record are gone
 
