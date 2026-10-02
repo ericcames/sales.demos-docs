@@ -21,7 +21,7 @@ flowchart LR
 |---|---|---|
 | Playbooks | `build_cis_image.yml`, `deploy_and_scan.yml`, `generate_policy_data.yml` | `build_cis_containerdisk.yml` |
 | Consumer | AWS, via a Terraform `data "aws_ami"` tag filter | OpenShift Virtualization, via a `DataImportCron` |
-| Scanned | **Yes** — real OpenSCAP run on a booted instance | No — inherits the same profile, scan deferred |
+| Scanned | **Yes** — real OpenSCAP run on a booted instance | Not by the factory — but every clone the demo boots is scanned ([below](#containerdisk-tags-as-measured-by-the-demo)) |
 | Automated | No — run by hand, needs live AWS credentials | **Yes** — monthly GitHub Action |
 | Duration | ~30 min total | 20–35 min |
 
@@ -63,6 +63,43 @@ Every remaining failure has written rationale in
     list is a **curated artifact with reasons**, reviewed when the benchmark
     changes — not a suppression list. It is also per-OS and per-target: this set
     is curated for RHEL 9 on AWS specifically, and a new target needs its own.
+
+## containerDisk tags, as measured by the demo
+
+The factory does not scan the containerDisk, but its consumer does. Every
+`Linux Day 1 - 0 Workflow` in `sales.demos` runs the same OpenSCAP profile on
+the booted clone (`Linux Day 1 - 4 Compliance Scan`) and publishes
+`<web_url>/compliance/summary.json`, which names the source tag. So every tag
+the demos have actually run has a measured number:
+
+| Tag | Measured | Pass / Fail / N/A | Score |
+|---|---|---|---|
+| `20260905-0411` | 2026-10-02, sandbox | 254 / 6 / 33 | **97.69** |
+| `20261002-1312` | 2026-10-02, demo | 255 / 7 / 33 | **97.33** |
+
+Same formula as the AMI's 98.07, `pass / (pass + fail)`. The job log and
+`summary.json` round it **down** to a whole percent, so both show `97%`. The
+HTML report's own headline (94.41% for `20261002-1312`) is OpenSCAP's weighted
+XCCDF score, a different number. Do not quote it next to these.
+
+**Why these are lower than the AMI's 98.07.** The demo scans *after* it has
+configured the guest, and the demo installs a web server. So
+`package_httpd_removed` fails because of the demo, not the image. The other five
+failures common to both tags are the exempt controls above.
+
+**What changed between the two tags.** A rule-by-rule diff of the two reports
+shows **every rule present in both scans gave the same result**. The October
+image carries newer CIS content, which evaluates two rules the September scan
+did not have:
+
+| Rule | Result | Status |
+|---|---|---|
+| `rsyslog_filecreatemode` | pass | — |
+| `ensure_journald_and_rsyslog_not_active_together` | **fail** | Neither fixed nor exempt yet: [image.builder.pipeline#144](https://github.com/ericcames/image.builder.pipeline/issues/144) |
+
+So the October tag is not a regression. It is measured against a slightly
+larger benchmark, and the one new rule it fails is open work, not a hidden
+exemption.
 
 ## The scheduled rebuild
 

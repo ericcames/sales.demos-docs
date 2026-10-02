@@ -126,10 +126,14 @@ that is merely present can be silently wrong.
 
 Volunteered, because they come up:
 
-**The containerDisk lineage is not independently scanned.** The RHEL
+**The factory does not scan the containerDisk lineage.** The RHEL
 containerDisk inherits the same CIS profile and packages as the scanned AMI,
-applied by Image Builder at compose time, but no separate OpenSCAP run is
-performed on it. The 98.07 belongs to the AMI lineage. Say so.
+applied by Image Builder at compose time, but the factory runs no separate
+OpenSCAP pass on it and has no gate. The 98.07 belongs to the AMI lineage. Say
+so. The consumer fills part of the gap: the demo scans every clone it boots, so
+each tag it has run has a measured number (97.69 for `20260905-0411`, 97.33 for
+`20261002-1312`). That number is taken *after* the demo configures the guest,
+and it gates nothing. See [RHEL 9](rhel9.md#containerdisk-tags-as-measured-by-the-demo).
 
 **Windows has no scanner score, and never will** without a Windows OpenSCAP
 agent. 27 of 27 is a control-by-control measurement, not a benchmark score.
