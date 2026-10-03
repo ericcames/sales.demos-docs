@@ -95,6 +95,12 @@ nav:
           - Architecture: demos/automation-orchestrator/architecture.md
           - Troubleshooting: demos/automation-orchestrator/troubleshooting.md
           - Objections: demos/automation-orchestrator/objections.md
+      - Policy as Code:
+          - Overview: demos/policy-as-code/README.md
+          - Run Sheet: demos/policy-as-code/run-sheet.md
+          - Talk Track: demos/policy-as-code/talk-track.md
+          - Architecture: demos/policy-as-code/architecture.md
+          - Objections: demos/policy-as-code/objections.md
       - Edge / Single Node OpenShift:
           - Overview: demos/edge-sno/README.md
           - Run Sheet: demos/edge-sno/run-sheet.md
