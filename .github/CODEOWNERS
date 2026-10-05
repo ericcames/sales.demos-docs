@@ -13,17 +13,17 @@
 # paths need a human. Measured 2026-09-10 against two dead rules.
 
 # Catch-all
-*                       @ericcames @mlowcher61
+*                       @ericcames @mlowcher61 @ynotbhatc
 
 # The conventions contract — changes here need extra scrutiny.
-/CLAUDE.md              @ericcames @mlowcher61
-/CONTRIBUTING.md        @ericcames @mlowcher61
+/CLAUDE.md              @ericcames @mlowcher61 @ynotbhatc
+/CONTRIBUTING.md        @ericcames @mlowcher61 @ynotbhatc
 
 # Secret hygiene — this repo is public.
-/.gitignore             @ericcames @mlowcher61
-/utilities/             @ericcames @mlowcher61
-/.github/               @ericcames @mlowcher61
+/.gitignore             @ericcames @mlowcher61 @ynotbhatc
+/utilities/             @ericcames @mlowcher61 @ynotbhatc
+/.github/               @ericcames @mlowcher61 @ynotbhatc
 
 # Demo content and the site itself
-/docs/                  @ericcames @mlowcher61
-/mkdocs.yml             @ericcames @mlowcher61
+/docs/                  @ericcames @mlowcher61 @ynotbhatc
+/mkdocs.yml             @ericcames @mlowcher61 @ynotbhatc

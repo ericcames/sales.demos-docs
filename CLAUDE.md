@@ -43,8 +43,9 @@ standard files. Add the nav entry in `mkdocs.yml`. See
 - **`main` is protected.** A pull request is required, with 0 required
   approvals — a PR should not block on a second person being around. All CI
   checks are required. Enforced on admins. The "one collaborator" reason this
-  used to give stopped being true (#20); @mlowcher61 co-owns every path in
-  `.github/CODEOWNERS`, which requests review and does **not** gate the merge.
+  used to give stopped being true (#20); @mlowcher61 and @ynotbhatc co-own
+  every path in `.github/CODEOWNERS` (#121), which requests review and does
+  **not** gate the merge.
 - **Merged branches delete themselves** on the remote
   (`delete_branch_on_merge` is enabled). Delete the local copy after merge:
   ```bash
