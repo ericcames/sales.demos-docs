@@ -7,10 +7,10 @@ once the rule is satisfied. About 15 minutes of screen time.
 
 | | |
 |---|---|
-| **Length** | 20 minutes (16 + 4 for questions) |
+| **Length** | 20 minutes (16 + 4 for questions), plus an optional 5-minute Act 2 |
 | **Audience** | Automation leads and change governance, platform engineers, security and compliance — one arc, with the beat to lean on named per room |
 | **Reader** | The Ansible pre-sales engineer presenting it |
-| **Needs a live environment?** | **Yes** — AAP 2.7 with the OPA server deployed. Nothing is rendered offline yet |
+| **Needs a live environment?** | **Yes** — AAP 2.7 with the OPA server deployed; Act 2 also needs the evidence store and dashboard. Only the dashboard is rendered offline |
 | **Status** | **Draft** — every beat proven through the AAP API; the UI launch prompts are not yet rehearsed ([#841](https://github.com/ericcames/sales.demos/issues/841)) |
 
 ---
@@ -42,6 +42,20 @@ reference.
    and runs with one, which stays on the job.
 6. OPA logs every decision with what it was asked — extra-var values redacted.
 
+**Act 2, optional (+5 min): prove the state.**
+
+7. Every Day 1 compliance scan writes a dated result and every rule's outcome
+   to an evidence store.
+8. A dashboard anyone can open with a plain link shows the latest score per
+   machine, what's failing now (with each rule's title and severity), and
+   the scan history. Of the six RHEL failures, five are documented
+   image-factory exceptions and one is the web server the machine exists to
+   run.
+9. The Windows break/fix workflow shows in the trend as 100% → 96% → 100%:
+   a control broken, caught by the next scan, fixed and re-proven.
+
+![The compliance dashboard](../../images/policy-compliance-dashboard.png)
+
 **What the demo is actually about** is moving rules out of documents and into
 the platform: written once as code, tested and versioned, enforced *before*
 the job starts, with the reason shown to the person who was stopped.
@@ -50,8 +64,9 @@ the job starts, with the reason shown to the person who was stopped.
 
 ## Why it does not work without a cluster (yet)
 
-Every beat is an AAP job launch against a live OPA server, and none of it is
-rendered offline. The verbatim AAP messages in the talk track were captured on
+Every Act 1 beat is an AAP job launch against a live OPA server, and none of
+it is rendered offline. Act 2's dashboard is, as the image above, captured
+from sandbox on 2026-10-08. The verbatim AAP messages in the talk track were captured on
 sandbox, so the words can be rehearsed anywhere. Screenshots are listed as
 outstanding in the [run sheet](run-sheet.md#screenshots-still-worth-capturing).
 
@@ -66,6 +81,9 @@ outstanding in the [run sheet](run-sheet.md#screenshots-still-worth-capturing).
    in this demo against OPA before you rely on it. From AAP:
    `AAP Ecosystem - Install Policy Server`.
 3. Launch **Policy as Code - Canary** once. It must be blocked.
+4. **For Act 2:** `AAP Ecosystem - Install Policy Evidence Store`, then
+   `AAP Ecosystem - Install Policy Compliance Dashboard`, then run a Day 1
+   compliance scan so there is something to show.
 
 ---
 

@@ -125,6 +125,53 @@ and say what it says. What this demo proves is that the feature works on AAP
 
 ---
 
+## Act 2: proving the state
+
+### "Is the policy engine grading this?"
+
+**Not yet — say that first.**
+
+> **"No. These scores come from the scanners: OpenSCAP on Linux, and a
+> configuration check on Windows. Grading the same facts with the policy
+> library is the next step. We held it back because the library's RHEL 9
+> benchmark can't yet tell 'no data' from 'compliant' in three of its
+> sections, and a compliance score has to fail closed."**
+
+Source: sales.demos#851 (an empty input scores 21.4%, with `filesystem`,
+`network` and `user_group` compliant).
+
+### "Your hardened image fails six rules?"
+
+> **"Five are exceptions the image factory made on purpose, each with a
+> written reason. A boot-loader password and a root password do nothing on a
+> cloud VM, and the users some rules check don't exist yet when the image is
+> built. The sixth is the web server we installed, because serving a page is
+> that machine's job. What matters is that every gap is known and owned."**
+
+Source: `image.builder.pipeline/playbooks/vars/exempt_controls.yml`.
+
+### "Anyone with the link can see it?"
+
+> **"Yes, by design for this demo: it's meant for a team without accounts. The
+> database is what makes it safe. The dashboard can only read the two evidence
+> tables, and every install proves a write is refused. It shows host names and
+> rule names, never credentials. In production you'd put your SSO in front of
+> it."**
+
+### "Where does the evidence live, and what happens when this environment goes away?"
+
+> **"In PostgreSQL on the same cluster, on its own storage volume. Today it
+> goes away with the environment. Exporting a dated evidence bundle somewhere
+> permanent is designed but not built."**
+
+### "Can our Grafana, or Grafana Cloud, read it instead?"
+
+> **"Yes. It's a plain PostgreSQL datasource with a read-only role, and the
+> dashboard is a JSON file in the repo. We run Grafana in the cluster here
+> only so the demo is self-contained."**
+
+---
+
 ## Questions to ask *them*
 
 **After the change window:**
@@ -132,6 +179,10 @@ and say what it says. What this demo proves is that the feature works on AAP
 
 **After Hello:**
 - *"Where do passwords end up in your job records today?"*
+
+**After the dashboard (Act 2):**
+- *"Where does the evidence you hand an auditor come from today, and how old
+  is it when they get it?"*
 
 **Before the close:**
 - *"Who would own the rules — the platform team, or security?"* The answer
@@ -148,3 +199,6 @@ and say what it says. What this demo proves is that the feature works on AAP
   rules.
 - Any date for team-based rules (`owner_scope`); it waits on an upstream
   release.
+- That the policy engine graded the Act 2 scores. The scanners did.
+- That the hardened image is "100% compliant". It isn't, and the five
+  documented exceptions are the better story.

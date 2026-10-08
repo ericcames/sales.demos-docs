@@ -28,6 +28,12 @@ which room you are in before you start, and spend your extra minute there.
 | OPA internals | That the reason is readable by the person who was blocked |
 | A library of 638 policies | That *their* rule could be written down this way |
 
+**Act 2, "Prove the state", is optional (+5 minutes).** Act 1 stops a bad
+change before it starts; Act 2 shows the evidence of what the machines
+actually look like. Run it for the governance and security rooms, or whenever
+someone says *"auditors"*. Skip it for a platform room that only came for
+enforcement.
+
 Three delivery notes:
 
 - **Do not open with OPA.** Open with the question AAP asks. OPA is the answer
@@ -226,6 +232,104 @@ Then **one** question, chosen for the room:
 
 ---
 
+**Running Act 2?** Don't ask the closing question yet. Bridge instead:
+
+> **"That's half of it. Stopping a bad change is one thing — proving what your
+> machines actually look like is the other half, and it's the half your
+> auditors ask for."**
+
+---
+
+## Act 2 · Prove the state (optional, 20–25)
+
+Act 1 answered *"may this change run?"* Act 2 answers *"is it compliant
+right now, and can you prove it?"* It's the other half the policy library's
+maintainer describes: gating changes, and evaluating state. Evaluating state
+is most of the real-world work.
+
+![The compliance dashboard: latest score per host, open violations, the trend, what is failing now, and the scan history](../../images/policy-compliance-dashboard.png)
+
+### Beat 9 · Every scan leaves evidence (20–21)
+
+On screen: the **Jobs** page, the last **Linux Day 1 - 4 Compliance Scan**.
+
+> **"Every time we scan a machine, the result isn't just a report on that
+> machine. It's written into an evidence store: a dated row per scan, with
+> every rule's result. Nobody has to remember to save it."**
+
+**Why this beat exists.** The scans already existed in the Day 1 workflow.
+What's new is that they *accumulate*. An audit trail is built as a side
+effect of normal operation, not assembled the week before the auditor arrives.
+
+**Transition:** *"And here's what that looks like to someone who isn't in
+AAP."*
+
+### Beat 10 · The dashboard anyone can open (21–24)
+
+Open the dashboard link. **No login.**
+
+> **"This is a plain link. I can send it to your audit team; they don't need
+> an AAP account or any training. Latest score per machine, what's failing
+> right now, and every scan we've ever recorded."**
+
+Point at **What is failing now**. The RHEL guest fails 6 CIS Level 1 rules,
+each with the benchmark's own title and severity:
+
+> **"Six failures on a hardened image. Five are exceptions the image factory
+> made on purpose, each with a written reason. A boot-loader password and a
+> root password are meaningless on a cloud VM, and the users these rules
+> check don't exist yet when the image is built. The sixth is
+> `package_httpd_removed`: we installed a web server, because that's this
+> machine's job. That's the conversation an auditor actually wants. Not 'are
+> you at 100%', but 'is every gap known, and does someone own it'."**
+
+Then **Compliance % over time** and **Assessment history**. The Windows line
+holds at 100%, steps down to 96%, and steps back up:
+
+> **"Here somebody weakened a domain-security setting on this server — CIS
+> 2.3.6.6, the strong session key. The next scan caught it: 96%, the control
+> named, the value it found and the value it expected. Then it was fixed and
+> scanned again: back to 100%. Every step is a row here and a job in AAP, with
+> a timestamp. That's the audit trail, and nobody wrote it by hand."**
+
+**Why this beat exists.** It turns compliance from a report someone runs into
+a record that's always current, and it puts that record in front of people
+who never log into automation.
+
+**Security room:** stay on the Windows row. 100% across 28 verified controls,
+plus 16 documented exceptions, each named.
+
+**Optional live moment (adds about two minutes):** launch the **Windows Day 2
+- 0 Break Fix** workflow at the start of Beat 9. It breaks CIS 2.3.6.6, scans,
+fixes it and scans again in about 2 minutes. Refresh the dashboard here and
+the dip and recovery appear as you talk. For something quicker, **Linux Day 1
+- 4 Compliance Scan** adds one row in about 50 seconds.
+
+### Beat 11 · The honest bits, Act 2 (24–25)
+
+Pick one:
+
+> **"These scores come from the scanners, OpenSCAP on Linux and a
+> configuration check on Windows, not from the policy engine yet. Grading the
+> same facts with the policy library is the next step, and we've found the
+> library needs every input present before it can be trusted to say
+> 'compliant'."**
+
+> **"The link is open to anyone who has it. What protects the data is the
+> database: the dashboard can only read the evidence, and we test on every
+> install that a write is refused. In production you'd put your single
+> sign-on in front of it."**
+
+> **"This demo environment is temporary, and the evidence goes with it.
+> Exporting a dated evidence bundle somewhere permanent isn't built yet."**
+
+**Close for Act 2:**
+
+- *"Where does the evidence you hand an auditor come from today, and how
+  old is it when they get it?"*
+
+---
+
 ## If you only get ten minutes
 
 Keep **Beat 1**, **Beat 2** (Hello) and **Beat 4** (Change Window with break
@@ -248,3 +352,14 @@ glass), then the first honest bit. Drop the canary, the ticket and the log.
 | The decision log keeps the key and redacts the value | `playbooks/files/opa/decision_log_mask.rego`, `playbooks/install_opa.yml` (log assert), sales.demos#844 |
 | Rules are attached per template, never at organization level | `inventory/group_vars/aap/opa_policy.yml` (`opa_policy_associations`) |
 | The canary was the library maintainer's suggestion | sales.demos#841 (review comment) |
+| Gating changes and evaluating state are the two halves; evaluating state is most of the work | The policy library maintainer, 2026-10-07 meeting on sales.demos#841 |
+| Every Day 1 compliance scan writes a dated assessment and the per-rule results to the evidence store | `playbooks/tasks/record_compliance_evidence.yml`, `playbooks/linux_compliance_scan.yml`, `playbooks/windows_compliance_scan.yml`, sales.demos#857 (jobs 321/322) |
+| RHEL guest: 97%, 6 failing rules; Windows: 100%, 28 controls, 16 exceptions | sales.demos#857 (assessments 3 and 4) |
+| Five of the six Linux failures are documented image-factory exemptions; the sixth is the installed web server | [`image.builder.pipeline/playbooks/vars/exempt_controls.yml`](https://github.com/ericcames/image.builder.pipeline/blob/16826028aebf8de7fe963bb5247eee0153516b19/playbooks/vars/exempt_controls.yml), `playbooks/roles/linux_configure/tasks/main.yml` (installs `httpd`) in sales.demos |
+| The dashboard opens with no login; anonymous visitors can only read, and a write is refused on every install | `playbooks/install_policy_dashboard.yml` (anonymous-write assert), sales.demos#859 (job 328) |
+| A Linux scan takes about 50 seconds | sales.demos#857 (job 321: 52 s) |
+| Linux failures carry the benchmark's title and severity | `playbooks/linux_compliance_scan.yml` (rule parser), sales.demos#865 (assessment 8) |
+| Break/fix: Windows 100% → 96% (CIS 2.3.6.6, found 0, expected 1) → 100% | `playbooks/break_windows_compliance.yml`, `playbooks/fix_windows_compliance.yml`, `Windows Day 2 - 0 Break Fix` in `inventory/group_vars/aap/controller_workflows.yml`, workflow 332 (assessments 6 and 7) |
+| Scores come from OpenSCAP and configuration verification, not OPA | `playbooks/files/grafana/compliance-evidence.json` (header text), sales.demos#857 |
+| OPA grading needs every input present; three `cis_rhel9` sections pass on empty input | sales.demos#851 (research comment) |
+| Evidence is not exported off-cluster yet | sales.demos#841 Phase 3 §3d (open) |
