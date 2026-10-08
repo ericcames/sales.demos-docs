@@ -6,10 +6,10 @@ that, present from this.
 
 | | |
 |---|---|
-| **Length** | 20 minutes (16 + 4 for questions) |
+| **Length** | 20 minutes (16 + 4 for questions), plus an optional **5-minute Act 2** |
 | **Audience** | Automation leads and change governance, platform engineers, security and compliance — one arc, a different beat to lean on for each ([talk track](talk-track.md#who-is-in-the-room)) |
-| **Needs an environment?** | **Yes** — AAP 2.7 with the OPA server deployed. Nothing is rendered offline yet |
-| **Assets** | AAP Templates page, a blocked job's Details page, the OPA pod log |
+| **Needs an environment?** | **Yes** — AAP 2.7 with the OPA server deployed; for Act 2, the evidence store and dashboard too. Only the dashboard is rendered offline ([image](../../images/policy-compliance-dashboard.png)) |
+| **Assets** | AAP Templates page, a blocked job's Details page, the OPA pod log; for Act 2, the compliance dashboard link |
 | **Rehearsed** | Every beat proven **through the AAP API** on sandbox, 2026-10-02 (jobs 141, 164–166, 179–180 — [evidence](https://github.com/ericcames/sales.demos/issues/841)). **The UI launch prompts are not yet rehearsed** |
 
 ---
@@ -33,6 +33,16 @@ that, present from this.
    3. OPA pod log (OpenShift console → project `policy-as-code` → pod `opa-*` → Logs), or keep `oc logs -f deploy/opa -n policy-as-code | grep 'Decision Log'` ready
    4. This run sheet
 5. Decide your close before you begin — see **Landing it**.
+6. **Act 2 only:**
+   1. Install the evidence store, then the dashboard: `AAP Ecosystem - Install
+      Policy Evidence Store`, then `AAP Ecosystem - Install Policy Compliance
+      Dashboard`. The second job prints the link.
+   2. Make sure **at least one compliance scan has run since** (the Day 1
+      workflows include one, or launch `Linux Day 1 - 4 Compliance Scan` /
+      `Windows Day 1 - 4 Compliance Scan`). An empty dashboard is the most
+      likely way Act 2 fails.
+   3. Open the dashboard link in a **private window**. That's exactly what
+      your audience will see, with no login.
 
 ---
 
@@ -47,7 +57,10 @@ that, present from this.
 | 11–14 | The change ticket | Launch **Change Ticket** → blocked; again with a ticket → runs |
 | 14–16 | What OPA saw | OPA decision log, values redacted |
 | 16–18 | The honest bits | (conversation, no screen) |
-| 18–20 | Close | Templates page |
+| 18–20 | Close — or bridge to Act 2 | Templates page |
+| *20–21* | *Act 2:* Every scan leaves evidence | Jobs page, last compliance scan |
+| *21–24* | *Act 2:* The dashboard anyone can open | Dashboard link, no login |
+| *24–25* | *Act 2:* The honest bits | (conversation) |
 
 ---
 
@@ -176,6 +189,48 @@ Pick **one** question:
 
 ---
 
+## Act 2 · Prove the state (optional, 20–25)
+
+Bridge from the close:
+
+> **"That's half of it. Stopping a bad change is one thing — proving what your
+> machines actually look like is the other half."**
+
+### 20–21 · Every scan leaves evidence
+
+**Jobs** → the last **Linux Day 1 - 4 Compliance Scan**. Say every scan now
+writes a dated row and every rule's result to an evidence store.
+
+*Optional live moment:* launch the **Windows Day 2 - 0 Break Fix** workflow
+now. It takes about 2 minutes (break → scan → fix → scan), so the dip and
+recovery are on the dashboard by the end of 21–24. Quicker: the Linux scan
+alone, about 50 s.
+
+### 21–24 · The dashboard anyone can open
+
+Switch to the private window with the dashboard link. Point at, in order:
+
+1. **No login.** *"I can send this to your audit team."*
+2. **Latest score:** RHEL 97%, Windows 100%.
+3. **What is failing now:** 6 rules on RHEL.
+   > **"Five are exceptions the image factory made on purpose, each with a
+   > written reason. The sixth is `package_httpd_removed`: we installed a web
+   > server, because that's this machine's job."**
+4. **Compliance % over time / Assessment history:** the Windows line steps
+   100% → 96% → 100%. CIS 2.3.6.6 broken, caught (found `0`, expected `1`),
+   fixed, re-proven. Refresh if you launched the workflow at 20–21.
+
+### 24–25 · The honest bits
+
+Pick one: scores come from the scanners, not the policy engine yet · the link
+is open, and the database is what makes it read-only · the evidence dies with
+this demo environment.
+
+**Close for Act 2:** *"Where does the evidence you hand an auditor come from
+today, and how old is it when they get it?"*
+
+---
+
 ## Running it live
 
 Every beat above **is** live — there is no offline version yet.
@@ -186,6 +241,7 @@ Every beat above **is** live — there is no offline version yet.
 | Change Window | It must be a weekday in `policy_change_window_timezone` |
 | Change Window / Ticket | `ask_labels_on_launch`; `break-glass` and `change-ticket:CHG0012345` exist as code |
 | What OPA saw | Console decision logs are on; health checks fill the log every 5 s — filter on `Decision Log` |
+| Act 2 dashboard | The evidence store exists **and** a compliance scan has run since it was installed |
 
 ### Recovery moves
 
@@ -196,6 +252,9 @@ Every beat above **is** live — there is no offline version yet.
 | Every guarded job errors, even clean ones | OPA unreachable — fail-closed. `oc get pods -n policy-as-code`; re-run `install_opa.yml` |
 | HTTP 403 launching with a label | You are not an org member (the `policy-demo` user is not). Launch as an org member or admin |
 | Labels prompt missing | `config.yml` has not run since the template gained `ask_labels_on_launch` |
+| Dashboard panels empty | No compliance scan has run since the evidence store was installed. Launch `Linux Day 1 - 4 Compliance Scan` (about 50 s) and refresh |
+| Dashboard link 503s | The `policy-dashboard` pod isn't ready. Re-run `AAP Ecosystem - Install Policy Compliance Dashboard`. If the cluster is gone, show the [committed image](../../images/policy-compliance-dashboard.png) instead |
+| Scan finished but no new row | Its log says *"policy-db is not installed"* or *"was NOT recorded"*. The scan itself still passed; re-run `AAP Ecosystem - Install Policy Evidence Store` |
 
 ---
 
@@ -207,3 +266,4 @@ Every beat above **is** live — there is no offline version yet.
 - [ ] Successful break-glass job showing both labels
 - [ ] Change Ticket blocked Explanation
 - [ ] OPA decision log line with `**REDACTED**`
+- [x] Compliance dashboard, Act 2 ([`policy-compliance-dashboard.png`](../../images/policy-compliance-dashboard.png), sandbox 2026-10-08)

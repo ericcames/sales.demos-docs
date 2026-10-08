@@ -20,7 +20,7 @@ readers, different lifecycles.
 | [Automation Orchestrator](automation-orchestrator/README.md) | Platform engineers and automation leads | 20 min | **Ready** |
 | [Edge / Single Node OpenShift](edge-sno/README.md) | Platform engineers and edge infrastructure architects | Setup ~90 min hands-on; the demo itself is the 30 min OCP Virt track | **Ready** |
 | [Observability — Grafana Cloud](observability/grafana/README.md) | Platform engineers, SREs and automation leads | 20 min | **Ready** ([#82](https://github.com/ericcames/sales.demos-docs/issues/82)) |
-| [Policy as Code](policy-as-code/README.md) | Automation leads and change governance, platform engineers, security and compliance | 20 min | **Draft** ([#841](https://github.com/ericcames/sales.demos/issues/841)) |
+| [Policy as Code](policy-as-code/README.md) | Automation leads and change governance, platform engineers, security and compliance | 20 min (+5 optional) | **Draft** ([#841](https://github.com/ericcames/sales.demos/issues/841)) |
 
 ---
 
