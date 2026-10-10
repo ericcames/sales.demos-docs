@@ -125,4 +125,5 @@ Phase status: [`ROADMAP.md` → Compliance as Code](https://github.com/ericcames
 
 - [sales.demos#841](https://github.com/ericcames/sales.demos/issues/841) — the build, every measurement, and what is still open
 - [`ynotbhatc/rego_policy_libraries`](https://github.com/ynotbhatc/rego_policy_libraries) — the policies (Apache-2.0)
+- [`ynotbhatc/aac-pack`](https://github.com/ynotbhatc/aac-pack) — the Compliance as Code playbooks, routing policies, AO workflows and evidence schema, published from the AAC product and pinned by tag (`aac_pack_version`, MIT)
 - [`ROADMAP.md`](https://github.com/ericcames/sales.demos/blob/main/ROADMAP.md) — what is done and what is not
