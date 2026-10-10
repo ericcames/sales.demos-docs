@@ -66,8 +66,9 @@ that, present from this.
 
 ## 0–2 · The question AAP now asks
 
-**Templates**, filtered on `policy`. Four templates, nothing special about any
-of them in the UI.
+**Templates**, filtered on `compliance`, then search `Policy as Code`. Four
+templates, nothing special about any of them in the UI. (The label alone also
+lists the Compliance as Code and install templates, sales.demos#893.)
 
 > **"Before any of these starts, AAP asks a policy server one question: may
 > this job run? If the answer is no, it does not start — and it tells you
@@ -121,7 +122,7 @@ incident switch that halts all automation. **Do not do it live.**
 > — no matter who launches it."**
 
 Launch again → **Labels** prompt → `break-glass` → **Successful**. Open
-the job: labels **`break-glass`, `policy`**.
+the job: labels **`break-glass`, `compliance`**.
 
 > **"Emergencies happen. The override exists, it's one label — and the label
 > stays on the job. Every break-glass is on the record."**

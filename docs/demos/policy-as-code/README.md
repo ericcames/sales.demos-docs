@@ -87,6 +87,40 @@ outstanding in the [run sheet](run-sheet.md#screenshots-still-worth-capturing).
 
 ---
 
+## What comes next: Compliance as Code (built, not yet demoable)
+
+Policy as Code answers *"may this job run?"*. Compliance as Code (AAC)
+answers *"how compliant is this host?"* with the assessment half of the same
+policy library, on the same cluster, writing to the same `policy-db`. Most
+of it is built and running on sandbox (measured 2026-10-10), but it **cannot
+be shown end to end yet**. Until it can, it has no run sheet of its own.
+
+| Piece | What exists | Installed by |
+|---|---|---|
+| Assessment OPA | One pod behind `opa-security`, `opa-compliance`, `opa-ot`, serving the same pinned `rego_policy_libraries` release | `AAP Ecosystem - Install Compliance Assessment Servers` |
+| Routing OPA | `opa-routing`, which decides the route inside the AAC Automation Orchestrator workflows | `AAP Ecosystem - Install Compliance Routing Server` |
+| Evidence database | A second database, `aac`, in `policy-db`, beside the Act 2 evidence | `AAP Ecosystem - Install Compliance Evidence Database` |
+| AAP content | Ten `Compliance as Code -` templates and the `Golden Image Enforcement` workflow, run from an `AAC` project pinned to a tag of [`ynotbhatc/aac-pack`](https://github.com/ynotbhatc/aac-pack) | `config.yml` |
+| Automation Orchestrator | Three `Compliance as Code - … (as code)` workflows: Golden Image, GPU Cross-Domain Flex, Tanium Comparison | `ao_workflows.yml` |
+
+**What blocks it:** several pack playbooks query tables that nothing creates
+yet, and the Golden Image family targets a container rather than this
+platform's VMs ([sales.demos#883](https://github.com/ericcames/sales.demos/issues/883)).
+Until that is fixed, the templates and workflows can be opened and shown,
+but not run. Collecting and assessing the demo VMs themselves (the fact
+shaper) is not built yet.
+
+**For this demo:** the `compliance` label now covers both halves
+([sales.demos#893](https://github.com/ericcames/sales.demos/issues/893)), so
+the Templates page needs a name search to show only the four
+`Policy as Code -` templates. Nothing in Act 1 or Act 2 changed. The policy
+library is still pinned at `v2.0.0`. `v2.1.0` is released and leaves
+`enforcement/aap` unchanged, but nothing here has adopted it yet.
+
+Phase status: [`ROADMAP.md` → Compliance as Code](https://github.com/ericcames/sales.demos/blob/main/ROADMAP.md#compliance-as-code--aac-on-this-platform).
+
+---
+
 ## Related
 
 - [sales.demos#841](https://github.com/ericcames/sales.demos/issues/841) — the build, every measurement, and what is still open
