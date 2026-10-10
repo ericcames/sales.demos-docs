@@ -320,9 +320,24 @@ not read co-ownership as enforcement.
 
 ### Adding a CI job is not the same as requiring it
 
-All 9 lint checks are required — `yamllint`, `ansible-lint`, `secret-guard`,
+All 10 checks are required — `yamllint`, `ansible-lint`, `secret-guard`,
 `secrets-example-sync`, `generated-files`, `skills-frontmatter`,
-`docs-artifacts-current`, `renderer-matches-role`, `fact-normalisation-agrees`.
+`docs-artifacts-current`, `renderer-matches-role`, `fact-normalisation-agrees`
+(all in `lint.yml`), and `pr-links-issue`
+([#879](https://github.com/ericcames/sales.demos/issues/879)).
+
+`pr-links-issue` is its own workflow, `pr-links-issue.yml`, because it reads
+the PR *description* and so must re-run on `edited` — fixing the body has to
+turn it green without a new commit, and `lint.yml` does not trigger on
+`edited`. It strips fenced code, inline code and HTML comments before looking
+for `Closes #N` or `Part of #N`, because GitHub ignores closing keywords in all
+three: the first version passed its own PR on a quoted `` `fixes #12` `` while
+GitHub linked nothing.
+
+**A new required check does not reach PRs already open.** Editing an open PR's
+description did not start the new workflow on any of the six PRs open when it
+merged; it ran only once `main` was merged into the branch ("Update branch").
+Until then such a PR shows the check as expected and cannot merge.
 
 !!! warning "#647 spent a day in this gap"
     `fact-normalisation-agrees` shipped in that PR, ran green on every push, and
