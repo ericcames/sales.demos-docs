@@ -28,7 +28,7 @@ that, present from this.
    If it *runs*, AAP is not reaching OPA — stop and fix before the room
    arrives (see Recovery moves).
 4. Open these in tabs:
-   1. AAP → **Templates**, filtered on label `policy`
+   1. AAP → **Templates**, filtered on label `compliance` (Policy and Compliance as Code share it, sales.demos#893)
    2. AAP → **Jobs**
    3. OPA pod log (OpenShift console → project `policy-as-code` → pod `opa-*` → Logs), or keep `oc logs -f deploy/opa -n policy-as-code | grep 'Decision Log'` ready
    4. This run sheet
