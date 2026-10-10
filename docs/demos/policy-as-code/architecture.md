@@ -34,7 +34,7 @@ Non-obvious things about the flow:
 - **No Route.** AAP runs on the same cluster and reaches OPA by Service DNS.
   Nothing about the policy server is exposed outside the cluster.
 - **Launch labels are merged with the template's.** A job launched with
-  `break-glass` carries `break-glass` *and* `policy`, and OPA sees both.
+  `break-glass` carries `break-glass` *and* `compliance`, and OPA sees both.
 - **Fail-closed, but only where attached.** No query path, no call. A dead
   OPA cannot affect a template that has no rule attached.
 
@@ -111,7 +111,7 @@ so an org-level rule would block `config.yml` and every VM workflow.
 | Job template | `AAP Ecosystem - Install Policy Evidence Store` (Act 2) |
 | Job template | `AAP Ecosystem - Install Policy Compliance Dashboard` (Act 2) |
 | Job template | `Linux Day 1 - 4 Compliance Scan`, `Windows Day 1 - 4 Compliance Scan`: unchanged, now also record evidence |
-| Label | `policy` (on every demo template), `break-glass`, `change-ticket:CHG0012345` (launch-time only) |
+| Label | `compliance` (on every demo and install template, shared with Compliance as Code since sales.demos#893), `break-glass`, `change-ticket:CHG0012345` (launch-time only) |
 | User / team | `policy-demo` in `app-team`, Execute on the four demo templates only |
 
 The `opa_query_path` on each template is set by `install_opa.yml` through the

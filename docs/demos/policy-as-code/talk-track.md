@@ -48,7 +48,9 @@ Three delivery notes:
 
 ## Beat 1 · The question AAP now asks (0–2)
 
-On screen: the Templates page filtered on `policy`.
+On screen: the Templates page filtered on label `compliance` and searched for
+`Policy as Code`. The label is shared with Compliance as Code
+(sales.demos#893), so the search narrows it to the four.
 
 > **"Before any of these starts, AAP asks a policy server one question: may
 > this job run? If the answer is no, it does not start — and it tells you
@@ -129,7 +131,7 @@ Launch **Policy as Code - Change Window** with no labels — **Error**:
 > waits — no matter who launches it, no matter how urgent it feels."**
 
 Launch again, choose the label **`break-glass`** — it runs, and the finished
-job carries labels `break-glass` and `policy`.
+job carries labels `break-glass` and `compliance`.
 
 > **"Emergencies happen, so the override exists. It's one label — and the
 > label stays on the job. Every time someone broke glass is on the record,
