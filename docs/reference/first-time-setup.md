@@ -39,8 +39,8 @@ Read-only. Run the whole block, then work only on what is `MISSING` or
 `PROBLEM`.
 
 ```bash
-test -f ~/.ansible.cfg && grep -q 'galaxy_server.rh_certified' ~/.ansible.cfg \
-  && echo "EXISTS   Hub token in ~/.ansible.cfg" || echo "MISSING  Hub token"
+bash utilities/check-hub-token.sh >/dev/null 2>&1 \
+  && echo "LIVE     Hub token in ~/.ansible.cfg" || echo "PROBLEM  Hub token missing or expired — step 1"
 test -s "${SALES_DEMOS_VAULT_PASS:-$HOME/secrets/.vault_pass_sales_demos}" \
   && echo "EXISTS   vault password" || echo "MISSING  vault password  <-- blocker"
 test -f playbooks/group_vars/all/secrets.yml \
@@ -78,11 +78,16 @@ uses to install Red Hat certified collections, **and** it is read at run time as
 stale. The same token authenticates both `rh_certified` and `rh_validated`.
 
 ```bash
-grep -A3 'galaxy_server.rh_certified' ~/.ansible.cfg | grep -qE '^token=.+' \
-  && echo "token present" || echo "no token"
+bash utilities/check-hub-token.sh
 ```
 
-If missing, load one at
+**It asks Red Hat SSO, not `grep`, because present is not live**
+([ericcames/sales.demos#597](https://github.com/ericcames/sales.demos/issues/597)).
+A token that has expired still passes every presence check, and then certified
+installs and every Red Hat hub sync fail on it. The script prints only the
+token's length.
+
+If missing or rejected, load one at
 <https://console.redhat.com/ansible/automation-hub/token>, then add these
 stanzas to `~/.ansible.cfg`:
 
@@ -106,6 +111,16 @@ url=https://galaxy.ansible.com/
 
 Use `~/.ansible.cfg`, **not** `~/.ansible/ansible.cfg`. The latter is a stale
 leftover on some machines.
+
+**Keep it alive.** An offline token expires after 30 days *unused*, and the
+check above counts as a use. Schedule it daily on Fedora or macOS:
+
+```bash
+bash utilities/install-hub-token-keepalive.sh
+```
+
+See [Hub token keepalive](hub-token-keepalive.md) for how it works, how to
+test it, and troubleshooting.
 
 !!! danger "Never create a project-local `ansible.cfg`"
     Ansible picks one cfg file and does not merge. A local one shadows

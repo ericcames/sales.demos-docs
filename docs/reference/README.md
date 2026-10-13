@@ -13,6 +13,7 @@ is the front door; these pages are the detail behind it.
 | Page | Read it when |
 |---|---|
 | [First-time setup](first-time-setup.md) | You are setting up a new machine to use this repo, or a prerequisite check is failing |
+| [Hub token keepalive](hub-token-keepalive.md) | You want the Automation Hub token to stop expiring, on Fedora or macOS |
 | [Environments](environments.md) | You need to know which cluster you are on, or why the sign-in logo is badged |
 | [New environment](new-environment.md) | Your RHDP cluster expired and you need to point at a fresh one |
 | [Running playbooks](running-playbooks.md) | You are running a phase from a laptop, or about to merge a playbook change |
