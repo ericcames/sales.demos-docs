@@ -132,6 +132,7 @@ nav:
   - Reference:
       - Overview: reference/README.md
       - First-Time Setup: reference/first-time-setup.md
+      - Hub Token Keepalive: reference/hub-token-keepalive.md
       - Environments: reference/environments.md
       - New Environment: reference/new-environment.md
       - Running Playbooks: reference/running-playbooks.md
